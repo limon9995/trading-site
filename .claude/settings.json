@@ -1,0 +1,12 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(curl -s -X POST http://localhost:5001/api/auth/login -H \"Content-Type: application/json\" -d '{\"\"\"\"email\"\"\"\":\"\"\"\"limon@gmail.com\"\"\"\",\"\"\"\"password\"\"\"\":\"\"\"\"test\"\"\"\"}')",
+      "Bash(curl -sv http://localhost:5001/api/auth/login)",
+      "Bash(curl -s -X POST http://localhost:5001/api/auth/login -H \"Content-Type: application/json\" -d '{\"\"email\"\":\"\"limon@gmail.com\"\",\"\"password\"\":\"\"test123\"\"}')",
+      "Bash(node -e \":*)",
+      "Bash(grep -n \"demoModeEnabled ? ''demo_balance'' : ''demo_balance''\" \"/home/md-limon-hossain/SAAS/kafi web/backend/src/controllers/binaryController.js\")",
+      "Bash(curl -s http://localhost:5001/api/auth/login)"
+    ]
+  }
+}
