@@ -30,7 +30,7 @@ const userSchema = new mongoose.Schema({
   // Demo USDT balance
   demo_balance: {
     type: Number,
-    default: () => parseFloat(process.env.DEFAULT_BALANCE || '10000'),
+    default: 0,
   },
   // Holdings: { BTC: { amount, avgBuyPrice }, ETH: {...}, ... }
   holdings: {

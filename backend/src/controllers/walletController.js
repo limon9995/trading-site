@@ -51,7 +51,7 @@ const getWallet = async (req, res) => {
     const bonusBalance = user.bonus_balance || 0;
 
     const totalBalance = usdtBalance + totalHoldingsValue;
-    const initialBalance = parseFloat(process.env.DEFAULT_BALANCE || '10000');
+    const initialBalance = user.total_recharged || 0;
     const totalPnl = (user.totalPnl || 0);
     const totalPnlPercent = initialBalance > 0 ? ((totalBalance - initialBalance) / initialBalance) * 100 : 0;
 
