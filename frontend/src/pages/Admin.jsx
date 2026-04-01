@@ -9,6 +9,44 @@ const ADMIN_BUTTON =
   'rounded-full border border-[#d6e2e4] bg-white px-4 py-2 text-xs font-semibold text-[#506d72] transition-all hover:-translate-y-0.5 disabled:opacity-40';
 const ADMIN_INPUT =
   'input-field rounded-[22px] border-[#d7e4e5] bg-[#f7fbfb]';
+const SECTION_CARD =
+  'rounded-[28px] border border-[#d9e6e7] bg-white/90 shadow-[0_18px_50px_rgba(8,35,41,0.07)]';
+
+function SectionHeader({ eyebrow, title, body, actions = null }) {
+  return (
+    <div className={`${SECTION_CARD} p-5 md:p-6`}>
+      <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
+        <div className="max-w-2xl">
+          {eyebrow && (
+            <p className="text-[11px] font-semibold uppercase tracking-[0.28em] text-[#6d8185]">
+              {eyebrow}
+            </p>
+          )}
+          <h3 className="mt-2 text-[26px] font-light tracking-[-0.03em] text-[#0d2127] md:text-[32px]">
+            {title}
+          </h3>
+          {body && <p className="mt-2 text-sm leading-6 text-text-secondary">{body}</p>}
+        </div>
+        {actions ? <div className="flex flex-wrap gap-2">{actions}</div> : null}
+      </div>
+    </div>
+  );
+}
+
+function QuickAction({ label, hint, accent = '#185b64', onClick }) {
+  return (
+    <button
+      onClick={onClick}
+      className="group rounded-[24px] border border-[#d9e6e7] bg-white px-4 py-4 text-left shadow-[0_18px_50px_rgba(8,35,41,0.06)] transition-all hover:-translate-y-1 hover:shadow-[0_24px_60px_rgba(8,35,41,0.1)]"
+    >
+      <p className="text-sm font-semibold text-[#0d2127]">{label}</p>
+      <p className="mt-1 text-xs text-text-secondary">{hint}</p>
+      <span className="mt-3 inline-flex text-xs font-semibold transition-transform group-hover:translate-x-0.5" style={{ color: accent }}>
+        Open
+      </span>
+    </button>
+  );
+}
 
 export default function Admin() {
   const [activeTab, setActiveTab] = useState('overview');
@@ -386,16 +424,16 @@ export default function Admin() {
   };
 
   const TABS = [
-    { key: 'overview',     label: '📊', fullLabel: 'Overview' },
-    { key: 'users',        label: '👥', fullLabel: 'Users' },
-    { key: 'kyc',          label: '🪪', fullLabel: 'KYC' },
-    { key: 'trades',       label: '📈', fullLabel: 'Trades' },
-    { key: 'binary',       label: '⚡', fullLabel: 'Binary' },
-    { key: 'deposit-addr', label: '💳', fullLabel: 'Addresses' },
-    { key: 'deposit-req',  label: '📥', fullLabel: 'Deposits' },
-    { key: 'withdrawals',  label: '💸', fullLabel: 'Withdrawals' },
-    { key: 'plans',        label: '🚀', fullLabel: 'Plans' },
-    { key: 'settings',     label: '⚙️', fullLabel: 'Settings' },
+    { key: 'overview', label: '📊', fullLabel: 'Overview', desc: 'System pulse and quick routes' },
+    { key: 'users', label: '👥', fullLabel: 'Users', desc: 'Roles, balances and account control' },
+    { key: 'kyc', label: '🪪', fullLabel: 'KYC', desc: 'Identity review workflow' },
+    { key: 'trades', label: '📈', fullLabel: 'Trades', desc: 'Spot trading activity' },
+    { key: 'binary', label: '⚡', fullLabel: 'Binary', desc: 'Binary settings and monitoring' },
+    { key: 'deposit-addr', label: '💳', fullLabel: 'Addresses', desc: 'Funding address management' },
+    { key: 'deposit-req', label: '📥', fullLabel: 'Deposits', desc: 'Voucher review queue' },
+    { key: 'withdrawals', label: '💸', fullLabel: 'Withdrawals', desc: 'Payout approvals and refunds' },
+    { key: 'plans', label: '🚀', fullLabel: 'Plans', desc: 'Revenue and purchase history' },
+    { key: 'settings', label: '⚙️', fullLabel: 'Settings', desc: 'Support and platform details' },
   ];
 
   return (
@@ -430,68 +468,146 @@ export default function Admin() {
         </div>
       </div>
 
-      <div className="overflow-x-auto pb-1">
-        <div className="flex w-max min-w-full gap-2 rounded-[28px] border border-[#d9e6e7] bg-white p-2 shadow-[0_18px_50px_rgba(8,35,41,0.07)] sm:w-fit">
-          {TABS.map(({ key, label, fullLabel }) => (
-            <button
-              key={key}
-              onClick={() => setActiveTab(key)}
-              className={`whitespace-nowrap rounded-[22px] px-4 py-3 text-sm font-semibold transition-all ${
-                activeTab === key
-                  ? 'bg-[#ee8267] text-white shadow-[0_12px_28px_rgba(238,130,103,0.22)]'
-                  : 'text-text-secondary hover:-translate-y-0.5 hover:bg-[#f7fbfb] hover:text-text-primary'
-              }`}
-            >
-              <span className="sm:hidden">{label}</span>
-              <span className="hidden sm:inline">{label} {fullLabel}</span>
-            </button>
-          ))}
-        </div>
+      <div className="grid grid-cols-2 gap-3 md:grid-cols-3 xl:grid-cols-5">
+        {TABS.map(({ key, label, fullLabel, desc }) => (
+          <button
+            key={key}
+            onClick={() => setActiveTab(key)}
+            className={`rounded-[26px] border p-4 text-left transition-all ${
+              activeTab === key
+                ? 'border-[#ee8267] bg-[linear-gradient(135deg,rgba(238,130,103,0.12),rgba(238,130,103,0.02))] shadow-[0_18px_40px_rgba(238,130,103,0.12)]'
+                : 'border-[#d9e6e7] bg-white shadow-[0_18px_50px_rgba(8,35,41,0.05)] hover:-translate-y-0.5 hover:border-[#c7dcde]'
+            }`}
+          >
+            <div className="flex items-center justify-between gap-3">
+              <span className={`text-xl ${activeTab === key ? '' : 'opacity-80'}`}>{label}</span>
+              {activeTab === key && (
+                <span className="rounded-full bg-[#ee8267] px-2 py-1 text-[10px] font-bold uppercase tracking-[0.2em] text-white">
+                  Live
+                </span>
+              )}
+            </div>
+            <p className="mt-3 text-sm font-semibold text-[#0d2127]">{fullLabel}</p>
+            <p className="mt-1 text-xs leading-5 text-text-secondary">{desc}</p>
+          </button>
+        ))}
       </div>
 
       {/* ── Overview Tab ─────────────────────────────────────────────────── */}
       {activeTab === 'overview' && (
         <div className="space-y-6">
+          <SectionHeader
+            eyebrow="Operator Workspace"
+            title="Run daily operations from one clearer control surface"
+            body="Jump into the tasks admins handle most often: user management, queue review, plan monitoring, and support settings. The goal here is fast scanning with less hunting."
+            actions={
+              <>
+                <button onClick={() => setActiveTab('users')} className={ADMIN_BUTTON}>Users</button>
+                <button onClick={() => setActiveTab('deposit-req')} className={ADMIN_BUTTON}>Deposits</button>
+                <button onClick={() => setActiveTab('withdrawals')} className={ADMIN_BUTTON}>Withdrawals</button>
+                <button onClick={() => setActiveTab('settings')} className={ADMIN_BUTTON}>Settings</button>
+              </>
+            }
+          />
+
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-4">
+            <QuickAction
+              label="Handle User Accounts"
+              hint="Search members, change roles, adjust balances, and ban problematic accounts."
+              accent="#185b64"
+              onClick={() => setActiveTab('users')}
+            />
+            <QuickAction
+              label="Review Deposits"
+              hint="Open submitted vouchers, approve valid deposits, and reject mismatches quickly."
+              accent="#ee8267"
+              onClick={() => setActiveTab('deposit-req')}
+            />
+            <QuickAction
+              label="Process Withdrawals"
+              hint="Approve outgoing withdrawals or reject and refund when details look wrong."
+              accent="#f6465d"
+              onClick={() => setActiveTab('withdrawals')}
+            />
+            <QuickAction
+              label="Tune Binary Controls"
+              hint="Manage result mode, payout settings, available pairs, and expiry options."
+              accent="#0ecb81"
+              onClick={() => setActiveTab('binary')}
+            />
+          </div>
+
           {/* Stat cards */}
           {!stats ? (
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-              {[...Array(3)].map((_, i) => <SkeletonCard key={i} lines={2} />)}
+            <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
+              {[...Array(4)].map((_, i) => <SkeletonCard key={i} lines={2} />)}
             </div>
           ) : (
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
               <div className={`${ADMIN_PANEL} p-6`}>
                 <p className="text-xs text-text-muted uppercase tracking-wider mb-1">Total Users</p>
                 <p className="text-[34px] font-semibold text-[#0d2127]">{stats.stats.totalUsers.toLocaleString()}</p>
+                <p className="mt-2 text-xs text-text-secondary">All registered platform members</p>
               </div>
               <div className={`${ADMIN_PANEL} p-6`}>
                 <p className="text-xs text-text-muted uppercase tracking-wider mb-1">Total Trades</p>
                 <p className="text-[34px] font-semibold text-brand-primary">{stats.stats.totalTrades.toLocaleString()}</p>
+                <p className="mt-2 text-xs text-text-secondary">Combined trading activity across users</p>
               </div>
               <div className={`${ADMIN_PANEL} p-6`}>
                 <p className="text-xs text-text-muted uppercase tracking-wider mb-1">Total Volume</p>
                 <p className="text-[34px] font-semibold text-green-trade">${stats.stats.totalVolume.toLocaleString(undefined, { maximumFractionDigits: 0 })}</p>
+                <p className="mt-2 text-xs text-text-secondary">Platform turnover handled by trades</p>
+              </div>
+              <div className={`${ADMIN_PANEL} p-6`}>
+                <p className="text-xs text-text-muted uppercase tracking-wider mb-1">Recharge Amount</p>
+                <p className="text-[34px] font-semibold text-[#0d2127]">${(stats.stats.totalRechargeAmount || 0).toLocaleString(undefined, { maximumFractionDigits: 0 })}</p>
+                <p className="mt-2 text-xs text-text-secondary">Total incoming recharge volume</p>
               </div>
             </div>
           )}
 
-          {/* Recent trades */}
-          {stats?.recentTrades?.length > 0 && (
-            <div className={`${ADMIN_PANEL} overflow-hidden`}>
-              <div className="border-b border-[#e3ecec] px-6 py-5">
-                <h3 className="text-[24px] font-light tracking-[-0.03em] text-[#0d2127]">Recent Platform Trades</h3>
-              </div>
-              <div className="divide-y divide-light-border/50">
-                {stats.recentTrades.map((t) => (
-                  <div key={t._id} className="px-5 py-3 flex flex-wrap items-center gap-3 text-sm">
-                    <span className={`text-xs font-bold px-2 py-0.5 rounded ${t.type === 'buy' ? 'bg-green-trade/10 text-green-trade' : 'bg-red-trade/10 text-red-trade'}`}>
-                      {t.type.toUpperCase()}
-                    </span>
-                    <span className="text-text-primary font-medium">{t.user?.username || 'Unknown'}</span>
-                    <span className="text-text-secondary">{t.coin}/USDT</span>
-                    <span className="text-text-secondary">{t.coinAmount.toFixed(6)} @ ${t.pricePerCoin.toLocaleString()}</span>
-                    <span className="ml-auto text-text-muted text-xs">{formatDate(t.createdAt)}</span>
+          {!stats ? null : (
+            <div className="grid grid-cols-1 gap-4 xl:grid-cols-[1.2fr_0.8fr]">
+              <div className={`${ADMIN_PANEL} overflow-hidden`}>
+                <div className="border-b border-[#e3ecec] px-6 py-5">
+                  <h3 className="text-[24px] font-light tracking-[-0.03em] text-[#0d2127]">Recent Platform Trades</h3>
+                  <p className="mt-1 text-sm text-text-secondary">A quick pulse on the latest market activity happening across user accounts.</p>
+                </div>
+                {stats?.recentTrades?.length > 0 ? (
+                  <div className="divide-y divide-light-border/50">
+                    {stats.recentTrades.map((t) => (
+                      <div key={t._id} className="px-5 py-3 flex flex-wrap items-center gap-3 text-sm">
+                        <span className={`text-xs font-bold px-2 py-0.5 rounded ${t.type === 'buy' ? 'bg-green-trade/10 text-green-trade' : 'bg-red-trade/10 text-red-trade'}`}>
+                          {t.type.toUpperCase()}
+                        </span>
+                        <span className="text-text-primary font-medium">{t.user?.username || 'Unknown'}</span>
+                        <span className="text-text-secondary">{t.coin}/USDT</span>
+                        <span className="text-text-secondary">{t.coinAmount.toFixed(6)} @ ${t.pricePerCoin.toLocaleString()}</span>
+                        <span className="ml-auto text-text-muted text-xs">{formatDate(t.createdAt)}</span>
+                      </div>
+                    ))}
                   </div>
-                ))}
+                ) : (
+                  <div className="px-6 py-12 text-sm text-text-muted">No recent trades available.</div>
+                )}
+              </div>
+              <div className={`${ADMIN_PANEL} p-6`}>
+                <h3 className="text-[24px] font-light tracking-[-0.03em] text-[#0d2127]">Operations Notes</h3>
+                <div className="mt-4 space-y-3">
+                  <div className="rounded-[22px] border border-[#dde8e9] bg-[#f7fbfb] p-4">
+                    <p className="text-sm font-semibold text-[#0d2127]">Users tab</p>
+                    <p className="mt-1 text-xs leading-5 text-text-secondary">Best place to search accounts, adjust balances, promote admins, or switch trade mode.</p>
+                  </div>
+                  <div className="rounded-[22px] border border-[#dde8e9] bg-[#f7fbfb] p-4">
+                    <p className="text-sm font-semibold text-[#0d2127]">Deposit and withdrawal tabs</p>
+                    <p className="mt-1 text-xs leading-5 text-text-secondary">Use these queues for money movement review. Each request stays visually separate for faster approve or reject decisions.</p>
+                  </div>
+                  <div className="rounded-[22px] border border-[#dde8e9] bg-[#f7fbfb] p-4">
+                    <p className="text-sm font-semibold text-[#0d2127]">Plans and settings</p>
+                    <p className="mt-1 text-xs leading-5 text-text-secondary">Monitor revenue, purchase history, support links, and product-level controls from a cleaner layout.</p>
+                  </div>
+                </div>
               </div>
             </div>
           )}
@@ -501,15 +617,42 @@ export default function Admin() {
       {/* ── Users Tab ────────────────────────────────────────────────────── */}
       {activeTab === 'users' && (
         <div className="space-y-4">
+          <SectionHeader
+            eyebrow="Accounts"
+            title="Search users and take account-level actions quickly"
+            body="This workspace is optimized for the tasks admins do most often: balance updates, role changes, bans, and per-user trade mode control."
+          />
+
           {/* Search */}
-          <div className={`${ADMIN_PANEL} max-w-sm p-4`}>
-            <input
-              type="text"
-              placeholder="Search by username or email..."
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              className={ADMIN_INPUT}
-            />
+          <div className="grid grid-cols-1 gap-4 xl:grid-cols-[0.75fr_1.25fr]">
+            <div className={`${ADMIN_PANEL} max-w-xl p-4`}>
+              <label className="mb-2 block text-xs font-semibold uppercase tracking-[0.24em] text-[#6d8185]">Find User</label>
+              <input
+                type="text"
+                placeholder="Search by username or email..."
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                className={ADMIN_INPUT}
+              />
+            </div>
+
+            <div className="grid grid-cols-1 gap-3 md:grid-cols-3">
+              <div className={`${ADMIN_PANEL} p-4`}>
+                <p className="text-xs uppercase tracking-[0.24em] text-[#6d8185]">Loaded Users</p>
+                <p className="mt-2 text-2xl font-semibold text-[#0d2127]">{users.length}</p>
+                <p className="mt-1 text-xs text-text-secondary">Current page snapshot</p>
+              </div>
+              <div className={`${ADMIN_PANEL} p-4`}>
+                <p className="text-xs uppercase tracking-[0.24em] text-[#6d8185]">Admins Visible</p>
+                <p className="mt-2 text-2xl font-semibold text-brand-primary">{users.filter((u) => u.role === 'admin').length}</p>
+                <p className="mt-1 text-xs text-text-secondary">Accounts with admin access</p>
+              </div>
+              <div className={`${ADMIN_PANEL} p-4`}>
+                <p className="text-xs uppercase tracking-[0.24em] text-[#6d8185]">Blocked Visible</p>
+                <p className="mt-2 text-2xl font-semibold text-red-trade">{users.filter((u) => u.isBanned).length}</p>
+                <p className="mt-1 text-xs text-text-secondary">Banned accounts on this page</p>
+              </div>
+            </div>
           </div>
 
           {loading ? <SkeletonTable rows={6} /> : (
@@ -649,6 +792,11 @@ export default function Admin() {
       {/* ── Trades Tab ───────────────────────────────────────────────────── */}
       {activeTab === 'trades' && (
         <div className="space-y-4">
+          <SectionHeader
+            eyebrow="Market Activity"
+            title="Review spot trades without digging through clutter"
+            body="Use this table to audit who traded, which pair was involved, and what amount or P&L moved through the system."
+          />
           {loading ? <SkeletonTable rows={8} /> : (
             <div className={`${ADMIN_PANEL} overflow-hidden`}>
               <div className="overflow-x-auto">
@@ -706,6 +854,11 @@ export default function Admin() {
       {/* ── KYC Tab ──────────────────────────────────────────────────────── */}
       {activeTab === 'kyc' && (
         <div className="space-y-4">
+          <SectionHeader
+            eyebrow="Identity Review"
+            title="Process KYC submissions with a cleaner approval workflow"
+            body="Pending cases stay easy to scan, while already verified or rejected profiles remain visible for reference."
+          />
           {kycLoading ? <SkeletonTable rows={4} /> : (
             <>
               {kycUsers.length === 0 ? (
@@ -751,7 +904,11 @@ export default function Admin() {
       {/* ── Withdrawals Tab ──────────────────────────────────────────────── */}
       {activeTab === 'withdrawals' && (
         <div className="space-y-4">
-          <h2 className="text-lg font-bold text-text-primary">Withdrawal Requests</h2>
+          <SectionHeader
+            eyebrow="Payout Queue"
+            title="Approve or reject withdrawal requests with clearer context"
+            body="Each request is grouped into a review card so admins can validate amount, network, address, and notes before taking action."
+          />
 
           {/* Status filter */}
           <div className="flex gap-2">
@@ -824,6 +981,11 @@ export default function Admin() {
       {/* ── Plan Purchases Tab ───────────────────────────────────────────── */}
       {activeTab === 'plans' && (
         <div className="space-y-4">
+          <SectionHeader
+            eyebrow="Revenue"
+            title="Track plan purchases and monitor recurring plan demand"
+            body="Use this area to understand which plans users are buying and how much revenue plan sales have generated."
+          />
           {/* Revenue summary card */}
           <div className="rounded-[30px] p-6 shadow-[0_24px_80px_rgba(8,35,41,0.12)]"
             style={{ background: 'linear-gradient(135deg, #014670 0%, #0075bb 100%)' }}>
@@ -893,6 +1055,11 @@ export default function Admin() {
       {/* ── Binary Trade Tab ─────────────────────────────────────────────── */}
       {activeTab === 'binary' && (
         <div className="space-y-4">
+          <SectionHeader
+            eyebrow="Binary Control"
+            title="Tune binary trading safely with clearer operator controls"
+            body="Critical toggles, result override mode, and pair availability are grouped together so admins can act faster with fewer mistakes."
+          />
           {/* Trade Settings */}
           <div className={`${ADMIN_PANEL} p-5 space-y-4`}>
             <h3 className="text-[24px] font-light tracking-[-0.03em] text-[#0d2127]">⚡ Binary Trade Settings</h3>
@@ -1165,6 +1332,11 @@ export default function Admin() {
       {/* ── Settings Tab ─────────────────────────────────────────────────── */}
       {activeTab === 'settings' && (
         <div className="space-y-4">
+          <SectionHeader
+            eyebrow="Support Setup"
+            title="Keep public support details easy to update"
+            body="These values feed the customer support experience, so admins can adjust contact details from one focused area."
+          />
           <div className={`${ADMIN_PANEL} space-y-5 p-5`}>
             <h3 className="text-[24px] font-light tracking-[-0.03em] text-[#0d2127]">📞 Support Contacts</h3>
             <p className="text-xs text-text-muted -mt-3">These appear on the Customer Service page.</p>
@@ -1203,6 +1375,11 @@ export default function Admin() {
       {/* ── Deposit Addresses Tab ────────────────────────────────────────── */}
       {activeTab === 'deposit-addr' && (
         <div className="space-y-6">
+          <SectionHeader
+            eyebrow="Funding Setup"
+            title="Manage deposit addresses with less operational friction"
+            body="Add, edit, disable, and review active addresses from one workspace so user funding details stay accurate."
+          />
           {/* Add/Edit form */}
           <div className={`${ADMIN_PANEL} p-5`}>
             <h3 className="font-semibold text-text-primary mb-4">
@@ -1332,6 +1509,11 @@ export default function Admin() {
       {/* ── Deposit Requests Tab ──────────────────────────────────────────── */}
       {activeTab === 'deposit-req' && (
         <div className="space-y-4">
+          <SectionHeader
+            eyebrow="Deposit Queue"
+            title="Review uploaded vouchers and approve deposits faster"
+            body="This section is tuned for queue handling: filter by status, preview proof, and approve or reject with an admin note."
+          />
           {/* Filter */}
           <div className="flex gap-2 flex-wrap">
             {[['', 'All'], ['pending', 'Pending'], ['approved', 'Approved'], ['rejected', 'Rejected']].map(([val, label]) => (
