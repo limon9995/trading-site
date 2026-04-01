@@ -24,6 +24,7 @@ const NewCoins = lazy(() => import('./pages/NewCoins'));
 const Withdraw = lazy(() => import('./pages/Withdraw'));
 const ForgotPassword = lazy(() => import('./pages/ForgotPassword'));
 const Layout = lazy(() => import('./components/Layout'));
+const AdminShell = lazy(() => import('./components/AdminShell'));
 
 // Error Boundary — catches render crashes and shows the error on screen
 class ErrorBoundary extends React.Component {
@@ -124,8 +125,19 @@ const AppRoutes = () => (
       <Route path="/recovery" element={<RouteContent label="Loading recovery..."><Recovery /></RouteContent>} />
       <Route path="/new-coins" element={<RouteContent label="Loading new coins..."><NewCoins /></RouteContent>} />
       <Route path="/withdraw" element={<RouteContent label="Loading withdrawals..."><Withdraw /></RouteContent>} />
-      <Route path="/admin" element={<AdminRoute><RouteContent label="Loading admin panel..."><Admin /></RouteContent></AdminRoute>} />
     </Route>
+    <Route
+      path="/admin"
+      element={
+        <AdminRoute>
+          <RouteContent label="Loading admin panel...">
+            <AdminShell>
+              <Admin />
+            </AdminShell>
+          </RouteContent>
+        </AdminRoute>
+      }
+    />
     <Route path="*" element={<Navigate to="/" replace />} />
   </Routes>
 );
