@@ -507,7 +507,7 @@ export default function BinaryTrade() {
   const [resultModal,  setResultModal]  = useState(null);
   const [activeTrades, setActiveTrades] = useState([]);
   const [history,      setHistory]      = useState([]);
-  const [activeTab,    setActiveTab]    = useState('active');
+  const [tradeView,    setTradeView]    = useState('chart');
   const [toast,        setToast]        = useState(null);
 
   const coinData     = prices[selectedCoin];
@@ -550,6 +550,11 @@ export default function BinaryTrade() {
 
   const availablePairs = settings.availablePairs || COINS;
   const balance        = user?.demo_balance || 0;
+  const marketStats = [
+    { label: '24h High', value: coinData?.high24h ? coinData.high24h.toLocaleString('en-US', { maximumFractionDigits: 2 }) : '---' },
+    { label: '24h Low', value: coinData?.low24h ? coinData.low24h.toLocaleString('en-US', { maximumFractionDigits: 2 }) : '---' },
+    { label: '24h Volume', value: coinData?.volume24h ? `${(coinData.volume24h / 1e6).toFixed(2)}M` : '---' },
+  ];
 
   if (!settings.tradingEnabled || settings.maintenanceMode) {
     return (
@@ -636,257 +641,268 @@ export default function BinaryTrade() {
   }
 
   return (
-    <div className="space-y-4 pb-28 animate-fade-in px-0">
-
-      {/* Toast */}
+    <div className="space-y-4 animate-fade-in px-0 pb-40">
       {toast && (
-        <div className="fixed top-4 left-1/2 -translate-x-1/2 z-50 px-4 py-3 rounded-2xl text-sm font-semibold shadow-xl max-w-sm text-center pointer-events-none"
-          style={{ background: toast.type === 'success' ? '#0ecb81' : '#f6465d', color: '#000' }}>
+        <div
+          className="fixed left-1/2 top-4 z-50 max-w-sm -translate-x-1/2 rounded-2xl px-4 py-3 text-center text-sm font-semibold shadow-xl pointer-events-none"
+          style={{ background: toast.type === 'success' ? '#0ecb81' : '#f6465d', color: '#000' }}
+        >
           {toast.msg}
         </div>
       )}
 
-      {/* ── Balance strip ─────────────────────────────────────── */}
       <div
-        className="rounded-[2rem] px-5 py-5 sm:px-6 sm:py-6"
-        style={{ background: 'linear-gradient(135deg, #0E2026 0%, #145863 58%, #1f6f78 100%)' }}
-      >
-        <div className="flex flex-col gap-5 sm:flex-row sm:items-end sm:justify-between">
-          <div className="max-w-xl">
-            <p className="text-[11px] font-semibold uppercase tracking-[0.28em] text-[#71d4db]">Binary Trading</p>
-            <h1 className="mt-2 text-white text-[1.9rem] leading-[1.05] font-semibold sm:text-[2.6rem]">
-              Fixed-time trades with a cleaner CEX-style shell
-            </h1>
-            <p className="mt-3 max-w-lg text-sm leading-6 text-white/68 sm:text-[15px]">
-              Track live pairs, choose expiry, and manage active positions from one premium trading surface.
-            </p>
-          </div>
-          <div className="grid grid-cols-2 gap-3 sm:min-w-[290px]">
-            <div className="rounded-[1.35rem] border border-white/10 bg-white/6 px-4 py-3 backdrop-blur">
-              <p className="text-white/56 text-[11px] uppercase tracking-[0.22em]">Balance</p>
-              <p className="mt-2 text-white font-bold text-lg sm:text-xl">${balance.toLocaleString('en-US', { minimumFractionDigits: 2 })}</p>
-            </div>
-            <div className="rounded-[1.35rem] border border-white/10 bg-white/6 px-4 py-3 backdrop-blur text-right">
-              <p className="text-white/56 text-[11px] uppercase tracking-[0.22em]">Win Profit</p>
-              <p className="mt-2 text-[#ffd07d] font-bold text-lg sm:text-xl">{((settings.payoutRate || 0.85) * 100).toFixed(0)}%</p>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div
-        className="rounded-[1.8rem] p-3 sm:p-4"
+        className="overflow-hidden rounded-[2rem]"
         style={{
-          background: 'linear-gradient(180deg, #ffffff 0%, #f8fbfc 100%)',
-          border: '1px solid rgba(64,191,201,0.14)',
-          boxShadow: '0 16px 36px rgba(6, 28, 33, 0.08)',
+          background: 'linear-gradient(180deg, #07151a 0%, #0b1e24 100%)',
+          border: '1px solid rgba(255,255,255,0.06)',
+          boxShadow: '0 22px 50px rgba(6, 28, 33, 0.28)',
         }}
       >
-        <div className="flex items-center justify-between gap-3 mb-3">
-          <div>
-            <p className="text-[11px] uppercase tracking-[0.24em] text-text-muted">Pairs</p>
-            <p className="text-sm font-semibold text-text-primary">Switch markets without leaving the trade view</p>
-          </div>
-          <div className="hidden sm:flex items-center gap-2 rounded-full bg-[#eef5f6] px-3 py-1.5 text-xs text-text-secondary">
-            <span className="h-2.5 w-2.5 rounded-full bg-[#3dc5ce]" />
-            Live pricing
-          </div>
-        </div>
-        <div className="flex gap-2 overflow-x-auto pb-1 scrollbar-hide">
-        {availablePairs.map(coin => {
-          const p   = prices[coin];
-          const chg = p?.change24h || 0;
-          return (
-            <button key={coin}
-              onClick={() => setSelectedCoin(coin)}
-              className={`flex-shrink-0 px-3 py-2.5 rounded-[1.15rem] transition-all ${selectedCoin === coin ? 'text-text-primary -translate-y-0.5' : 'text-text-muted hover:text-text-primary hover:-translate-y-0.5'}`}
-              style={{
-                background: selectedCoin === coin ? 'rgba(244,146,126,0.12)' : '#eef5f6',
-                border: selectedCoin === coin ? '1px solid rgba(244,146,126,0.42)' : '1px solid rgba(13,80,86,0.08)',
-                minWidth: 84,
-              }}>
-              <p className="text-xs font-bold">{coin}</p>
-              <p className={`text-xs mt-0.5 ${chg >= 0 ? 'text-green-trade' : 'text-red-trade'}`}>
-                {chg >= 0 ? '+' : ''}{chg.toFixed(2)}%
-              </p>
-            </button>
-          );
-        })}
-        </div>
-      </div>
-
-      {/* ── Chart card ────────────────────────────────────────── */}
-      <div className="rounded-[2rem] overflow-hidden" style={{ background: '#0E2026', border: '1px solid rgba(255,255,255,0.08)', boxShadow: '0 22px 50px rgba(6, 28, 33, 0.24)' }}>
-
-        {/* Price header */}
-        <div className="flex flex-col gap-4 px-4 pt-4 pb-3 sm:flex-row sm:items-start sm:justify-between sm:px-5 sm:pt-5">
-          <div className="min-w-0">
-            <p className="text-text-muted text-sm font-medium">{selectedCoin}/USDT</p>
-            <p className="mt-1 truncate text-[2rem] font-bold text-white sm:text-[2.4rem] lg:text-[2.8rem]">
-              ${currentPrice ? currentPrice.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 4 }) : '---'}
-            </p>
-            <p className={`mt-1 text-sm font-semibold sm:text-lg ${change24h >= 0 ? 'text-green-trade' : 'text-red-trade'}`}>
-              {change24h >= 0 ? '▲' : '▼'} {Math.abs(change24h).toFixed(2)}% (24h)
-            </p>
-          </div>
-          <div className="flex-shrink-0 rounded-[1.15rem] bg-white/5 px-4 py-3 sm:min-w-[160px]">
-            {coinData && <p className="text-sm text-text-muted sm:text-base">Vol: <span className="font-semibold text-white">${(coinData.volume24h / 1e6).toFixed(1)}M</span></p>}
-            <div className="mt-2 flex items-center gap-2 justify-start sm:justify-end">
-              <div className="h-2.5 w-2.5 rounded-full bg-green-trade animate-pulse" />
-              <span className="text-sm font-medium text-green-trade">Live</span>
-            </div>
-          </div>
-        </div>
-
-        {/* Interval selector */}
-        <div className="flex gap-2 px-4 pb-3 overflow-x-auto scrollbar-hide sm:px-5">
-          {INTERVALS.map(({ label, value }) => (
-            <button key={value}
-              onClick={() => setInterval(value)}
-              className={`px-4 py-2 rounded-full text-sm font-semibold transition-all ${
-                interval === value ? 'text-white' : 'text-text-muted hover:text-white'
-              }`}
-              style={{ background: interval === value ? 'rgba(238,130,103,0.5)' : 'rgba(255,255,255,0.07)' }}>
-              {label}
-            </button>
-          ))}
-        </div>
-
-        {/* Candlestick chart */}
-        <div className="h-[320px] px-2 pb-3 sm:h-[420px] lg:h-[560px]">
-          <CandlestickChart
-            key={`${selectedCoin}_${interval}`}
-            symbol={selectedCoin}
-            interval={interval}
-            currentPrice={currentPrice}
-          />
-        </div>
-      </div>
-
-      {/* ── UP / DOWN Buttons ─────────────────────────────────── */}
-      <div className="grid grid-cols-2 gap-3">
-        <button
-          onClick={() => setModal('up')}
-          disabled={!currentPrice}
-          className="py-3.5 rounded-full flex items-center justify-center gap-1.5 font-bold text-sm transition-all active:scale-95 hover:-translate-y-0.5 disabled:opacity-50"
-          style={{ background: 'linear-gradient(135deg, #0ecb81 0%, #06a860 100%)', color: '#000', boxShadow: '0 3px 12px rgba(14,203,129,0.3)' }}>
-          <span className="text-base leading-none">▲</span>
-          <span className="text-sm font-bold">Long / Up</span>
-        </button>
-        <button
-          onClick={() => setModal('down')}
-          disabled={!currentPrice}
-          className="py-3.5 rounded-full flex items-center justify-center gap-1.5 font-bold text-sm transition-all active:scale-95 hover:-translate-y-0.5 disabled:opacity-50"
-          style={{ background: 'linear-gradient(135deg, #f6465d 0%, #c9303f 100%)', color: '#fff', boxShadow: '0 3px 12px rgba(246,70,93,0.3)' }}>
-          <span className="text-base leading-none">▼</span>
-          <span className="text-sm font-bold">Short / Down</span>
-        </button>
-      </div>
-
-      {/* Info strip */}
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs text-text-muted text-center">
-        {[
-          { label: 'Min',    value: `$${settings.minTradeAmount}`,                           color: 'text-text-primary' },
-          { label: 'Payout', value: `${((settings.payoutRate||0.85)*100).toFixed(0)}%`,      color: 'text-brand-primary' },
-          { label: 'Max',    value: `$${settings.maxTradeAmount}`,                           color: 'text-text-primary' },
-          { label: 'Active', value: activeTrades.length,                                     color: 'text-brand-primary' },
-        ].map(({ label, value, color }) => (
-          <div key={label} className="rounded-[1.2rem] p-3" style={{ background: 'linear-gradient(180deg, #ffffff 0%, #f8fbfc 100%)', border: '1px solid rgba(64,191,201,0.12)' }}>
-            <p className={`font-bold ${color}`}>{value}</p>
-            <p>{label}</p>
-          </div>
-        ))}
-      </div>
-
-      {/* ── Trades Tabs ───────────────────────────────────────── */}
-      <div>
-        <div className="flex gap-1 p-1 rounded-full mb-3 bg-light-card border border-light-border">
-          {['active', 'history'].map(tab => (
-            <button key={tab}
-              onClick={() => setActiveTab(tab)}
-              className={`flex-1 py-2.5 rounded-full text-sm font-semibold transition-all capitalize ${activeTab === tab ? 'bg-brand-primary text-white' : 'text-text-secondary hover:text-text-primary'}`}>
-              {tab}
-              {tab === 'active' && activeTrades.length > 0 && (
-                <span className="ml-1 px-1.5 py-0.5 rounded-full text-xs bg-brand-primary text-white">
-                  {activeTrades.length}
+        <div className="border-b border-white/6 px-4 pb-4 pt-4 sm:px-5">
+          <div className="flex items-start justify-between gap-3">
+            <div className="min-w-0">
+              <div className="flex items-center gap-2">
+                <button
+                  className="rounded-full bg-white/6 px-3 py-1.5 text-sm font-semibold text-white transition-all hover:bg-white/10"
+                  onClick={() => setTradeView('chart')}
+                >
+                  {selectedCoin}/USDT
+                </button>
+                <span className={`text-sm font-semibold ${change24h >= 0 ? 'text-green-trade' : 'text-red-trade'}`}>
+                  {change24h >= 0 ? '+' : '-'}{Math.abs(change24h).toFixed(2)}%
                 </span>
-              )}
-            </button>
-          ))}
+              </div>
+              <p className="mt-3 text-[2rem] font-bold leading-none text-white sm:text-[2.6rem]">
+                ${currentPrice ? currentPrice.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 4 }) : '---'}
+              </p>
+              <p className="mt-2 text-sm text-white/58">
+                Balance ${balance.toLocaleString('en-US', { minimumFractionDigits: 2 })} · Payout {((settings.payoutRate || 0.85) * 100).toFixed(0)}%
+              </p>
+            </div>
+
+            <div className="flex flex-col items-end gap-2">
+              <div className="rounded-[1.1rem] bg-white/6 px-3 py-2 text-right">
+                <p className="text-[11px] uppercase tracking-[0.18em] text-white/42">Live</p>
+                <p className="mt-1 text-sm font-semibold text-white">
+                  {coinData?.volume24h ? `${(coinData.volume24h / 1e6).toFixed(1)}M` : '---'}
+                </p>
+              </div>
+              <div className="flex items-center gap-2 rounded-full border border-green-trade/30 bg-green-trade/10 px-3 py-1 text-xs font-semibold text-green-trade">
+                <span className="h-2 w-2 rounded-full bg-green-trade animate-pulse" />
+                Market Open
+              </div>
+            </div>
+          </div>
+
+          <div className="mt-4 flex gap-2 overflow-x-auto pb-1 scrollbar-hide">
+            {availablePairs.map(coin => {
+              const chg = prices[coin]?.change24h || 0;
+              const active = selectedCoin === coin;
+              return (
+                <button
+                  key={coin}
+                  onClick={() => setSelectedCoin(coin)}
+                  className={`flex-shrink-0 rounded-[1rem] border px-3 py-2 text-left transition-all ${active ? '-translate-y-0.5' : 'hover:-translate-y-0.5'}`}
+                  style={{
+                    minWidth: 88,
+                    background: active ? 'rgba(240,185,11,0.14)' : 'rgba(255,255,255,0.05)',
+                    borderColor: active ? 'rgba(240,185,11,0.35)' : 'rgba(255,255,255,0.08)',
+                  }}
+                >
+                  <p className={`text-sm font-bold ${active ? 'text-[#f0b90b]' : 'text-white'}`}>{coin}</p>
+                  <p className={`mt-1 text-xs font-medium ${chg >= 0 ? 'text-green-trade' : 'text-red-trade'}`}>
+                    {chg >= 0 ? '+' : ''}{chg.toFixed(2)}%
+                  </p>
+                </button>
+              );
+            })}
+          </div>
+
+          <div className="mt-4 flex gap-2 border-b border-white/6 pb-3 text-sm">
+            {[
+              { id: 'chart', label: 'Chart' },
+              { id: 'active', label: `Active${activeTrades.length ? ` (${activeTrades.length})` : ''}` },
+              { id: 'history', label: 'History' },
+            ].map(tab => (
+              <button
+                key={tab.id}
+                onClick={() => setTradeView(tab.id)}
+                className={`rounded-full px-4 py-2 font-semibold transition-all ${tradeView === tab.id ? 'bg-white text-[#091318]' : 'text-white/56 hover:text-white'}`}
+              >
+                {tab.label}
+              </button>
+            ))}
+          </div>
+
+          <div className="mt-4 grid grid-cols-3 gap-2 sm:gap-3">
+            {marketStats.map(item => (
+              <div key={item.label} className="rounded-[1rem] bg-white/5 px-3 py-3">
+                <p className="text-[10px] uppercase tracking-[0.18em] text-white/38">{item.label}</p>
+                <p className="mt-1 text-sm font-semibold text-white sm:text-base">{item.value}</p>
+              </div>
+            ))}
+          </div>
         </div>
 
-        {activeTab === 'active' ? (
-          activeTrades.length === 0 ? (
-            <div className="rounded-[1.8rem] border border-[rgba(64,191,201,0.12)] bg-white px-6 py-12 text-center text-text-muted shadow-[0_16px_34px_rgba(6,28,33,0.06)]">
-              <p className="text-3xl mb-2">📊</p>
-              <p className="text-sm">No active trades</p>
-              <p className="text-xs mt-1">Click Up or Down to start</p>
-            </div>
-          ) : (
-            <div className="space-y-2">
-              {activeTrades.map(trade => (
-                <ActiveTradeCard key={trade._id} trade={trade}
-                  currentPrice={prices[trade.coin]?.price}
-                  onSettled={handleTradeSettled} />
+        {tradeView === 'chart' && (
+          <>
+            <div className="flex gap-2 overflow-x-auto px-4 pb-3 pt-4 scrollbar-hide sm:px-5">
+              {INTERVALS.map(({ label, value }) => (
+                <button
+                  key={value}
+                  onClick={() => setInterval(value)}
+                  className={`rounded-full px-4 py-2 text-sm font-semibold transition-all ${
+                    interval === value ? 'bg-[#f0b90b] text-[#201500]' : 'bg-white/6 text-white/60 hover:text-white'
+                  }`}
+                >
+                  {label}
+                </button>
               ))}
             </div>
-          )
-        ) : (
-          history.length === 0 ? (
-            <div className="rounded-[1.8rem] border border-[rgba(64,191,201,0.12)] bg-white px-6 py-12 text-center text-text-muted shadow-[0_16px_34px_rgba(6,28,33,0.06)]">
-              <p className="text-3xl mb-2">📈</p>
-              <p className="text-sm">No trade history</p>
+
+            <div className="h-[420px] px-2 pb-4 sm:h-[560px] lg:h-[680px]">
+              <CandlestickChart
+                key={`${selectedCoin}_${interval}`}
+                symbol={selectedCoin}
+                interval={interval}
+                currentPrice={currentPrice}
+              />
             </div>
-          ) : (
-            <div className="space-y-2">
-              {history.map(trade => {
-                const won  = trade.status === 'won';
-                const isUp = trade.direction === 'up';
-                return (
-                  <div
+          </>
+        )}
+
+        {tradeView === 'active' && (
+          <div className="px-4 py-4 sm:px-5">
+            {activeTrades.length === 0 ? (
+              <div className="rounded-[1.8rem] border border-white/10 bg-white/4 px-6 py-12 text-center text-white/56">
+                <p className="mb-2 text-3xl">📊</p>
+                <p className="text-sm">No active trades</p>
+                <p className="mt-1 text-xs">Open a long or short position to see it here.</p>
+              </div>
+            ) : (
+              <div className="space-y-2">
+                {activeTrades.map(trade => (
+                  <ActiveTradeCard
                     key={trade._id}
-                    className="rounded-[1.6rem] p-4"
-                    style={{
-                      background: 'linear-gradient(180deg, #ffffff 0%, #f8fbfc 100%)',
-                      border: `1px solid ${won ? 'rgba(14,203,129,0.18)' : 'rgba(246,70,93,0.18)'}`,
-                      boxShadow: '0 16px 34px rgba(6, 28, 33, 0.08)',
-                    }}
-                  >
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-3">
-                        <div className={`w-10 h-10 rounded-xl flex items-center justify-center font-bold text-lg ${won ? 'bg-green-trade/20 text-green-trade' : 'bg-red-trade/20 text-red-trade'}`}>
-                          {won ? '✓' : '✗'}
+                    trade={trade}
+                    currentPrice={prices[trade.coin]?.price}
+                    onSettled={handleTradeSettled}
+                  />
+                ))}
+              </div>
+            )}
+          </div>
+        )}
+
+        {tradeView === 'history' && (
+          <div className="px-4 py-4 sm:px-5">
+            {history.length === 0 ? (
+              <div className="rounded-[1.8rem] border border-white/10 bg-white/4 px-6 py-12 text-center text-white/56">
+                <p className="mb-2 text-3xl">📈</p>
+                <p className="text-sm">No trade history</p>
+              </div>
+            ) : (
+              <div className="space-y-2">
+                {history.map(trade => {
+                  const won = trade.status === 'won';
+                  const isUp = trade.direction === 'up';
+                  return (
+                    <div
+                      key={trade._id}
+                      className="rounded-[1.6rem] p-4"
+                      style={{
+                        background: 'linear-gradient(180deg, #ffffff 0%, #f8fbfc 100%)',
+                        border: `1px solid ${won ? 'rgba(14,203,129,0.18)' : 'rgba(246,70,93,0.18)'}`,
+                        boxShadow: '0 16px 34px rgba(6, 28, 33, 0.08)',
+                      }}
+                    >
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-3">
+                          <div className={`flex h-10 w-10 items-center justify-center rounded-xl text-lg font-bold ${won ? 'bg-green-trade/20 text-green-trade' : 'bg-red-trade/20 text-red-trade'}`}>
+                            {won ? '✓' : '✗'}
+                          </div>
+                          <div>
+                            <p className="text-sm font-semibold text-text-primary">{trade.coin}/USDT</p>
+                            <p className={`mt-0.5 text-xs ${isUp ? 'text-green-trade' : 'text-red-trade'}`}>
+                              {isUp ? '▲ Long' : '▼ Short'} · {trade.duration}s
+                            </p>
+                          </div>
                         </div>
-                        <div>
-                          <p className="text-text-primary font-semibold text-sm">{trade.coin}/USDT</p>
-                          <p className={`text-xs mt-0.5 ${isUp ? 'text-green-trade' : 'text-red-trade'}`}>
-                            {isUp ? '▲ Long' : '▼ Short'} · {trade.duration}s
+                        <div className="text-right">
+                          <p className={`text-sm font-bold ${won ? 'text-green-trade' : 'text-red-trade'}`}>
+                            {won ? `+$${trade.profit?.toFixed(2)}` : `-$${trade.amount?.toFixed(2)}`}
                           </p>
+                          <p className="text-xs text-text-muted">${trade.amount?.toFixed(2)}</p>
                         </div>
                       </div>
-                      <div className="text-right">
-                        <p className={`font-bold text-sm ${won ? 'text-green-trade' : 'text-red-trade'}`}>
-                          {won ? `+$${trade.profit?.toFixed(2)}` : `-$${trade.amount?.toFixed(2)}`}
-                        </p>
-                        <p className="text-text-muted text-xs">${trade.amount?.toFixed(2)}</p>
+                      <div className="mt-2 flex flex-wrap justify-between gap-1 text-xs text-text-muted">
+                        <span>Entry: <span className="text-text-primary">${trade.entryPrice?.toLocaleString('en-US', { minimumFractionDigits: 2 })}</span></span>
+                        <span>Close: <span className="text-text-primary">${trade.closePrice?.toLocaleString('en-US', { minimumFractionDigits: 2 })}</span></span>
+                        <span>{new Date(trade.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
                       </div>
                     </div>
-                    <div className="flex flex-wrap justify-between mt-2 text-xs text-text-muted gap-1">
-                      <span>Entry: <span className="text-text-primary">${trade.entryPrice?.toLocaleString('en-US', { minimumFractionDigits: 2 })}</span></span>
-                      <span>Close: <span className="text-text-primary">${trade.closePrice?.toLocaleString('en-US', { minimumFractionDigits: 2 })}</span></span>
-                      <span>{new Date(trade.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-          )
+                  );
+                })}
+              </div>
+            )}
+          </div>
         )}
       </div>
 
+      <div className="sticky bottom-20 z-30 px-1 sm:bottom-6 sm:px-0">
+        <div
+          className="rounded-[2rem] border border-white/8 px-3 py-3 backdrop-blur-xl sm:px-4"
+          style={{ background: 'rgba(7, 21, 26, 0.92)', boxShadow: '0 24px 50px rgba(6, 28, 33, 0.3)' }}
+        >
+          <div className="mb-3 grid grid-cols-3 gap-2 text-center text-xs sm:text-sm">
+            <div className="rounded-[1rem] bg-white/6 px-3 py-2">
+              <p className="text-white/38">Min</p>
+              <p className="mt-1 font-semibold text-white">${settings.minTradeAmount}</p>
+            </div>
+            <div className="rounded-[1rem] bg-white/6 px-3 py-2">
+              <p className="text-white/38">Payout</p>
+              <p className="mt-1 font-semibold text-[#f0b90b]">{((settings.payoutRate || 0.85) * 100).toFixed(0)}%</p>
+            </div>
+            <div className="rounded-[1rem] bg-white/6 px-3 py-2">
+              <p className="text-white/38">Active</p>
+              <p className="mt-1 font-semibold text-white">{activeTrades.length}</p>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-2 gap-3">
+            <button
+              onClick={() => setModal('up')}
+              disabled={!currentPrice}
+              className="rounded-[1.4rem] py-4 text-center font-bold transition-all active:scale-95 hover:-translate-y-0.5 disabled:opacity-50"
+              style={{ background: 'linear-gradient(135deg, #0ecb81 0%, #06a860 100%)', color: '#02160c', boxShadow: '0 10px 24px rgba(14,203,129,0.26)' }}
+            >
+              <p className="text-base sm:text-lg">Buy / Up</p>
+              <p className="mt-1 text-xl sm:text-2xl">${currentPrice ? currentPrice.toFixed(2) : '--'}</p>
+            </button>
+            <button
+              onClick={() => setModal('down')}
+              disabled={!currentPrice}
+              className="rounded-[1.4rem] py-4 text-center font-bold transition-all active:scale-95 hover:-translate-y-0.5 disabled:opacity-50"
+              style={{ background: 'linear-gradient(135deg, #f6465d 0%, #c9303f 100%)', color: '#fff', boxShadow: '0 10px 24px rgba(246,70,93,0.26)' }}
+            >
+              <p className="text-base sm:text-lg">Sell / Down</p>
+              <p className="mt-1 text-xl sm:text-2xl">${currentPrice ? currentPrice.toFixed(2) : '--'}</p>
+            </button>
+          </div>
+        </div>
+      </div>
+
       {modal && (
-        <OrderModal coin={selectedCoin} direction={modal} currentPrice={currentPrice}
-          settings={settings} balance={balance} onConfirm={handlePlaceTrade} onClose={() => setModal(null)} />
+        <OrderModal
+          coin={selectedCoin}
+          direction={modal}
+          currentPrice={currentPrice}
+          settings={settings}
+          balance={balance}
+          onConfirm={handlePlaceTrade}
+          onClose={() => setModal(null)}
+        />
       )}
 
       {resultModal && (
