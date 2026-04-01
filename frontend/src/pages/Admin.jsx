@@ -4,15 +4,15 @@ import { adminAPI, adminDepositAPI, adminWithdrawAPI, settingsAPI, profileAPI, p
 import { SkeletonCard, SkeletonTable } from '../components/SkeletonCard';
 
 const ADMIN_PANEL =
-  'rounded-[30px] border border-[#d9e6e7] bg-white shadow-[0_24px_80px_rgba(8,35,41,0.08)]';
+  'rounded-[30px] border border-[#efd58a] bg-[#fffdf7] shadow-[0_24px_80px_rgba(120,87,16,0.12)]';
 const ADMIN_BUTTON =
-  'rounded-full border border-[#d6e2e4] bg-white px-4 py-2 text-xs font-semibold text-[#506d72] transition-all hover:-translate-y-0.5 disabled:opacity-40';
+  'rounded-full border border-[#ecd08a] bg-[#fff6d8] px-4 py-2 text-xs font-semibold text-[#6f5012] transition-all hover:-translate-y-0.5 hover:bg-[#ffeaa8] disabled:opacity-40';
 const ADMIN_INPUT =
-  'input-field rounded-[22px] border-[#d7e4e5] bg-[#f7fbfb]';
+  'input-field rounded-[22px] border-[#ecd08a] bg-[#fffaf0] text-[#2f2208] placeholder:text-[#b79c5c]';
 const SECTION_CARD =
-  'rounded-[28px] border border-[#d9e6e7] bg-white/90 shadow-[0_18px_50px_rgba(8,35,41,0.07)]';
+  'rounded-[28px] border border-[#efd58a] bg-[#fffdf8] shadow-[0_18px_50px_rgba(120,87,16,0.11)]';
 const ADMIN_FIELD_LABEL =
-  'mb-2 block text-[11px] font-semibold uppercase tracking-[0.22em] text-[#567178]';
+  'mb-2 block text-[11px] font-semibold uppercase tracking-[0.22em] text-[#8a670f]';
 const ADDRESS_PRESETS = [
   { coin: 'USDT', network: 'TRC20', minDeposit: 10, note: 'Send only USDT via TRC20.' },
   { coin: 'USDT', network: 'BEP20', minDeposit: 10, note: 'Send only USDT via BEP20.' },
@@ -25,11 +25,11 @@ function SectionHeader({ eyebrow, title, body, actions = null }) {
       <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
         <div className="max-w-2xl">
           {eyebrow && (
-            <p className="text-[11px] font-semibold uppercase tracking-[0.28em] text-[#6d8185]">
+            <p className="text-[11px] font-semibold uppercase tracking-[0.28em] text-[#9b771c]">
               {eyebrow}
             </p>
           )}
-          <h3 className="mt-2 text-[26px] font-light tracking-[-0.03em] text-[#0d2127] md:text-[32px]">
+          <h3 className="mt-2 text-[26px] font-light tracking-[-0.03em] text-[#241807] md:text-[32px]">
             {title}
           </h3>
           {body && <p className="mt-2 text-sm leading-6 text-text-secondary">{body}</p>}
@@ -44,9 +44,9 @@ function QuickAction({ label, hint, accent = '#185b64', onClick }) {
   return (
     <button
       onClick={onClick}
-      className="group rounded-[24px] border border-[#d9e6e7] bg-white px-4 py-4 text-left shadow-[0_18px_50px_rgba(8,35,41,0.06)] transition-all hover:-translate-y-1 hover:shadow-[0_24px_60px_rgba(8,35,41,0.1)]"
+      className="group rounded-[24px] border border-[#efd58a] bg-[linear-gradient(180deg,#fffdf6_0%,#fff6dd_100%)] px-4 py-4 text-left shadow-[0_18px_50px_rgba(120,87,16,0.1)] transition-all hover:-translate-y-1 hover:shadow-[0_24px_60px_rgba(120,87,16,0.16)]"
     >
-      <p className="text-sm font-semibold text-[#0d2127]">{label}</p>
+      <p className="text-sm font-semibold text-[#241807]">{label}</p>
       <p className="mt-1 text-xs text-text-secondary">{hint}</p>
       <span className="mt-3 inline-flex text-xs font-semibold transition-transform group-hover:translate-x-0.5" style={{ color: accent }}>
         Open
@@ -56,16 +56,16 @@ function QuickAction({ label, hint, accent = '#185b64', onClick }) {
 }
 
 const TAB_TONES = {
-  overview: { accent: '#185b64', glow: 'rgba(24,91,100,0.12)' },
-  users: { accent: '#ee8267', glow: 'rgba(238,130,103,0.16)' },
-  kyc: { accent: '#f59e0b', glow: 'rgba(245,158,11,0.14)' },
-  trades: { accent: '#0ea5e9', glow: 'rgba(14,165,233,0.14)' },
-  binary: { accent: '#0ecb81', glow: 'rgba(14,203,129,0.14)' },
-  'deposit-addr': { accent: '#64748b', glow: 'rgba(100,116,139,0.14)' },
-  'deposit-req': { accent: '#ef4444', glow: 'rgba(239,68,68,0.14)' },
-  withdrawals: { accent: '#8b5cf6', glow: 'rgba(139,92,246,0.14)' },
-  plans: { accent: '#06b6d4', glow: 'rgba(6,182,212,0.14)' },
-  settings: { accent: '#14b8a6', glow: 'rgba(20,184,166,0.14)' },
+  overview: { accent: '#f0b90b', glow: 'rgba(240,185,11,0.18)' },
+  users: { accent: '#d8a106', glow: 'rgba(216,161,6,0.16)' },
+  kyc: { accent: '#f59e0b', glow: 'rgba(245,158,11,0.18)' },
+  trades: { accent: '#f3ba2f', glow: 'rgba(243,186,47,0.16)' },
+  binary: { accent: '#c58b07', glow: 'rgba(197,139,7,0.16)' },
+  'deposit-addr': { accent: '#b8860b', glow: 'rgba(184,134,11,0.15)' },
+  'deposit-req': { accent: '#e6a700', glow: 'rgba(230,167,0,0.16)' },
+  withdrawals: { accent: '#b17a00', glow: 'rgba(177,122,0,0.16)' },
+  plans: { accent: '#d4a017', glow: 'rgba(212,160,23,0.16)' },
+  settings: { accent: '#8f6b10', glow: 'rgba(143,107,16,0.16)' },
 };
 
 export default function Admin() {
@@ -477,10 +477,10 @@ export default function Admin() {
 
   return (
     <div className="space-y-6 animate-fade-in">
-      <div className="overflow-hidden rounded-[34px] bg-[linear-gradient(135deg,#0b2026_0%,#114850_50%,#1a6d71_100%)] px-6 py-6 text-white shadow-[0_30px_90px_rgba(8,32,38,0.28)] md:px-8">
+      <div className="overflow-hidden rounded-[34px] bg-[linear-gradient(135deg,#1f1605_0%,#5c4310_45%,#b78710_100%)] px-6 py-6 text-white shadow-[0_30px_90px_rgba(98,70,10,0.34)] md:px-8">
         <div className="flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between">
           <div className="max-w-2xl">
-            <span className="inline-flex rounded-full border border-white/15 bg-white/10 px-4 py-1.5 text-[11px] font-semibold uppercase tracking-[0.28em] text-[#97e4e5]">
+            <span className="inline-flex rounded-full border border-[#f7d76b]/40 bg-[#f0b90b]/18 px-4 py-1.5 text-[11px] font-semibold uppercase tracking-[0.28em] text-[#ffe7a0]">
               Restricted Console
             </span>
             <h2 className="mt-4 text-[32px] font-light leading-[1.02] tracking-[-0.04em] md:text-[42px]">
@@ -491,20 +491,20 @@ export default function Admin() {
             </p>
           </div>
           <div className="grid gap-3 sm:grid-cols-3 lg:min-w-[540px]">
-            <div className="rounded-[24px] border border-white/12 bg-white/8 px-5 py-4 backdrop-blur">
-              <p className="text-[11px] uppercase tracking-[0.24em] text-white/48">Users</p>
+            <div className="rounded-[24px] border border-[#f7d76b]/30 bg-white/8 px-5 py-4 backdrop-blur">
+              <p className="text-[11px] uppercase tracking-[0.24em] text-[#ffeab6]/70">Users</p>
               <p className="mt-2 text-[28px] font-semibold text-white">{stats?.stats?.totalUsers?.toLocaleString?.() || '—'}</p>
-              <p className="mt-1 text-xs text-white/55">Accounts on platform</p>
+              <p className="mt-1 text-xs text-[#fff1c9]/70">Accounts on platform</p>
             </div>
-            <div className="rounded-[24px] border border-white/12 bg-white/8 px-5 py-4 backdrop-blur">
-              <p className="text-[11px] uppercase tracking-[0.24em] text-white/48">Pending Deposits</p>
+            <div className="rounded-[24px] border border-[#f7d76b]/30 bg-white/8 px-5 py-4 backdrop-blur">
+              <p className="text-[11px] uppercase tracking-[0.24em] text-[#ffeab6]/70">Pending Deposits</p>
               <p className="mt-2 text-[28px] font-semibold text-white">{depositRequests.filter((req) => req.status === 'pending').length}</p>
-              <p className="mt-1 text-xs text-white/55">Needs review</p>
+              <p className="mt-1 text-xs text-[#fff1c9]/70">Needs review</p>
             </div>
-            <div className="rounded-[24px] border border-white/12 bg-white/8 px-5 py-4 backdrop-blur">
-              <p className="text-[11px] uppercase tracking-[0.24em] text-white/48">Pending Withdrawals</p>
+            <div className="rounded-[24px] border border-[#f7d76b]/30 bg-white/8 px-5 py-4 backdrop-blur">
+              <p className="text-[11px] uppercase tracking-[0.24em] text-[#ffeab6]/70">Pending Withdrawals</p>
               <p className="mt-2 text-[28px] font-semibold text-white">{withdrawRequests.filter((req) => req.status === 'pending').length}</p>
-              <p className="mt-1 text-xs text-white/55">Needs payout action</p>
+              <p className="mt-1 text-xs text-[#fff1c9]/70">Needs payout action</p>
             </div>
           </div>
         </div>
@@ -529,14 +529,14 @@ export default function Admin() {
             <div className="flex items-center justify-between gap-3">
               <span className={`text-xl ${activeTab === key ? '' : 'opacity-80'}`}>{label}</span>
               {activeTab === key && (
-                <span className="rounded-full bg-[#ee8267] px-2 py-1 text-[10px] font-bold uppercase tracking-[0.2em] text-white">
+                <span className="rounded-full bg-[#f0b90b] px-2 py-1 text-[10px] font-bold uppercase tracking-[0.2em] text-[#2a1d05]">
                   Live
                 </span>
               )}
             </div>
             <div className="mt-3 flex items-start justify-between gap-3">
               <div>
-                <p className="text-sm font-semibold text-[#0d2127]">{fullLabel}</p>
+                <p className="text-sm font-semibold text-[#241807]">{fullLabel}</p>
                 <p className="mt-1 text-xs leading-5 text-text-secondary">{desc}</p>
               </div>
               <span
@@ -608,7 +608,7 @@ export default function Admin() {
               </div>
               <div className={`${ADMIN_PANEL} p-6`}>
                 <p className="text-xs text-text-muted uppercase tracking-wider mb-1">Total Trades</p>
-                <p className="text-[34px] font-semibold text-brand-primary">{stats.stats.totalTrades.toLocaleString()}</p>
+                <p className="text-[34px] font-semibold text-[#b8860b]">{stats.stats.totalTrades.toLocaleString()}</p>
                 <p className="mt-2 text-xs text-text-secondary">Combined trading activity across users</p>
               </div>
               <div className={`${ADMIN_PANEL} p-6`}>
@@ -701,7 +701,7 @@ export default function Admin() {
               </div>
               <div className={`${ADMIN_PANEL} p-4`}>
                 <p className="text-xs uppercase tracking-[0.24em] text-[#6d8185]">Admins Visible</p>
-                <p className="mt-2 text-2xl font-semibold text-brand-primary">{users.filter((u) => u.role === 'admin').length}</p>
+                <p className="mt-2 text-2xl font-semibold text-[#b8860b]">{users.filter((u) => u.role === 'admin').length}</p>
                 <p className="mt-1 text-xs text-text-secondary">Accounts with admin access</p>
               </div>
               <div className={`${ADMIN_PANEL} p-4`}>
@@ -730,7 +730,7 @@ export default function Admin() {
                       <tr key={u._id} className={`border-b border-light-border/50 transition-colors hover:bg-[#f6fbfb] ${u.isBanned ? 'opacity-60' : ''}`}>
                         <td className="px-5 py-4">
                           <div className="flex items-center gap-3">
-                            <div className={`w-8 h-8 rounded-full flex items-center justify-center font-bold text-sm ${u.isBanned ? 'bg-red-trade/20 text-red-trade' : 'bg-brand-primary/10 text-brand-primary'}`}>
+                            <div className={`w-8 h-8 rounded-full flex items-center justify-center font-bold text-sm ${u.isBanned ? 'bg-red-trade/20 text-red-trade' : 'bg-[#f0b90b]/15 text-[#9b7008]'}`}>
                               {u.isBanned ? '🚫' : u.username[0]?.toUpperCase()}
                             </div>
                             <div>
@@ -774,7 +774,7 @@ export default function Admin() {
                                   setCoinPrices(data.prices || data || {});
                                 } catch {}
                               }}
-                              className="rounded-full bg-brand-primary/10 px-3 py-1.5 text-xs font-semibold text-brand-primary transition-colors hover:bg-brand-primary/20"
+                              className="rounded-full bg-[#f0b90b]/15 px-3 py-1.5 text-xs font-semibold text-[#9b7008] transition-colors hover:bg-[#f0b90b]/25"
                             >
                               Balance
                             </button>
@@ -971,7 +971,7 @@ export default function Admin() {
           <div className="flex gap-2">
             {['', 'pending', 'approved', 'rejected'].map(s => (
               <button key={s} onClick={() => { setWithdrawReqStatus(s); setWithdrawReqPage(1); }}
-                className={`rounded-full px-4 py-2 text-xs font-semibold capitalize transition-all ${withdrawReqStatus === s ? 'bg-[#ee8267] text-white shadow-[0_12px_28px_rgba(238,130,103,0.18)]' : 'border border-light-border/40 bg-[#f7fbfb] text-text-muted hover:-translate-y-0.5'}`}>
+                className={`rounded-full px-4 py-2 text-xs font-semibold capitalize transition-all ${withdrawReqStatus === s ? 'bg-[#f0b90b] text-[#2a1d05] shadow-[0_12px_28px_rgba(240,185,11,0.24)]' : 'border border-[#ecd08a] bg-[#fffaf0] text-[#7d6323] hover:-translate-y-0.5'}`}>
                 {s || 'All'}
               </button>
             ))}
@@ -1008,7 +1008,7 @@ export default function Admin() {
                         <p className="font-mono break-all flex-1">Address: {req.address}</p>
                         <button
                           onClick={() => { navigator.clipboard.writeText(req.address); toast.success('Address copied!'); }}
-                          className="flex-shrink-0 rounded-full bg-brand-primary/20 px-3 py-1.5 text-[10px] font-semibold text-brand-primary transition-all hover:bg-brand-primary/40"
+                          className="flex-shrink-0 rounded-full bg-[#f0b90b]/18 px-3 py-1.5 text-[10px] font-semibold text-[#9b7008] transition-all hover:bg-[#f0b90b]/30"
                           title="Copy address"
                         >
                           📋 Copy
@@ -1330,7 +1330,7 @@ export default function Admin() {
             </div>
 
             <button onClick={handleSaveBinarySettings} disabled={binarySettingsSaving}
-              className="flex h-14 w-full items-center justify-center gap-2 rounded-full bg-[#ee8267] text-sm font-semibold text-white shadow-[0_18px_40px_rgba(238,130,103,0.28)] transition-all hover:-translate-y-0.5 hover:bg-[#e8775a]">
+              className="flex h-14 w-full items-center justify-center gap-2 rounded-full bg-[#f0b90b] text-sm font-semibold text-[#2a1d05] shadow-[0_18px_40px_rgba(240,185,11,0.3)] transition-all hover:-translate-y-0.5 hover:bg-[#dca70a]">
               {binarySettingsSaving && <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />}
               Save Binary Settings
             </button>
@@ -1427,7 +1427,7 @@ export default function Admin() {
             </div>
 
             <button onClick={handleSaveAllSettings} disabled={settingsSaving}
-              className="flex h-14 w-full items-center justify-center gap-2 rounded-full bg-[#ee8267] text-sm font-semibold text-white shadow-[0_18px_40px_rgba(238,130,103,0.28)] transition-all hover:-translate-y-0.5 hover:bg-[#e8775a]">
+              className="flex h-14 w-full items-center justify-center gap-2 rounded-full bg-[#f0b90b] text-sm font-semibold text-[#2a1d05] shadow-[0_18px_40px_rgba(240,185,11,0.3)] transition-all hover:-translate-y-0.5 hover:bg-[#dca70a]">
               {settingsSaving && <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />}
               Save Settings
             </button>
@@ -1544,7 +1544,7 @@ export default function Admin() {
                 <button
                   onClick={handleSaveAddress}
                   disabled={addrLoading}
-                  className="flex min-h-[52px] items-center gap-2 rounded-full bg-[#ee8267] px-6 text-sm font-semibold text-white shadow-[0_18px_40px_rgba(238,130,103,0.22)] transition-all hover:-translate-y-0.5 hover:bg-[#e8775a]"
+                  className="flex min-h-[52px] items-center gap-2 rounded-full bg-[#f0b90b] px-6 text-sm font-semibold text-[#2a1d05] shadow-[0_18px_40px_rgba(240,185,11,0.24)] transition-all hover:-translate-y-0.5 hover:bg-[#dca70a]"
                 >
                   {addrLoading && <div className="w-4 h-4 border-2 border-light-border border-t-transparent rounded-full animate-spin" />}
                   {editingAddr ? 'Save Address Changes' : 'Create Deposit Address'}
@@ -1637,7 +1637,7 @@ export default function Admin() {
                     <div className="flex flex-row flex-wrap gap-2 lg:flex-col lg:items-stretch">
                       <button
                         onClick={() => { setEditingAddr(addr); setAddrForm({ coin: addr.coin, network: addr.network, address: addr.address, minDeposit: addr.minDeposit, note: addr.note || '' }); }}
-                        className="rounded-full bg-brand-primary/10 px-4 py-2 text-sm font-semibold text-brand-primary transition-colors hover:bg-brand-primary/20"
+                        className="rounded-full bg-[#f0b90b]/15 px-4 py-2 text-sm font-semibold text-[#9b7008] transition-colors hover:bg-[#f0b90b]/25"
                       >
                         Edit
                       </button>
@@ -1678,8 +1678,8 @@ export default function Admin() {
                 onClick={() => { setDepositReqStatus(val); setDepositReqPage(1); }}
                 className={`rounded-full px-4 py-2 text-sm font-medium transition-all ${
                   depositReqStatus === val
-                    ? 'bg-[#ee8267] text-text-inverse shadow-[0_12px_28px_rgba(238,130,103,0.18)]'
-                    : 'border border-light-border bg-[#f7fbfb] text-text-secondary hover:-translate-y-0.5 hover:text-text-primary'
+                    ? 'bg-[#f0b90b] text-[#2a1d05] shadow-[0_12px_28px_rgba(240,185,11,0.24)]'
+                    : 'border border-[#ecd08a] bg-[#fffaf0] text-[#7d6323] hover:-translate-y-0.5 hover:text-[#241807]'
                 }`}
               >
                 {label}
@@ -1708,7 +1708,7 @@ export default function Admin() {
                             {/* User + amount */}
                             <div className="flex items-center gap-3 flex-wrap">
                               <div className="flex items-center gap-2">
-                                <div className="w-8 h-8 rounded-full bg-brand-primary/10 flex items-center justify-center text-brand-primary font-bold text-sm">
+                                <div className="w-8 h-8 rounded-full bg-[#f0b90b]/15 flex items-center justify-center text-[#9b7008] font-bold text-sm">
                                   {req.user?.username?.[0]?.toUpperCase() || '?'}
                                 </div>
                                 <div>
@@ -1716,7 +1716,7 @@ export default function Admin() {
                                   <p className="text-xs text-text-muted">{req.user?.email}</p>
                                 </div>
                               </div>
-                              <div className="text-lg font-bold text-brand-primary">{req.amount} {req.coin}</div>
+                              <div className="text-lg font-bold text-[#b8860b]">{req.amount} {req.coin}</div>
                               <span className="text-xs bg-light-hover text-text-secondary px-2 py-0.5 rounded-full border border-light-border">{req.network}</span>
                               <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${sc.cls}`}>{sc.label}</span>
                             </div>
@@ -1799,7 +1799,7 @@ export default function Admin() {
             </h3>
             <p className="text-sm text-text-secondary mb-4">
               <span className="text-text-primary font-medium">{reviewModal.request.user?.username}</span> —{' '}
-              <span className="font-semibold text-brand-primary">{reviewModal.request.amount} {reviewModal.request.coin}</span> via {reviewModal.request.network}
+              <span className="font-semibold text-[#b8860b]">{reviewModal.request.amount} {reviewModal.request.coin}</span> via {reviewModal.request.network}
             </p>
             {reviewModal.action === 'approve' && (
               <div className="bg-green-trade/5 border border-green-trade/20 rounded-lg p-3 mb-4">
@@ -1848,7 +1848,7 @@ export default function Admin() {
               <h3 className="text-lg font-bold text-text-primary mb-1">Add Balance (USDT)</h3>
               <p className="text-sm text-text-secondary mb-4">
                 User: <span className="text-text-primary font-medium">{balanceModal.user.username}</span> —
-                Current: <span className="text-brand-primary font-medium">${balanceModal.user.demo_balance.toFixed(2)} USDT</span>
+                Current: <span className="text-[#b8860b] font-medium">${balanceModal.user.demo_balance.toFixed(2)} USDT</span>
               </p>
 
               <div className="space-y-4">
@@ -1917,7 +1917,7 @@ export default function Admin() {
                   <button
                     onClick={handleModifyBalance}
                     disabled={modalLoading}
-                    className="flex flex-1 items-center justify-center gap-2 rounded-full bg-[#ee8267] px-4 py-3 text-sm font-semibold text-white shadow-[0_18px_40px_rgba(238,130,103,0.22)] transition-all hover:-translate-y-0.5 hover:bg-[#e8775a]"
+                    className="flex flex-1 items-center justify-center gap-2 rounded-full bg-[#f0b90b] px-4 py-3 text-sm font-semibold text-[#2a1d05] shadow-[0_18px_40px_rgba(240,185,11,0.24)] transition-all hover:-translate-y-0.5 hover:bg-[#dca70a]"
                   >
                     {modalLoading && <div className="w-4 h-4 border-2 border-light-border border-t-transparent rounded-full animate-spin" />}
                     Add ${usdtVal > 0 ? usdtVal.toFixed(2) : '0'} USDT
@@ -1938,7 +1938,7 @@ export default function Admin() {
             </h3>
             <p className="text-sm text-text-secondary mb-4">
               <span className="text-text-primary font-medium">{withdrawReviewModal.request.user?.username}</span> —{' '}
-              <span className="font-semibold text-brand-primary">${withdrawReviewModal.request.amount.toFixed(2)} {withdrawReviewModal.request.coin}</span> via {withdrawReviewModal.request.network}
+              <span className="font-semibold text-[#b8860b]">${withdrawReviewModal.request.amount.toFixed(2)} {withdrawReviewModal.request.coin}</span> via {withdrawReviewModal.request.network}
             </p>
             {withdrawReviewModal.action === 'reject' && (
               <p className="text-xs text-brand-yellow bg-brand-yellow/10 rounded-xl px-3 py-2 mb-4">
