@@ -14,7 +14,7 @@ export default function TradePage() {
   const [tab, setTab] = useState('binary');
 
   return (
-    <div className="w-full max-w-2xl mx-auto px-0 space-y-4">
+    <div className="w-full max-w-7xl mx-auto px-0 space-y-4">
       <div className="overflow-hidden rounded-[34px] bg-[linear-gradient(135deg,#0b2026_0%,#114850_48%,#1b6d71_100%)] px-6 py-7 text-white shadow-[0_28px_90px_rgba(8,32,38,0.28)] md:px-8">
         <h1 className="text-[34px] font-light tracking-[-0.03em]">Trading desk</h1>
         <p className="mt-3 max-w-xl text-sm leading-6 text-white/68 md:text-base">Binary and forex tabs now sit inside the same exchange-style shell as the rest of the platform.</p>

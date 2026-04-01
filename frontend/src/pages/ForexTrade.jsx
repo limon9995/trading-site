@@ -334,32 +334,32 @@ export default function ForexTrade() {
       </div>
 
       {/* Chart card */}
-      <div className="rounded-[1.8rem] overflow-hidden" style={{ background: '#0E2026', border: '1px solid rgba(255,255,255,0.08)', boxShadow: '0 22px 50px rgba(6, 28, 33, 0.24)' }}>
+      <div className="rounded-[2rem] overflow-hidden" style={{ background: '#0E2026', border: '1px solid rgba(255,255,255,0.08)', boxShadow: '0 22px 50px rgba(6, 28, 33, 0.24)' }}>
         {/* Price header */}
-        <div className="px-3 pt-3 pb-2 flex items-start justify-between gap-2">
+        <div className="flex flex-col gap-4 px-4 pt-4 pb-3 sm:flex-row sm:items-start sm:justify-between sm:px-5 sm:pt-5">
           <div className="min-w-0">
-            <p className="text-text-muted text-xs">{coin}/USDT · Forex</p>
-            <p className="text-white font-bold text-xl truncate">
+            <p className="text-sm text-text-muted">{coin}/USDT · Forex</p>
+            <p className="truncate text-[2rem] font-bold text-white sm:text-[2.4rem] lg:text-[2.8rem]">
               ${currentPrice ? currentPrice.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 4 }) : '---'}
             </p>
-            <p className={`text-xs font-semibold mt-0.5 ${change24h >= 0 ? 'text-green-trade' : 'text-red-trade'}`}>
+            <p className={`mt-1 text-sm font-semibold sm:text-lg ${change24h >= 0 ? 'text-green-trade' : 'text-red-trade'}`}>
               {change24h >= 0 ? '▲' : '▼'} {Math.abs(change24h).toFixed(2)}% (24h)
             </p>
           </div>
-          <div className="text-right flex-shrink-0 rounded-[1rem] bg-white/5 px-3 py-2">
-            {coinData && <p className="text-text-muted text-xs">Vol: <span className="text-white">${(coinData.volume24h / 1e6).toFixed(1)}M</span></p>}
-            <div className="flex items-center gap-1 justify-end mt-1">
-              <div className="w-2 h-2 rounded-full bg-green-trade animate-pulse" />
-              <span className="text-green-trade text-xs">Live</span>
+          <div className="flex-shrink-0 rounded-[1.15rem] bg-white/5 px-4 py-3 sm:min-w-[160px]">
+            {coinData && <p className="text-sm text-text-muted sm:text-base">Vol: <span className="font-semibold text-white">${(coinData.volume24h / 1e6).toFixed(1)}M</span></p>}
+            <div className="mt-2 flex items-center gap-2 justify-start sm:justify-end">
+              <div className="h-2.5 w-2.5 rounded-full bg-green-trade animate-pulse" />
+              <span className="text-sm text-green-trade">Live</span>
             </div>
           </div>
         </div>
 
         {/* Interval selector */}
-        <div className="flex gap-1 px-3 pb-2 overflow-x-auto scrollbar-hide">
+        <div className="flex gap-2 px-4 pb-3 overflow-x-auto scrollbar-hide sm:px-5">
           {INTERVALS.map(({ label, value }) => (
             <button key={value} onClick={() => setInterval(value)}
-              className={`px-3 py-1.5 rounded-full text-xs font-semibold transition-all ${interval === value ? 'text-white' : 'text-text-muted hover:text-white'}`}
+              className={`px-4 py-2 rounded-full text-sm font-semibold transition-all ${interval === value ? 'text-white' : 'text-text-muted hover:text-white'}`}
               style={{ background: interval === value ? 'rgba(238,130,103,0.5)' : 'rgba(255,255,255,0.07)' }}>
               {label}
             </button>
@@ -367,7 +367,7 @@ export default function ForexTrade() {
         </div>
 
         {/* Chart */}
-        <div className="h-44 sm:h-64 px-1 pb-2">
+        <div className="h-[320px] px-2 pb-3 sm:h-[420px] lg:h-[560px]">
           <CandlestickChart key={`${coin}_${interval}`} symbol={coin} interval={interval} currentPrice={currentPrice} />
         </div>
       </div>
