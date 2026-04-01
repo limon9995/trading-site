@@ -11,6 +11,13 @@ const ADMIN_INPUT =
   'input-field rounded-[22px] border-[#d7e4e5] bg-[#f7fbfb]';
 const SECTION_CARD =
   'rounded-[28px] border border-[#d9e6e7] bg-white/90 shadow-[0_18px_50px_rgba(8,35,41,0.07)]';
+const ADMIN_FIELD_LABEL =
+  'mb-2 block text-[11px] font-semibold uppercase tracking-[0.22em] text-[#567178]';
+const ADDRESS_PRESETS = [
+  { coin: 'USDT', network: 'TRC20', minDeposit: 10, note: 'Send only USDT via TRC20.' },
+  { coin: 'USDT', network: 'BEP20', minDeposit: 10, note: 'Send only USDT via BEP20.' },
+  { coin: 'BTC', network: 'BTC', minDeposit: 0.0001, note: 'Send only BTC on the Bitcoin network.' },
+];
 
 function SectionHeader({ eyebrow, title, body, actions = null }) {
   return (
@@ -1433,126 +1440,219 @@ export default function Admin() {
         <div className="space-y-6">
           <SectionHeader
             eyebrow="Funding Setup"
-            title="Manage deposit addresses with less operational friction"
-            body="Add, edit, disable, and review active addresses from one workspace so user funding details stay accurate."
+            title="Keep funding instructions clear, readable, and safe"
+            body="Set wallet details in a structured format so admins can scan faster and users always see the right coin, network, minimum deposit, and caution note."
           />
-          {/* Add/Edit form */}
-          <div className={`${ADMIN_PANEL} p-5`}>
-            <h3 className="font-semibold text-text-primary mb-4">
-              {editingAddr ? '✏️ Edit Address' : '➕ Add Deposit Address'}
-            </h3>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <div>
-                <label className="text-xs text-text-muted mb-1.5 block">Coin (e.g. USDT, BTC, ETH)</label>
-                <input
-                  className={`${ADMIN_INPUT} uppercase`}
-                  value={addrForm.coin}
-                  onChange={(e) => setAddrForm(f => ({ ...f, coin: e.target.value.toUpperCase() }))}
-                  placeholder="USDT"
-                />
+          <div className="grid gap-4 xl:grid-cols-[1.2fr_0.8fr]">
+            <div className={`${ADMIN_PANEL} p-5 md:p-6`}>
+              <div className="flex flex-col gap-4 border-b border-[#e3ecec] pb-5 md:flex-row md:items-start md:justify-between">
+                <div>
+                  <p className="text-[11px] font-semibold uppercase tracking-[0.24em] text-[#6d8185]">
+                    {editingAddr ? 'Editing Address' : 'New Address'}
+                  </p>
+                  <h3 className="mt-2 text-[24px] font-light tracking-[-0.03em] text-[#0d2127]">
+                    {editingAddr ? 'Update funding destination' : 'Add deposit address'}
+                  </h3>
+                  <p className="mt-2 max-w-xl text-sm leading-6 text-text-secondary">
+                    Fill the core details once, then use the note field to show users exactly which network is accepted.
+                  </p>
+                </div>
+                <div className="flex flex-wrap gap-2">
+                  {ADDRESS_PRESETS.map((preset) => (
+                    <button
+                      key={`${preset.coin}-${preset.network}`}
+                      onClick={() => setAddrForm((f) => ({
+                        ...f,
+                        coin: preset.coin,
+                        network: preset.network,
+                        minDeposit: preset.minDeposit,
+                        note: preset.note,
+                      }))}
+                      className="rounded-full border border-[#d9e6e7] bg-[#f7fbfb] px-3 py-2 text-xs font-semibold text-[#426169] transition-all hover:-translate-y-0.5 hover:border-[#bdd1d4]"
+                    >
+                      {preset.coin} {preset.network}
+                    </button>
+                  ))}
+                </div>
               </div>
-              <div>
-                <label className="text-xs text-text-muted mb-1.5 block">Network (e.g. TRC20, ERC20, BEP20)</label>
-                <input
-                  className={ADMIN_INPUT}
-                  value={addrForm.network}
-                  onChange={(e) => setAddrForm(f => ({ ...f, network: e.target.value }))}
-                  placeholder="TRC20"
-                />
+
+              <div className="mt-5 grid grid-cols-1 gap-4 md:grid-cols-2">
+                <div>
+                  <label className={ADMIN_FIELD_LABEL}>Coin Symbol</label>
+                  <p className="mb-2 text-xs text-text-muted">Short code only, like `USDT`, `BTC`, `ETH`.</p>
+                  <input
+                    className={`${ADMIN_INPUT} min-h-[58px] uppercase text-base font-semibold text-[#0d2127] placeholder:text-[#b8c9cc]`}
+                    value={addrForm.coin}
+                    onChange={(e) => setAddrForm(f => ({ ...f, coin: e.target.value.toUpperCase() }))}
+                    placeholder="USDT"
+                  />
+                </div>
+                <div>
+                  <label className={ADMIN_FIELD_LABEL}>Network Name</label>
+                  <p className="mb-2 text-xs text-text-muted">Example: `TRC20`, `ERC20`, `BEP20`.</p>
+                  <input
+                    className={`${ADMIN_INPUT} min-h-[58px] text-base font-medium text-[#0d2127] placeholder:text-[#b8c9cc]`}
+                    value={addrForm.network}
+                    onChange={(e) => setAddrForm(f => ({ ...f, network: e.target.value.toUpperCase() }))}
+                    placeholder="TRC20"
+                  />
+                </div>
+                <div className="md:col-span-2">
+                  <label className={ADMIN_FIELD_LABEL}>Wallet Address</label>
+                  <p className="mb-2 text-xs text-text-muted">Paste the full receiving address exactly as users should copy it.</p>
+                  <textarea
+                    rows="3"
+                    className={`${ADMIN_INPUT} min-h-[110px] resize-y font-mono text-sm leading-6 text-[#0d2127] placeholder:text-[#b8c9cc]`}
+                    value={addrForm.address}
+                    onChange={(e) => setAddrForm(f => ({ ...f, address: e.target.value }))}
+                    placeholder="Paste wallet address here..."
+                  />
+                </div>
+                <div>
+                  <label className={ADMIN_FIELD_LABEL}>Minimum Deposit</label>
+                  <p className="mb-2 text-xs text-text-muted">Smallest valid amount a user can send for this address.</p>
+                  <input
+                    type="number"
+                    className={`${ADMIN_INPUT} min-h-[58px] text-base font-semibold text-[#0d2127] placeholder:text-[#b8c9cc]`}
+                    value={addrForm.minDeposit}
+                    onChange={(e) => setAddrForm(f => ({ ...f, minDeposit: e.target.value }))}
+                    placeholder="10"
+                    min="0"
+                  />
+                </div>
+                <div>
+                  <label className={ADMIN_FIELD_LABEL}>User Note</label>
+                  <p className="mb-2 text-xs text-text-muted">Short warning or instruction shown on the deposit page.</p>
+                  <input
+                    className={`${ADMIN_INPUT} min-h-[58px] text-base text-[#0d2127] placeholder:text-[#b8c9cc]`}
+                    value={addrForm.note}
+                    onChange={(e) => setAddrForm(f => ({ ...f, note: e.target.value }))}
+                    placeholder="Only send USDT on TRC20 network"
+                  />
+                </div>
               </div>
-              <div className="sm:col-span-2">
-                <label className="text-xs text-text-muted mb-1.5 block">Deposit Address</label>
-                <input
-                  className={`${ADMIN_INPUT} font-mono text-sm`}
-                  value={addrForm.address}
-                  onChange={(e) => setAddrForm(f => ({ ...f, address: e.target.value }))}
-                  placeholder="Wallet address..."
-                />
-              </div>
-              <div>
-                <label className="text-xs text-text-muted mb-1.5 block">Minimum Deposit</label>
-                <input
-                  type="number"
-                  className={ADMIN_INPUT}
-                  value={addrForm.minDeposit}
-                  onChange={(e) => setAddrForm(f => ({ ...f, minDeposit: e.target.value }))}
-                  placeholder="10"
-                  min="0"
-                />
-              </div>
-              <div>
-                <label className="text-xs text-text-muted mb-1.5 block">Note (shown to user, optional)</label>
-                <input
-                  className={ADMIN_INPUT}
-                  value={addrForm.note}
-                  onChange={(e) => setAddrForm(f => ({ ...f, note: e.target.value }))}
-                  placeholder="e.g. Only send USDT on TRC20 network"
-                />
+
+              <div className="mt-5 flex flex-wrap gap-3">
+                {editingAddr && (
+                  <button
+                    onClick={() => { setEditingAddr(null); setAddrForm({ coin: 'USDT', network: 'TRC20', address: '', minDeposit: 10, note: '' }); }}
+                    className={ADMIN_BUTTON}
+                  >
+                    Cancel Edit
+                  </button>
+                )}
+                <button
+                  onClick={handleSaveAddress}
+                  disabled={addrLoading}
+                  className="flex min-h-[52px] items-center gap-2 rounded-full bg-[#ee8267] px-6 text-sm font-semibold text-white shadow-[0_18px_40px_rgba(238,130,103,0.22)] transition-all hover:-translate-y-0.5 hover:bg-[#e8775a]"
+                >
+                  {addrLoading && <div className="w-4 h-4 border-2 border-light-border border-t-transparent rounded-full animate-spin" />}
+                  {editingAddr ? 'Save Address Changes' : 'Create Deposit Address'}
+                </button>
               </div>
             </div>
-            <div className="flex gap-3 mt-4">
-              {editingAddr && (
-                <button
-                  onClick={() => { setEditingAddr(null); setAddrForm({ coin: 'USDT', network: 'TRC20', address: '', minDeposit: 10, note: '' }); }}
-                  className={ADMIN_BUTTON}
-                >
-                  Cancel
-                </button>
-              )}
-              <button
-                onClick={handleSaveAddress}
-                disabled={addrLoading}
-                className="flex h-12 items-center gap-2 rounded-full bg-[#ee8267] px-5 text-sm font-semibold text-white shadow-[0_18px_40px_rgba(238,130,103,0.22)] transition-all hover:-translate-y-0.5 hover:bg-[#e8775a]"
-              >
-                {addrLoading && <div className="w-4 h-4 border-2 border-light-border border-t-transparent rounded-full animate-spin" />}
-                {editingAddr ? 'Update Address' : 'Add Address'}
-              </button>
+
+            <div className="grid gap-4">
+              <div className={`${ADMIN_PANEL} p-5`}>
+                <p className="text-[11px] font-semibold uppercase tracking-[0.24em] text-[#6d8185]">Address Checklist</p>
+                <div className="mt-4 space-y-3">
+                  <div className="rounded-[22px] border border-[#e0eaeb] bg-[#f7fbfb] p-4">
+                    <p className="text-sm font-semibold text-[#0d2127]">Match coin + network</p>
+                    <p className="mt-1 text-xs leading-5 text-text-secondary">If the network label is wrong, users can send funds to the wrong chain.</p>
+                  </div>
+                  <div className="rounded-[22px] border border-[#e0eaeb] bg-[#f7fbfb] p-4">
+                    <p className="text-sm font-semibold text-[#0d2127]">Show a warning note</p>
+                    <p className="mt-1 text-xs leading-5 text-text-secondary">Use the note to say things like “Only send USDT on TRC20”.</p>
+                  </div>
+                  <div className="rounded-[22px] border border-[#e0eaeb] bg-[#f7fbfb] p-4">
+                    <p className="text-sm font-semibold text-[#0d2127]">Disable instead of delete</p>
+                    <p className="mt-1 text-xs leading-5 text-text-secondary">If an address may be reused later, disable it first so history stays intact.</p>
+                  </div>
+                </div>
+              </div>
+
+              <div className={`${ADMIN_PANEL} grid grid-cols-2 gap-3 p-5`}>
+                <div className="rounded-[22px] bg-[#f7fbfb] p-4">
+                  <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-[#6d8185]">Total</p>
+                  <p className="mt-2 text-2xl font-semibold text-[#0d2127]">{depositAddresses.length}</p>
+                  <p className="mt-1 text-xs text-text-secondary">Configured addresses</p>
+                </div>
+                <div className="rounded-[22px] bg-[#f7fbfb] p-4">
+                  <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-[#6d8185]">Active</p>
+                  <p className="mt-2 text-2xl font-semibold text-green-trade">{depositAddresses.filter((addr) => addr.isActive).length}</p>
+                  <p className="mt-1 text-xs text-text-secondary">Visible to users</p>
+                </div>
+              </div>
             </div>
           </div>
 
-          {/* Addresses list */}
           <div className={`${ADMIN_PANEL} overflow-hidden`}>
-            <div className="px-5 py-4 border-b border-light-border">
-              <h3 className="font-semibold text-text-primary">All Deposit Addresses ({depositAddresses.length})</h3>
+            <div className="flex flex-col gap-2 border-b border-light-border px-5 py-4 md:flex-row md:items-end md:justify-between">
+              <div>
+                <p className="text-[11px] font-semibold uppercase tracking-[0.24em] text-[#6d8185]">Configured Addresses</p>
+                <h3 className="mt-1 text-[24px] font-light tracking-[-0.03em] text-[#0d2127]">
+                  All deposit addresses ({depositAddresses.length})
+                </h3>
+              </div>
+              <p className="text-sm text-text-secondary">Each row shows coin, chain, minimum amount, current status, and quick actions.</p>
             </div>
             {depositAddresses.length === 0 ? (
-              <div className="p-8 text-center text-text-muted">No deposit addresses configured yet.</div>
+              <div className="p-10 text-center">
+                <p className="text-base font-medium text-[#0d2127]">No deposit addresses configured yet.</p>
+                <p className="mt-2 text-sm text-text-muted">Use the form above to add the first funding address for users.</p>
+              </div>
             ) : (
               <div className="divide-y divide-light-border/50">
                 {depositAddresses.map((addr) => (
-                  <div key={addr._id} className="px-5 py-4">
-                    <div className="flex items-start justify-between gap-4">
-                      <div className="space-y-1 min-w-0">
-                        <div className="flex items-center gap-2 flex-wrap">
-                          <span className="font-bold text-brand-primary">{addr.coin}</span>
-                          <span className="text-xs bg-light-hover text-text-secondary px-2 py-0.5 rounded-full border border-light-border">{addr.network}</span>
-                          <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${addr.isActive ? 'bg-green-trade/10 text-green-trade' : 'bg-red-trade/10 text-red-trade'}`}>
-                            {addr.isActive ? 'Active' : 'Disabled'}
-                          </span>
-                        </div>
-                        <p className="text-sm text-text-primary font-mono break-all">{addr.address}</p>
-                        <p className="text-xs text-text-muted">Min: {addr.minDeposit} {addr.coin}{addr.note ? ` · ${addr.note}` : ''}</p>
+                  <div key={addr._id} className="grid gap-4 px-5 py-5 lg:grid-cols-[1.1fr_0.9fr_220px] lg:items-start">
+                    <div className="min-w-0">
+                      <div className="flex items-center gap-2 flex-wrap">
+                        <span className="rounded-full bg-[#0d2127] px-3 py-1 text-xs font-bold uppercase tracking-[0.2em] text-white">
+                          {addr.coin}
+                        </span>
+                        <span className="rounded-full border border-light-border bg-[#f7fbfb] px-3 py-1 text-xs font-semibold text-[#587177]">
+                          {addr.network}
+                        </span>
+                        <span className={`rounded-full px-3 py-1 text-xs font-semibold ${addr.isActive ? 'bg-green-trade/10 text-green-trade' : 'bg-red-trade/10 text-red-trade'}`}>
+                          {addr.isActive ? 'Active' : 'Disabled'}
+                        </span>
                       </div>
-                      <div className="flex flex-col gap-2 flex-shrink-0">
-                        <button
-                          onClick={() => { setEditingAddr(addr); setAddrForm({ coin: addr.coin, network: addr.network, address: addr.address, minDeposit: addr.minDeposit, note: addr.note || '' }); }}
-                          className="rounded-full bg-brand-primary/10 px-3 py-1.5 text-xs font-semibold text-brand-primary transition-colors hover:bg-brand-primary/20"
-                        >
-                          Edit
-                        </button>
-                        <button
-                          onClick={() => handleToggleAddress(addr)}
-                          className="rounded-full border border-light-border bg-[#f7fbfb] px-3 py-1.5 text-xs font-semibold text-text-secondary transition-colors hover:bg-light-border"
-                        >
-                          {addr.isActive ? 'Disable' : 'Enable'}
-                        </button>
-                        <button
-                          onClick={() => handleDeleteAddress(addr._id)}
-                          className="rounded-full bg-red-trade/10 px-3 py-1.5 text-xs font-semibold text-red-trade transition-colors hover:bg-red-trade/20"
-                        >
-                          Delete
-                        </button>
+                      <p className="mt-3 text-[13px] font-semibold uppercase tracking-[0.22em] text-[#6d8185]">Wallet Address</p>
+                      <p className="mt-2 break-all rounded-[20px] bg-[#f7fbfb] px-4 py-3 font-mono text-sm leading-6 text-[#16323a]">
+                        {addr.address}
+                      </p>
+                    </div>
+
+                    <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-1">
+                      <div className="rounded-[22px] border border-[#e2ecec] bg-[#fbfdfd] p-4">
+                        <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-[#6d8185]">Minimum Deposit</p>
+                        <p className="mt-2 text-xl font-semibold text-[#0d2127]">{addr.minDeposit} {addr.coin}</p>
                       </div>
+                      <div className="rounded-[22px] border border-[#e2ecec] bg-[#fbfdfd] p-4">
+                        <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-[#6d8185]">User Note</p>
+                        <p className="mt-2 text-sm leading-6 text-text-secondary">{addr.note || 'No note added yet.'}</p>
+                      </div>
+                    </div>
+
+                    <div className="flex flex-row flex-wrap gap-2 lg:flex-col lg:items-stretch">
+                      <button
+                        onClick={() => { setEditingAddr(addr); setAddrForm({ coin: addr.coin, network: addr.network, address: addr.address, minDeposit: addr.minDeposit, note: addr.note || '' }); }}
+                        className="rounded-full bg-brand-primary/10 px-4 py-2 text-sm font-semibold text-brand-primary transition-colors hover:bg-brand-primary/20"
+                      >
+                        Edit
+                      </button>
+                      <button
+                        onClick={() => handleToggleAddress(addr)}
+                        className="rounded-full border border-light-border bg-[#f7fbfb] px-4 py-2 text-sm font-semibold text-text-secondary transition-colors hover:bg-light-border"
+                      >
+                        {addr.isActive ? 'Disable' : 'Enable'}
+                      </button>
+                      <button
+                        onClick={() => handleDeleteAddress(addr._id)}
+                        className="rounded-full bg-red-trade/10 px-4 py-2 text-sm font-semibold text-red-trade transition-colors hover:bg-red-trade/20"
+                      >
+                        Delete
+                      </button>
                     </div>
                   </div>
                 ))}
