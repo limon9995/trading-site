@@ -48,6 +48,19 @@ function QuickAction({ label, hint, accent = '#185b64', onClick }) {
   );
 }
 
+const TAB_TONES = {
+  overview: { accent: '#185b64', glow: 'rgba(24,91,100,0.12)' },
+  users: { accent: '#ee8267', glow: 'rgba(238,130,103,0.16)' },
+  kyc: { accent: '#f59e0b', glow: 'rgba(245,158,11,0.14)' },
+  trades: { accent: '#0ea5e9', glow: 'rgba(14,165,233,0.14)' },
+  binary: { accent: '#0ecb81', glow: 'rgba(14,203,129,0.14)' },
+  'deposit-addr': { accent: '#64748b', glow: 'rgba(100,116,139,0.14)' },
+  'deposit-req': { accent: '#ef4444', glow: 'rgba(239,68,68,0.14)' },
+  withdrawals: { accent: '#8b5cf6', glow: 'rgba(139,92,246,0.14)' },
+  plans: { accent: '#06b6d4', glow: 'rgba(6,182,212,0.14)' },
+  settings: { accent: '#14b8a6', glow: 'rgba(20,184,166,0.14)' },
+};
+
 export default function Admin() {
   const [activeTab, setActiveTab] = useState('overview');
   const [stats, setStats] = useState(null);
@@ -436,33 +449,49 @@ export default function Admin() {
     { key: 'settings', label: '⚙️', fullLabel: 'Settings', desc: 'Support and platform details' },
   ];
 
+  const tabCounts = {
+    overview: stats?.stats?.totalUsers || 0,
+    users: users.length || stats?.stats?.totalUsers || 0,
+    kyc: kycUsers.length || 0,
+    trades: trades.length || stats?.stats?.totalTrades || 0,
+    binary: binaryTrades.length || 0,
+    'deposit-addr': depositAddresses.length || 0,
+    'deposit-req': depositRequests.filter((req) => req.status === 'pending').length || 0,
+    withdrawals: withdrawRequests.filter((req) => req.status === 'pending').length || 0,
+    plans: planPurchases.length || 0,
+    settings: 3,
+  };
+
   return (
     <div className="space-y-6 animate-fade-in">
-      <div className="overflow-hidden rounded-[34px] bg-[linear-gradient(135deg,#0b2026_0%,#114850_50%,#1a6d71_100%)] px-6 py-7 text-white shadow-[0_30px_90px_rgba(8,32,38,0.28)] md:px-8">
-        <div className="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
+      <div className="overflow-hidden rounded-[34px] bg-[linear-gradient(135deg,#0b2026_0%,#114850_50%,#1a6d71_100%)] px-6 py-6 text-white shadow-[0_30px_90px_rgba(8,32,38,0.28)] md:px-8">
+        <div className="flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between">
           <div className="max-w-2xl">
             <span className="inline-flex rounded-full border border-white/15 bg-white/10 px-4 py-1.5 text-[11px] font-semibold uppercase tracking-[0.28em] text-[#97e4e5]">
               Restricted Console
             </span>
-            <h2 className="mt-4 text-[36px] font-light leading-[1.04] tracking-[-0.03em] md:text-[48px]">
-              Control the platform with the same premium shell.
+            <h2 className="mt-4 text-[32px] font-light leading-[1.02] tracking-[-0.04em] md:text-[42px]">
+              Operate users, money flow and risk controls faster.
             </h2>
-            <p className="mt-3 max-w-xl text-sm leading-6 text-white/68 md:text-base">
-              Admin tools now sit inside the same CTA, spacing and panel system as the public product instead of a plain utility screen.
+            <p className="mt-3 max-w-xl text-sm leading-6 text-white/68 md:text-[15px]">
+              Built for day-to-day handling: review pending queues, adjust accounts, monitor revenue, and change product controls without hunting through clutter.
             </p>
           </div>
-          <div className="grid gap-3 sm:grid-cols-3 lg:min-w-[500px]">
+          <div className="grid gap-3 sm:grid-cols-3 lg:min-w-[540px]">
             <div className="rounded-[24px] border border-white/12 bg-white/8 px-5 py-4 backdrop-blur">
               <p className="text-[11px] uppercase tracking-[0.24em] text-white/48">Users</p>
               <p className="mt-2 text-[28px] font-semibold text-white">{stats?.stats?.totalUsers?.toLocaleString?.() || '—'}</p>
+              <p className="mt-1 text-xs text-white/55">Accounts on platform</p>
             </div>
             <div className="rounded-[24px] border border-white/12 bg-white/8 px-5 py-4 backdrop-blur">
-              <p className="text-[11px] uppercase tracking-[0.24em] text-white/48">Trades</p>
-              <p className="mt-2 text-[28px] font-semibold text-white">{stats?.stats?.totalTrades?.toLocaleString?.() || '—'}</p>
+              <p className="text-[11px] uppercase tracking-[0.24em] text-white/48">Pending Deposits</p>
+              <p className="mt-2 text-[28px] font-semibold text-white">{depositRequests.filter((req) => req.status === 'pending').length}</p>
+              <p className="mt-1 text-xs text-white/55">Needs review</p>
             </div>
             <div className="rounded-[24px] border border-white/12 bg-white/8 px-5 py-4 backdrop-blur">
-              <p className="text-[11px] uppercase tracking-[0.24em] text-white/48">Access</p>
-              <p className="mt-2 text-[28px] font-semibold text-white">Admin</p>
+              <p className="text-[11px] uppercase tracking-[0.24em] text-white/48">Pending Withdrawals</p>
+              <p className="mt-2 text-[28px] font-semibold text-white">{withdrawRequests.filter((req) => req.status === 'pending').length}</p>
+              <p className="mt-1 text-xs text-white/55">Needs payout action</p>
             </div>
           </div>
         </div>
@@ -473,11 +502,16 @@ export default function Admin() {
           <button
             key={key}
             onClick={() => setActiveTab(key)}
-            className={`rounded-[26px] border p-4 text-left transition-all ${
-              activeTab === key
-                ? 'border-[#ee8267] bg-[linear-gradient(135deg,rgba(238,130,103,0.12),rgba(238,130,103,0.02))] shadow-[0_18px_40px_rgba(238,130,103,0.12)]'
-                : 'border-[#d9e6e7] bg-white shadow-[0_18px_50px_rgba(8,35,41,0.05)] hover:-translate-y-0.5 hover:border-[#c7dcde]'
-            }`}
+            className="rounded-[24px] border p-4 text-left transition-all hover:-translate-y-0.5"
+            style={{
+              borderColor: activeTab === key ? TAB_TONES[key].accent : '#d9e6e7',
+              background: activeTab === key
+                ? `linear-gradient(135deg, ${TAB_TONES[key].glow} 0%, rgba(255,255,255,0.98) 65%)`
+                : '#ffffff',
+              boxShadow: activeTab === key
+                ? `0 18px 40px ${TAB_TONES[key].glow}`
+                : '0 18px 50px rgba(8,35,41,0.05)',
+            }}
           >
             <div className="flex items-center justify-between gap-3">
               <span className={`text-xl ${activeTab === key ? '' : 'opacity-80'}`}>{label}</span>
@@ -487,8 +521,18 @@ export default function Admin() {
                 </span>
               )}
             </div>
-            <p className="mt-3 text-sm font-semibold text-[#0d2127]">{fullLabel}</p>
-            <p className="mt-1 text-xs leading-5 text-text-secondary">{desc}</p>
+            <div className="mt-3 flex items-start justify-between gap-3">
+              <div>
+                <p className="text-sm font-semibold text-[#0d2127]">{fullLabel}</p>
+                <p className="mt-1 text-xs leading-5 text-text-secondary">{desc}</p>
+              </div>
+              <span
+                className="rounded-full px-2.5 py-1 text-[11px] font-bold"
+                style={{ background: `${TAB_TONES[key].accent}18`, color: TAB_TONES[key].accent }}
+              >
+                {tabCounts[key]}
+              </span>
+            </div>
           </button>
         ))}
       </div>
