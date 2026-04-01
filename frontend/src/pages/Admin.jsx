@@ -98,6 +98,7 @@ export default function Admin() {
   const [depositReqPage, setDepositReqPage] = useState(1);
   const [depositReqPagination, setDepositReqPagination] = useState({});
   const [depositReqStatus, setDepositReqStatus] = useState('');
+  const [depositReqError, setDepositReqError] = useState('');
   const [reviewModal, setReviewModal] = useState(null); // { request, action }
   const [reviewNote, setReviewNote] = useState('');
   const [reviewLoading, setReviewLoading] = useState(false);
@@ -107,6 +108,7 @@ export default function Admin() {
   const [withdrawReqPage, setWithdrawReqPage] = useState(1);
   const [withdrawReqPagination, setWithdrawReqPagination] = useState({});
   const [withdrawReqStatus, setWithdrawReqStatus] = useState('');
+  const [withdrawReqError, setWithdrawReqError] = useState('');
   const [withdrawReviewModal, setWithdrawReviewModal] = useState(null);
   const [withdrawReviewNote, setWithdrawReviewNote] = useState('');
   const [withdrawReviewLoading, setWithdrawReviewLoading] = useState(false);
@@ -181,21 +183,27 @@ export default function Admin() {
 
   const fetchDepositRequests = useCallback(async () => {
     setLoading(true);
+    setDepositReqError('');
     try {
       const { data } = await adminDepositAPI.getRequests(depositReqPage, depositReqStatus);
       setDepositRequests(data.requests || []);
       setDepositReqPagination(data.pagination || {});
-    } catch { toast.error('Failed to load deposit requests'); }
+    } catch (err) {
+      setDepositReqError(err.response?.data?.error || 'Failed to load deposit requests.');
+    }
     finally { setLoading(false); }
   }, [depositReqPage, depositReqStatus]);
 
   const fetchWithdrawRequests = useCallback(async () => {
     setLoading(true);
+    setWithdrawReqError('');
     try {
       const { data } = await adminWithdrawAPI.getRequests(withdrawReqPage, withdrawReqStatus);
       setWithdrawRequests(data.requests || []);
       setWithdrawReqPagination(data.pagination || {});
-    } catch { toast.error('Failed to load withdraw requests'); }
+    } catch (err) {
+      setWithdrawReqError(err.response?.data?.error || 'Failed to load withdrawal requests.');
+    }
     finally { setLoading(false); }
   }, [withdrawReqPage, withdrawReqStatus]);
 
@@ -243,21 +251,19 @@ export default function Admin() {
     if (activeTab === 'trades') fetchTrades();
     if (activeTab === 'overview') setLoading(false);
     if (activeTab === 'deposit-addr') fetchDepositAddresses();
-    if (activeTab === 'deposit-req') fetchDepositRequests();
     if (activeTab === 'settings') fetchSiteSettings();
     if (activeTab === 'kyc') fetchKycUsers();
     if (activeTab === 'plans') fetchPlanPurchases();
     if (activeTab === 'binary') { fetchBinarySettings(); fetchBinaryTrades(); }
-    if (activeTab === 'withdrawals') fetchWithdrawRequests();
-  }, [activeTab, page, fetchUsers, fetchTrades, fetchDepositAddresses, fetchDepositRequests, fetchPlanPurchases, fetchWithdrawRequests]);
+  }, [activeTab, page, fetchUsers, fetchTrades, fetchDepositAddresses, fetchPlanPurchases]);
 
   useEffect(() => {
     if (activeTab === 'deposit-req') fetchDepositRequests();
-  }, [depositReqPage, depositReqStatus, fetchDepositRequests]);
+  }, [activeTab, depositReqPage, depositReqStatus, fetchDepositRequests]);
 
   useEffect(() => {
     if (activeTab === 'withdrawals') fetchWithdrawRequests();
-  }, [withdrawReqPage, withdrawReqStatus, fetchWithdrawRequests]);
+  }, [activeTab, withdrawReqPage, withdrawReqStatus, fetchWithdrawRequests]);
 
   const getUsdtEquivalent = () => {
     const amt = parseFloat(balanceCoinAmount);
@@ -964,6 +970,12 @@ export default function Admin() {
             ))}
           </div>
 
+          {withdrawReqError && (
+            <div className="rounded-[22px] border border-red-trade/20 bg-red-trade/5 px-4 py-3 text-sm text-red-trade">
+              {withdrawReqError}
+            </div>
+          )}
+
           {loading ? <div className="text-center py-8 text-text-muted">Loading...</div> : withdrawRequests.length === 0 ? (
             <div className={`${ADMIN_PANEL} p-8 text-center text-text-muted`}>No withdrawal requests found.</div>
           ) : (
@@ -1574,6 +1586,12 @@ export default function Admin() {
               </button>
             ))}
           </div>
+
+          {depositReqError && (
+            <div className="rounded-[22px] border border-red-trade/20 bg-red-trade/5 px-4 py-3 text-sm text-red-trade">
+              {depositReqError}
+            </div>
+          )}
 
           {loading ? <SkeletonTable rows={5} /> : (
             <>
