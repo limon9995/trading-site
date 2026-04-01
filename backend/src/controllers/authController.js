@@ -11,6 +11,7 @@ const RESET_OTP_EXPIRY = 10 * 60 * 1000; // 10 minutes
 // In-memory OTP store for registration
 const registerOtpStore = new Map(); // email -> { otp, expiresAt, pendingData }
 const REGISTER_OTP_EXPIRY = 10 * 60 * 1000;
+const SKIP_OTP_VERIFICATION = true;
 
 const normalizeEmail = (email = '') => email.toLowerCase().trim();
 
@@ -55,8 +56,37 @@ const sendRegisterOtp = async (req, res) => {
 // POST /api/auth/register — verify OTP then create account
 const register = async (req, res) => {
   try {
-    const { email, otp } = req.body;
+    const { email, otp, username, password, referralCode } = req.body;
     const normalizedEmail = normalizeEmail(email);
+
+    if (SKIP_OTP_VERIFICATION) {
+      if (!username || !password) {
+        return res.status(400).json({ error: 'Username and password are required.' });
+      }
+
+      const existingUser = await User.findOne({ $or: [{ email: normalizedEmail }, { username }] });
+      if (existingUser) {
+        const field = existingUser.email === normalizedEmail ? 'Email' : 'Username';
+        return res.status(409).json({ error: `${field} already in use.` });
+      }
+
+      const newUser = new User({ username, email: normalizedEmail, password });
+
+      if (referralCode) {
+        const referrer = await User.findOne({ referralCode: referralCode.toUpperCase() });
+        if (referrer) {
+          newUser.referredBy = referrer._id;
+          referrer.referralCount += 1;
+          await referrer.save();
+        }
+      }
+
+      await newUser.save();
+      registerOtpStore.delete(normalizedEmail);
+
+      const token = generateToken(newUser._id);
+      return res.status(201).json({ message: 'Account created successfully!', token, user: newUser.toSafeObject() });
+    }
 
     // OTP verification
     if (!otp) return res.status(400).json({ error: 'OTP is required.' });
@@ -68,19 +98,22 @@ const register = async (req, res) => {
     }
     if (record.otp !== otp.trim()) return res.status(400).json({ error: 'Invalid OTP.' });
 
-    const { username, password, referralCode } = record.pendingData;
+    const pendingData = record.pendingData;
+    const finalUsername = pendingData.username;
+    const finalPassword = pendingData.password;
+    const finalReferralCode = pendingData.referralCode;
 
     // Double-check uniqueness
-    const existingUser = await User.findOne({ $or: [{ email: normalizedEmail }, { username }] });
+    const existingUser = await User.findOne({ $or: [{ email: normalizedEmail }, { username: finalUsername }] });
     if (existingUser) {
       const field = existingUser.email === normalizedEmail ? 'Email' : 'Username';
       return res.status(409).json({ error: `${field} already in use.` });
     }
 
-    const newUser = new User({ username, email: normalizedEmail, password });
+    const newUser = new User({ username: finalUsername, email: normalizedEmail, password: finalPassword });
 
-    if (referralCode) {
-      const referrer = await User.findOne({ referralCode: referralCode.toUpperCase() });
+    if (finalReferralCode) {
+      const referrer = await User.findOne({ referralCode: finalReferralCode.toUpperCase() });
       if (referrer) {
         newUser.referredBy = referrer._id;
         referrer.referralCount += 1;
@@ -220,6 +253,17 @@ const forgotPassword = async (req, res) => {
     const user = await User.findOne({ email: normalizedEmail });
     if (!user) return res.status(404).json({ error: 'No account found with this email.' });
 
+    if (SKIP_OTP_VERIFICATION) {
+      resetOtpStore.set(normalizedEmail, {
+        otp: null,
+        expiresAt: Date.now() + RESET_OTP_EXPIRY,
+        userId: user._id,
+        verified: true,
+      });
+
+      return res.json({ message: 'Email verified. You can now reset your password.' });
+    }
+
     const otp = Math.floor(100000 + Math.random() * 900000).toString();
     resetOtpStore.set(normalizedEmail, { otp, expiresAt: Date.now() + RESET_OTP_EXPIRY, userId: user._id });
 
@@ -237,6 +281,13 @@ const verifyResetOtp = async (req, res) => {
     const { email, otp } = req.body;
     if (!email || !otp) return res.status(400).json({ error: 'Email and OTP are required.' });
     const normalizedEmail = normalizeEmail(email);
+
+    if (SKIP_OTP_VERIFICATION) {
+      const record = resetOtpStore.get(normalizedEmail);
+      if (!record) return res.status(400).json({ error: 'No reset request found. Please try again.' });
+      resetOtpStore.set(normalizedEmail, { ...record, verified: true });
+      return res.json({ message: 'OTP verification skipped.' });
+    }
 
     const record = resetOtpStore.get(normalizedEmail);
     if (!record) return res.status(400).json({ error: 'No OTP request found. Please try again.' });
@@ -259,12 +310,13 @@ const verifyResetOtp = async (req, res) => {
 const resetPassword = async (req, res) => {
   try {
     const { email, otp, newPassword } = req.body;
-    if (!email || !otp || !newPassword) return res.status(400).json({ error: 'All fields are required.' });
+    if (!email || !newPassword || (!SKIP_OTP_VERIFICATION && !otp)) return res.status(400).json({ error: 'All fields are required.' });
     if (newPassword.length < 6) return res.status(400).json({ error: 'Password must be at least 6 characters.' });
     const normalizedEmail = normalizeEmail(email);
 
     const record = resetOtpStore.get(normalizedEmail);
-    if (!record || !record.verified || record.otp !== otp.trim()) {
+    const otpMatches = SKIP_OTP_VERIFICATION || record?.otp === otp?.trim();
+    if (!record || !record.verified || !otpMatches) {
       return res.status(400).json({ error: 'Invalid or expired session. Please start over.' });
     }
     if (Date.now() > record.expiresAt) {

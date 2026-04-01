@@ -24,9 +24,8 @@ export default function ForgotPassword() {
     setLoading(true);
     try {
       await authAPI.forgotPassword(email.trim());
-      toast.success('OTP sent to your email!');
-      setStep(STEPS.OTP);
-      startResendTimer();
+      toast.success('Email verified. Set your new password.');
+      setStep(STEPS.PASSWORD);
     } catch (err) {
       toast.error(err.response?.data?.error || 'Failed to send OTP');
     } finally {
@@ -151,7 +150,7 @@ export default function ForgotPassword() {
           {step === STEPS.EMAIL && (
             <>
               <h2 className="text-2xl font-extrabold text-text-primary mb-1">Forgot Password</h2>
-              <p className="text-sm text-text-secondary mb-6">Enter your registered email to receive an OTP</p>
+              <p className="text-sm text-text-secondary mb-6">Enter your registered email to continue</p>
               <form onSubmit={handleSendOtp} className="space-y-4">
                 <div>
                   <label className="block text-sm font-semibold text-text-primary mb-1.5">Email Address</label>
@@ -161,7 +160,7 @@ export default function ForgotPassword() {
                     onBlur={e => e.target.style.borderColor = '#E8EAED'} />
                 </div>
                 <button type="submit" disabled={loading} className={btnPrimary} style={{ background: '#EE8267' }}>
-                  {loading ? <><div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />Sending...</> : 'Send OTP'}
+                  {loading ? <><div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />Checking...</> : 'Continue'}
                 </button>
               </form>
             </>

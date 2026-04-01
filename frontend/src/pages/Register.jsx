@@ -3,7 +3,6 @@ import { Link, useNavigate } from 'react-router-dom';
 import toast from 'react-hot-toast';
 import { useAuth } from '../context/AuthContext';
 import { useTheme } from '../context/ThemeContext';
-import { authAPI } from '../services/api';
 
 function AuthBrand() {
   return (
@@ -51,12 +50,11 @@ export default function Register() {
     if (form.password.length < 6) return toast.error('Password must be at least 6 characters');
     setLoading(true);
     try {
-      await authAPI.sendRegisterOtp(form);
-      toast.success('OTP sent to your email!');
-      setStep(2);
-      startResendTimer();
+      await register(form);
+      toast.success('Account created! Welcome to CEX.IO');
+      navigate('/dashboard');
     } catch (err) {
-      toast.error(err.response?.data?.error || 'Failed to send OTP');
+      toast.error(err.response?.data?.error || 'Registration failed');
     } finally {
       setLoading(false);
     }
@@ -294,7 +292,7 @@ export default function Register() {
                   <button type="submit" disabled={loading}
                     className="w-full h-[56px] rounded-full font-semibold text-[16px] text-white mt-3 flex items-center justify-center gap-2 transition-all active:scale-95 disabled:opacity-50 hover:brightness-105"
                     style={{ background: '#F4927E' }}>
-                    {loading ? <><div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />Sending OTP...</> : 'Send OTP to Email'}
+                    {loading ? <><div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />Creating account...</> : 'Create Account'}
                   </button>
                 </form>
               </>
