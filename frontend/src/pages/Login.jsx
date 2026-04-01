@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import toast from 'react-hot-toast';
 import { useAuth } from '../context/AuthContext';
+import { useTheme } from '../context/ThemeContext';
 
 function AuthBrand() {
   return (
@@ -22,6 +23,7 @@ function AuthBrand() {
 export default function Login() {
   const { login } = useAuth();
   const navigate = useNavigate();
+  const { isDark, toggleTheme } = useTheme();
   const [form, setForm] = useState({ email: '', password: '' });
   const [loading, setLoading] = useState(false);
   const [showPass, setShowPass] = useState(false);
@@ -42,11 +44,15 @@ export default function Login() {
     }
   };
 
-  const inputCls = "w-full px-4 py-3.5 rounded-[20px] text-sm text-text-primary placeholder-text-muted outline-none transition-all";
-  const inputStyle = { background: '#f4f7f8', border: '1px solid #E8EAED' };
+  const inputCls = "w-full px-4 py-3.5 rounded-[20px] text-sm outline-none transition-all";
+  const inputStyle = {
+    background: isDark ? '#0f2a32' : '#f4f7f8',
+    border: `1px solid ${isDark ? 'rgba(255,255,255,0.1)' : '#E8EAED'}`,
+    color: isDark ? '#e8f0f2' : '#0E2026',
+  };
 
   return (
-    <div className="min-h-screen flex" style={{ background: 'linear-gradient(180deg, #fbfcfd 0%, #f4f7f8 100%)' }}>
+    <div className="min-h-screen flex relative" style={{ background: isDark ? 'linear-gradient(180deg, #071d23 0%, #0a2229 100%)' : 'linear-gradient(180deg, #fbfcfd 0%, #f4f7f8 100%)' }}>
       {/* Left panel — branding (hidden on mobile) */}
       <div className="hidden xl:flex flex-col justify-between w-[46%] px-14 py-12 relative overflow-hidden"
         style={{ background: 'linear-gradient(155deg, #071d23 0%, #0f545a 55%, #114147 100%)' }}>
@@ -82,11 +88,28 @@ export default function Login() {
         <p className="text-xs text-white/30 relative">© {new Date().getFullYear()} CEX.IO. All rights reserved.</p>
       </div>
 
+      {/* Theme toggle — top right */}
+      <button
+        onClick={toggleTheme}
+        className="absolute top-5 right-5 z-10 w-10 h-10 rounded-full flex items-center justify-center transition-all"
+        style={{ background: isDark ? 'rgba(255,255,255,0.08)' : 'rgba(14,32,38,0.06)', color: isDark ? '#9BA3A6' : '#566367' }}
+      >
+        {isDark ? (
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" className="w-5 h-5">
+            <path strokeLinecap="round" strokeLinejoin="round" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364-6.364l-.707.707M6.343 17.657l-.707.707m12.728 0l-.707-.707M6.343 6.343l-.707-.707M12 7a5 5 0 100 10A5 5 0 0012 7z"/>
+          </svg>
+        ) : (
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" className="w-5 h-5">
+            <path strokeLinecap="round" strokeLinejoin="round" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"/>
+          </svg>
+        )}
+      </button>
+
       {/* Right panel — login form */}
       <div className="flex-1 flex flex-col items-center justify-center p-5 sm:p-8 xl:p-10">
         {/* Mobile logo */}
         <div className="mb-8 xl:hidden">
-          <div className="flex items-center gap-3 text-text-primary">
+          <div className="flex items-center gap-3" style={{ color: isDark ? '#e8f0f2' : '#0E2026' }}>
             <div className="relative w-10 h-10">
               <div className="absolute inset-0 rounded-full border-[5px] border-cyan-500 opacity-90" />
               <div className="absolute inset-[7px] rounded-full border-[4px] border-cyan-500 opacity-90" />
@@ -100,11 +123,17 @@ export default function Login() {
         </div>
 
         <div className="w-full max-w-[520px] animate-bounce-in">
-          <div className="rounded-[32px] cex-surface p-6 sm:p-8">
+          <div className="rounded-[32px] p-6 sm:p-8"
+            style={{
+              background: isDark ? 'rgba(14,32,38,0.92)' : 'rgba(255,255,255,0.88)',
+              border: `1px solid ${isDark ? 'rgba(255,255,255,0.08)' : 'rgba(217,230,231,0.92)'}`,
+              boxShadow: isDark ? '0 24px 80px rgba(0,0,0,0.4)' : '0 24px 80px rgba(8,35,41,0.08)',
+              backdropFilter: 'blur(18px)',
+            }}>
           <div className="flex items-start justify-between gap-4 mb-8">
             <div>
-              <h2 className="text-[34px] font-light text-text-primary leading-none mb-2">Welcome back</h2>
-              <p className="text-text-secondary text-[15px]">Sign in to continue trading and managing your assets</p>
+              <h2 className="text-[34px] font-light leading-none mb-2" style={{ color: isDark ? '#e8f0f2' : '#0E2026' }}>Welcome back</h2>
+              <p className="text-[15px]" style={{ color: isDark ? '#9BA3A6' : '#566367' }}>Sign in to continue trading and managing your assets</p>
             </div>
             <div className="hidden sm:flex w-12 h-12 rounded-2xl items-center justify-center text-white" style={{ background: 'linear-gradient(135deg, #0E2026 0%, #185B64 100%)' }}>
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="w-5 h-5"><path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7"/></svg>
@@ -114,13 +143,13 @@ export default function Login() {
           <form onSubmit={handleSubmit} className="space-y-4">
             {/* Email */}
             <div>
-              <label className="block text-sm font-semibold text-text-primary mb-1.5">Email Address</label>
+              <label className="block text-sm font-semibold mb-1.5" style={{ color: isDark ? '#e8f0f2' : '#0E2026' }}>Email Address</label>
               <input
                 type="email" name="email" value={form.email} onChange={handleChange}
                 placeholder="you@example.com" required
                 className={inputCls} style={inputStyle}
                 onFocus={e => e.target.style.borderColor = '#EE8267'}
-                onBlur={e => e.target.style.borderColor = '#E8EAED'}
+                onBlur={e => e.target.style.borderColor = isDark ? 'rgba(255,255,255,0.1)' : '#E8EAED'}
                 autoComplete="email"
               />
             </div>
@@ -128,7 +157,7 @@ export default function Login() {
             {/* Password */}
             <div>
               <div className="flex items-center justify-between mb-1.5">
-                <label className="block text-sm font-semibold text-text-primary">Password</label>
+                <label className="block text-sm font-semibold" style={{ color: isDark ? '#e8f0f2' : '#0E2026' }}>Password</label>
                 <Link to="/forgot-password" className="text-xs font-semibold hover:underline" style={{ color: '#EE8267' }}>Forgot password?</Link>
               </div>
               <div className="relative">
@@ -137,11 +166,12 @@ export default function Login() {
                   placeholder="••••••••" required
                   className={`${inputCls} pr-10`} style={inputStyle}
                   onFocus={e => e.target.style.borderColor = '#EE8267'}
-                  onBlur={e => e.target.style.borderColor = '#E8EAED'}
+                  onBlur={e => e.target.style.borderColor = isDark ? 'rgba(255,255,255,0.1)' : '#E8EAED'}
                   autoComplete="current-password"
                 />
                 <button type="button" onClick={() => setShowPass(!showPass)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-text-muted hover:text-text-primary transition-colors">
+                  className="absolute right-3 top-1/2 -translate-y-1/2 transition-colors"
+                  style={{ color: isDark ? '#566367' : '#9BA3A6' }}>
                   {showPass
                     ? <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="w-4 h-4"><path strokeLinecap="round" strokeLinejoin="round" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21"/></svg>
                     : <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="w-4 h-4"><path strokeLinecap="round" strokeLinejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path strokeLinecap="round" strokeLinejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
@@ -160,13 +190,13 @@ export default function Login() {
           {/* Promo */}
           <div className="mt-5 p-4 rounded-[24px] flex items-start gap-3"
             style={{ background: 'rgba(244,146,126,0.08)', border: '1px solid rgba(244,146,126,0.16)' }}>
-            <span className="w-10 h-10 rounded-2xl flex items-center justify-center text-[#0E2026] font-bold" style={{ background: '#F4927E' }}>+</span>
-            <p className="text-sm text-text-secondary leading-6">
-              New here? <span style={{ color: '#EE8267' }} className="font-semibold">Register</span> and get <span className="text-text-primary font-bold">$10,000 USDT</span> demo credit to explore the dashboard.
+            <span className="w-10 h-10 rounded-2xl flex items-center justify-center text-[#0E2026] font-bold flex-shrink-0" style={{ background: '#F4927E' }}>+</span>
+            <p className="text-sm leading-6" style={{ color: isDark ? '#9BA3A6' : '#566367' }}>
+              New here? <span style={{ color: '#EE8267' }} className="font-semibold">Register</span> and get <span className="font-bold" style={{ color: isDark ? '#e8f0f2' : '#0E2026' }}>$10,000 USDT</span> demo credit to explore the dashboard.
             </p>
           </div>
 
-          <p className="text-center text-sm text-text-secondary mt-6">
+          <p className="text-center text-sm mt-6" style={{ color: isDark ? '#9BA3A6' : '#566367' }}>
             Don't have an account?{' '}
             <Link to="/register" className="font-bold hover:underline" style={{ color: '#EE8267' }}>Create one free</Link>
           </p>

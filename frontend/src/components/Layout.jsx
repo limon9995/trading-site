@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Outlet, NavLink, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import { useTheme } from '../context/ThemeContext';
 import { useMarketPrices } from '../hooks/useMarketPrices';
 import NotificationFeed from './NotificationFeed';
 
@@ -12,7 +13,7 @@ function ShellBrand() {
         <div className="absolute inset-[5px] rounded-full border-[3px] border-cyan-500 opacity-90" />
         <div className="absolute left-0 top-1/2 -translate-y-1/2 w-4 h-[4px] rounded-full bg-cyan-500" />
       </div>
-      <div className="text-text-primary leading-none">
+      <div className="leading-none" style={{ color: 'var(--cex-text)' }}>
         <span className="text-[16px] font-light tracking-tight">CEX</span>
         <span className="text-[16px] font-light opacity-60">.IO</span>
       </div>
@@ -110,6 +111,7 @@ export default function Layout() {
   const [searchQuery, setSearchQuery] = useState('');
   const [searchOpen, setSearchOpen] = useState(false);
   const { user, logout } = useAuth();
+  const { isDark, toggleTheme } = useTheme();
   const { prices } = useMarketPrices();
   const navigate = useNavigate();
   const searchRef = useRef(null);
@@ -148,12 +150,13 @@ export default function Layout() {
   return (
     <div className="min-h-screen flex flex-col"
       style={{
-        background:
-          'radial-gradient(circle at top left, rgba(24,91,100,0.12), transparent 22%), linear-gradient(180deg, #fbfcfd 0%, #f2f3f5 100%)',
+        background: isDark
+          ? 'linear-gradient(180deg, #071d23 0%, #0a2229 100%)'
+          : 'radial-gradient(circle at top left, rgba(24,91,100,0.12), transparent 22%), linear-gradient(180deg, #fbfcfd 0%, #f2f3f5 100%)',
       }}>
 
       {/* ── Top Header — CEX.IO white ─────────────────────────────────── */}
-      <header className="fixed top-0 left-0 right-0 z-40 backdrop-blur-xl" style={{ background: 'rgba(255,255,255,0.88)', borderBottom: '1px solid rgba(232,234,237,0.95)', height: 72 }}>
+      <header className="fixed top-0 left-0 right-0 z-40 backdrop-blur-xl" style={{ background: isDark ? 'rgba(14,32,38,0.92)' : 'rgba(255,255,255,0.88)', borderBottom: isDark ? '1px solid rgba(255,255,255,0.08)' : '1px solid rgba(232,234,237,0.95)', height: 72 }}>
         <div className="flex items-center justify-between px-4 h-full max-w-2xl mx-auto lg:max-w-6xl">
 
           {/* Left: Avatar → drawer */}
@@ -174,9 +177,12 @@ export default function Layout() {
 
             {/* Search */}
             <div className="flex-1 relative" ref={searchRef}>
-              <div className={`flex items-center gap-2 rounded-[18px] px-3 h-11 border transition-colors ${searchOpen ? 'border-brand-primary/50 shadow-sm' : 'border-light-border hover:border-text-muted/40'}`}
-                style={{ background: 'rgba(244,247,248,0.95)' }}>
-                <svg className="w-3.5 h-3.5 text-text-muted flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <div className={`flex items-center gap-2 rounded-[18px] px-3 h-11 border transition-colors ${searchOpen ? 'border-brand-primary/50 shadow-sm' : ''}`}
+                style={{
+                  background: isDark ? 'rgba(15,42,50,0.95)' : 'rgba(244,247,248,0.95)',
+                  borderColor: searchOpen ? '#EE826780' : isDark ? 'rgba(255,255,255,0.08)' : '#E8EAED',
+                }}>
+                <svg className="w-3.5 h-3.5 flex-shrink-0" style={{ color: 'var(--cex-text-3)' }} fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                 </svg>
                 <input
@@ -185,36 +191,40 @@ export default function Layout() {
                   onChange={(e) => setSearchQuery(e.target.value)}
                   onFocus={() => setSearchOpen(true)}
                   placeholder="Search coins..."
-                  className="bg-transparent text-text-primary text-xs w-full outline-none placeholder-text-muted"
+                  className="bg-transparent text-xs w-full outline-none"
+                  style={{ color: 'var(--cex-text)' }}
                 />
                 {searchQuery && (
-                  <button onClick={() => setSearchQuery('')} className="text-text-muted hover:text-text-primary text-xs">✕</button>
+                  <button onClick={() => setSearchQuery('')} className="text-xs" style={{ color: 'var(--cex-text-3)' }}>✕</button>
                 )}
               </div>
 
               {/* Search Dropdown */}
               {searchOpen && (
                 <div className="absolute top-full left-0 right-0 mt-2 rounded-[24px] overflow-hidden shadow-xl z-50"
-                  style={{ background: 'rgba(255,255,255,0.96)', border: '1px solid #E8EAED', backdropFilter: 'blur(18px)' }}>
-                  <div className="px-3 py-2 border-b border-light-border">
-                    <p className="text-xs text-text-muted">{searchQuery ? `Results for "${searchQuery}"` : 'Popular Coins'}</p>
+                  style={{ background: isDark ? 'rgba(14,32,38,0.98)' : 'rgba(255,255,255,0.96)', border: `1px solid ${isDark ? 'rgba(255,255,255,0.08)' : '#E8EAED'}`, backdropFilter: 'blur(18px)' }}>
+                  <div className="px-3 py-2" style={{ borderBottom: `1px solid ${isDark ? 'rgba(255,255,255,0.08)' : '#E8EAED'}` }}>
+                    <p className="text-xs" style={{ color: 'var(--cex-text-3)' }}>{searchQuery ? `Results for "${searchQuery}"` : 'Popular Coins'}</p>
                   </div>
                   {searchResults.length === 0 ? (
-                    <div className="px-3 py-4 text-center text-xs text-text-muted">No coins found</div>
+                    <div className="px-3 py-4 text-center text-xs" style={{ color: 'var(--cex-text-3)' }}>No coins found</div>
                   ) : (
                     searchResults.map((coin) => (
                       <button key={coin.symbol} onClick={() => handleSelectCoin(coin.symbol)}
-                        className="w-full flex items-center gap-3 px-3 py-2.5 hover:bg-light-hover transition-colors text-left">
+                        className="w-full flex items-center gap-3 px-3 py-2.5 transition-colors text-left"
+                        style={{ '&:hover': { background: 'var(--cex-hover)' } }}
+                        onMouseEnter={e => e.currentTarget.style.background = isDark ? 'rgba(255,255,255,0.05)' : '#f0f1f3'}
+                        onMouseLeave={e => e.currentTarget.style.background = 'transparent'}>
                         <div className="w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0 text-white"
                           style={{ background: '#EE8267' }}>
                           {coin.symbol[0]}
                         </div>
                         <div className="flex-1 min-w-0">
-                          <p className="text-sm font-semibold text-text-primary">{coin.symbol}</p>
-                          <p className="text-xs text-text-muted truncate capitalize">{coin.coinId?.replace(/-/g, ' ')}</p>
+                          <p className="text-sm font-semibold" style={{ color: 'var(--cex-text)' }}>{coin.symbol}</p>
+                          <p className="text-xs truncate capitalize" style={{ color: 'var(--cex-text-3)' }}>{coin.coinId?.replace(/-/g, ' ')}</p>
                         </div>
                         <div className="text-right">
-                          <p className="text-xs font-semibold text-text-primary">
+                          <p className="text-xs font-semibold" style={{ color: 'var(--cex-text)' }}>
                             ${coin.price < 1 ? coin.price.toFixed(4) : coin.price.toLocaleString(undefined, { maximumFractionDigits: 2 })}
                           </p>
                           <p className={`text-xs ${(coin.change24h || 0) >= 0 ? 'text-green-trade' : 'text-red-trade'}`}>
@@ -229,9 +239,25 @@ export default function Layout() {
             </div>
           </div>
 
-          {/* Right: Bell + Admin */}
+          {/* Right: Theme toggle + Bell + Admin */}
           <div className="flex items-center gap-1">
-            <button className="w-9 h-9 rounded-2xl flex items-center justify-center text-text-muted hover:text-text-primary transition-colors hover:bg-white">
+            {/* Theme toggle */}
+            <button
+              onClick={toggleTheme}
+              className="w-9 h-9 rounded-2xl flex items-center justify-center transition-colors"
+              style={{ color: isDark ? '#9BA3A6' : '#566367' }}
+            >
+              {isDark ? (
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" className="w-5 h-5">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364-6.364l-.707.707M6.343 17.657l-.707.707m12.728 0l-.707-.707M6.343 6.343l-.707-.707M12 7a5 5 0 100 10A5 5 0 0012 7z"/>
+                </svg>
+              ) : (
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" className="w-5 h-5">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"/>
+                </svg>
+              )}
+            </button>
+            <button className="w-9 h-9 rounded-2xl flex items-center justify-center transition-colors" style={{ color: isDark ? '#9BA3A6' : '#566367' }}>
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" className="w-5 h-5">
                 <path strokeLinecap="round" strokeLinejoin="round" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
               </svg>
@@ -270,18 +296,18 @@ export default function Layout() {
         <div className="fixed inset-0 z-50 flex">
           <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" onClick={() => setDrawerOpen(false)} />
           <div className="relative w-72 h-full flex flex-col slide-in-right shadow-2xl"
-            style={{ background: 'rgba(255,255,255,0.95)', borderRight: '1px solid #E8EAED', backdropFilter: 'blur(18px)' }}>
+            style={{ background: isDark ? 'rgba(14,32,38,0.98)' : 'rgba(255,255,255,0.95)', borderRight: `1px solid ${isDark ? 'rgba(255,255,255,0.08)' : '#E8EAED'}`, backdropFilter: 'blur(18px)' }}>
 
             {/* User info */}
-            <div className="px-5 pt-10 pb-5 border-b border-light-border">
+            <div className="px-5 pt-10 pb-5" style={{ borderBottom: `1px solid ${isDark ? 'rgba(255,255,255,0.08)' : '#E8EAED'}` }}>
               <div className="flex items-center gap-3">
                 <div className="w-12 h-12 rounded-full flex items-center justify-center font-bold text-xl text-white flex-shrink-0"
                   style={{ background: 'linear-gradient(135deg, #EE8267 0%, #F4927E 100%)' }}>
                   {user?.username?.[0]?.toUpperCase() || 'U'}
                 </div>
                 <div>
-                  <p className="font-semibold text-text-primary text-sm">{user?.username}</p>
-                  <p className="text-xs text-text-muted truncate max-w-[170px]">{user?.email}</p>
+                  <p className="font-semibold text-sm" style={{ color: 'var(--cex-text)' }}>{user?.username}</p>
+                  <p className="text-xs truncate max-w-[170px]" style={{ color: 'var(--cex-text-3)' }}>{user?.email}</p>
                   <span className="text-xs px-2 py-0.5 rounded-full font-semibold mt-1 inline-block text-white"
                     style={{ background: 'linear-gradient(135deg, #EE8267 0%, #F4927E 100%)' }}>
                     {user?.plan !== 'none' ? user?.plan?.toUpperCase() : 'Standard'}
@@ -296,9 +322,10 @@ export default function Layout() {
                 <NavLink key={to + label} to={to} onClick={() => setDrawerOpen(false)}
                   className={({ isActive }) =>
                     `flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all ${
-                      isActive ? 'text-brand-primary bg-brand-primary/8' : 'text-text-secondary hover:bg-light-hover hover:text-text-primary'
+                      isActive ? 'text-brand-primary bg-brand-primary/8' : 'hover:text-brand-primary'
                     }`
                   }
+                  style={({ isActive }) => isActive ? {} : { color: 'var(--cex-text-2)' }}
                 >
                   <>
                     <span className="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0"
@@ -329,7 +356,7 @@ export default function Layout() {
             </nav>
 
             {/* Logout */}
-            <div className="px-2 pb-6 pt-2 border-t border-light-border">
+            <div className="px-2 pb-6 pt-2" style={{ borderTop: `1px solid ${isDark ? 'rgba(255,255,255,0.08)' : '#E8EAED'}` }}>
               <button onClick={handleLogout}
                 className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-text-secondary hover:bg-red-trade/8 hover:text-red-trade transition-all">
                 <span className="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0 bg-red-trade/10 border border-red-trade/20">
@@ -355,8 +382,8 @@ export default function Layout() {
       {/* ── Bottom Navigation — CEX.IO style ──────────────────────────── */}
       <nav className="fixed bottom-0 left-0 right-0 z-40 backdrop-blur-xl"
         style={{
-          background: 'rgba(255,255,255,0.88)',
-          borderTop: '1px solid rgba(232,234,237,0.95)',
+          background: isDark ? 'rgba(14,32,38,0.95)' : 'rgba(255,255,255,0.88)',
+          borderTop: isDark ? '1px solid rgba(255,255,255,0.08)' : '1px solid rgba(232,234,237,0.95)',
           paddingBottom: 'env(safe-area-inset-bottom, 0px)',
           minHeight: 70,
         }}>

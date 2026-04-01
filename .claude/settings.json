@@ -6,7 +6,16 @@
       "Bash(curl -s -X POST http://localhost:5001/api/auth/login -H \"Content-Type: application/json\" -d '{\"\"email\"\":\"\"limon@gmail.com\"\",\"\"password\"\":\"\"test123\"\"}')",
       "Bash(node -e \":*)",
       "Bash(grep -n \"demoModeEnabled ? ''demo_balance'' : ''demo_balance''\" \"/home/md-limon-hossain/SAAS/kafi web/backend/src/controllers/binaryController.js\")",
-      "Bash(curl -s http://localhost:5001/api/auth/login)"
+      "Bash(curl -s http://localhost:5001/api/auth/login)",
+      "WebFetch(domain:webcache.googleusercontent.com)",
+      "WebFetch(domain:coinsutra.com)",
+      "WebFetch(domain:www.daytrading.com)",
+      "WebFetch(domain:coincub.com)",
+      "WebFetch(domain:nftevening.com)",
+      "WebFetch(domain:blog.cex.io)",
+      "Bash(node -e \"require\\(''dotenv''\\).config\\(\\); console.log\\(''PORT:'', process.env.PORT\\); console.log\\(''MONGO_URI:'', process.env.MONGO_URI ? ''set'' : ''NOT SET''\\); console.log\\(''JWT_SECRET:'', process.env.JWT_SECRET ? ''set'' : ''NOT SET''\\);\")",
+      "Bash(timeout 10 node -e \":*)",
+      "Bash(timeout 15 node -e \":*)"
     ]
   }
 }

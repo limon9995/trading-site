@@ -15,27 +15,61 @@
     --cex-card: #ffffff;
     --cex-shadow: 0 24px 80px rgba(8, 35, 41, 0.08);
     --cex-shadow-hover: 0 28px 90px rgba(8, 35, 41, 0.11);
+    --cex-bg: #fbfcfd;
+    --cex-bg2: #f2f3f5;
+    --cex-text: #0e2026;
+    --cex-text-2: #566367;
+    --cex-text-3: #9ba3a6;
+    --cex-input-bg: #f4f7f8;
+    --cex-hover: #f0f1f3;
+    --cex-surface-bg: rgba(255, 255, 255, 0.88);
   }
+
+  .dark {
+    --cex-mist: #071d23;
+    --cex-border: rgba(255,255,255,0.08);
+    --cex-border-soft: rgba(255,255,255,0.08);
+    --cex-card: #0e2026;
+    --cex-shadow: 0 24px 80px rgba(0,0,0,0.4);
+    --cex-shadow-hover: 0 28px 90px rgba(0,0,0,0.5);
+    --cex-bg: #071d23;
+    --cex-bg2: #0a2229;
+    --cex-text: #e8f0f2;
+    --cex-text-2: #9ba3a6;
+    --cex-text-3: #566367;
+    --cex-input-bg: #0f2a32;
+    --cex-hover: rgba(255,255,255,0.05);
+    --cex-surface-bg: rgba(14, 32, 38, 0.92);
+  }
+
   * { box-sizing: border-box; }
   html {
     background:
       radial-gradient(circle at top left, rgba(24, 91, 100, 0.12), transparent 24%),
       linear-gradient(180deg, #fbfcfd 0%, #f2f3f5 100%);
   }
+  html.dark {
+    background: linear-gradient(180deg, #071d23 0%, #0a2229 100%);
+  }
   body {
-    @apply bg-light-bg text-text-primary antialiased;
+    @apply antialiased;
+    color: var(--cex-text);
     font-family: 'Manrope', system-ui, sans-serif;
     line-height: 1.45;
     letter-spacing: -0.01em;
     scrollbar-width: thin;
-    scrollbar-color: #E8EAED #f2f3f5;
+    scrollbar-color: var(--cex-border) var(--cex-mist);
     background:
       radial-gradient(circle at top left, rgba(24, 91, 100, 0.12), transparent 24%),
       linear-gradient(180deg, #fbfcfd 0%, #f2f3f5 100%);
   }
+  .dark body,
+  .dark {
+    background: linear-gradient(180deg, #071d23 0%, #0a2229 100%);
+  }
   ::-webkit-scrollbar { width: 4px; height: 4px; }
-  ::-webkit-scrollbar-track { background: #f2f3f5; }
-  ::-webkit-scrollbar-thumb { background: #E8EAED; border-radius: 3px; }
+  ::-webkit-scrollbar-track { background: var(--cex-mist); }
+  ::-webkit-scrollbar-thumb { background: var(--cex-border); border-radius: 3px; }
   ::-webkit-scrollbar-thumb:hover { background: #EE826744; }
   h1, h2, h3, h4 {
     letter-spacing: -0.03em;
@@ -62,12 +96,16 @@
 
 @layer components {
   .card {
-    @apply bg-light-card rounded-[28px];
+    background: var(--cex-card);
+    @apply rounded-[28px];
     border: 1px solid var(--cex-border-soft);
     box-shadow: 0 18px 50px rgba(8, 35, 41, 0.055);
   }
+  .dark .card {
+    box-shadow: 0 18px 50px rgba(0,0,0,0.25);
+  }
   .cex-surface {
-    background: rgba(255, 255, 255, 0.88);
+    background: var(--cex-surface-bg);
     border: 1px solid var(--cex-border-soft);
     box-shadow: var(--cex-shadow);
     backdrop-filter: blur(18px);
@@ -79,6 +117,12 @@
     border: 1px solid var(--cex-border-soft);
     box-shadow: 0 20px 60px rgba(14, 32, 38, 0.065);
   }
+  .dark .cex-panel {
+    background:
+      linear-gradient(180deg, rgba(14,32,38,0.98), rgba(10,25,31,0.95)),
+      linear-gradient(135deg, rgba(24, 91, 100, 0.12), rgba(238, 130, 103, 0.06));
+    box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+  }
   .cex-dark-panel {
     background:
       radial-gradient(circle at top right, rgba(238, 130, 103, 0.22), transparent 30%),
@@ -87,9 +131,9 @@
   }
   .cex-chip {
     @apply inline-flex items-center gap-2 rounded-full px-4 py-2.5 text-xs font-semibold;
-    background: rgba(255, 255, 255, 0.72);
-    border: 1px solid rgba(232, 234, 237, 0.95);
-    color: #566367;
+    background: var(--cex-surface-bg);
+    border: 1px solid var(--cex-border-soft);
+    color: var(--cex-text-2);
     min-height: 40px;
   }
   /* CEX.IO coral CTA button */
@@ -132,17 +176,18 @@
   }
   .input-field {
     @apply w-full rounded-[20px] px-4
-           text-text-primary placeholder-text-muted text-sm
-           focus:outline-none transition-all duration-200;
+           text-sm focus:outline-none transition-all duration-200;
+    color: var(--cex-text);
     min-height: 52px;
-    border: 1.5px solid #E8EAED;
-    background: #f4f7f8;
+    border: 1.5px solid var(--cex-border);
+    background: var(--cex-input-bg);
     line-height: 1.35;
   }
+  .input-field::placeholder { color: var(--cex-text-3); }
   .input-field:focus {
     border-color: #EE8267;
     box-shadow: 0 0 0 3px rgba(238,130,103,0.12);
-    background: #fff;
+    background: var(--cex-card);
   }
   .skeleton {
     @apply bg-light-border rounded animate-pulse;
@@ -169,9 +214,10 @@
   }
   /* List row */
   .list-row {
-    @apply flex items-center gap-3 px-4 py-4 hover:bg-light-hover transition-colors;
-    border-bottom: 1px solid #E8EAED;
+    @apply flex items-center gap-3 px-4 py-4 transition-colors;
+    border-bottom: 1px solid var(--cex-border);
   }
+  .list-row:hover { background: var(--cex-hover); }
   .list-row:last-child { border-bottom: none; }
   /* Section label */
   .section-label {

@@ -18,7 +18,7 @@ const writeTheme = (value) => {
 
 export const ThemeProvider = ({ children }) => {
   const [isDark, setIsDark] = useState(() => {
-    return readTheme() !== 'light';
+    return readTheme() === 'dark';
   });
 
   useEffect(() => {
