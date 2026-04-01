@@ -198,9 +198,9 @@ const getAnalytics = async (req, res) => {
 const adjustPlan = async (req, res) => {
   try {
     const { plan, duration } = req.body;
-    const validPlans = ['none', 'starter', 'pro', 'vip'];
+    const validPlans = ['none', 'level1', 'level2', 'level3', 'level4'];
     if (!validPlans.includes(plan)) {
-      return res.status(400).json({ error: 'Invalid plan. Must be one of: none, starter, pro, vip.' });
+      return res.status(400).json({ error: 'Invalid plan. Must be one of: none, level1, level2, level3, level4.' });
     }
 
     const user = await User.findById(req.params.id);

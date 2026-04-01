@@ -6,12 +6,15 @@ const PlanPurchase = require('../models/PlanPurchase');
 // Default plan data (seeded on first request if DB is empty)
 const DEFAULT_PLANS = [
   {
-    name: 'starter',
+    name: 'level1',
+    level: 1,
     displayName: 'Starter',
     price: 100,
     dailyReturn: 1.0,
     duration: 30,
     maxReturn: 30,
+    tradeBonus: 10,
+    withdrawSpeed: 'normal',
     features: [
       'Daily returns of 1.0%',
       '30-day duration',
@@ -21,12 +24,15 @@ const DEFAULT_PLANS = [
     ],
   },
   {
-    name: 'pro',
+    name: 'level2',
+    level: 2,
     displayName: 'Pro',
     price: 500,
     dailyReturn: 1.5,
     duration: 60,
     maxReturn: 90,
+    tradeBonus: 20,
+    withdrawSpeed: 'fast',
     features: [
       'Daily returns of 1.5%',
       '60-day duration',
@@ -37,12 +43,15 @@ const DEFAULT_PLANS = [
     ],
   },
   {
-    name: 'vip',
+    name: 'level3',
+    level: 3,
     displayName: 'VIP',
     price: 2000,
     dailyReturn: 2.0,
     duration: 90,
     maxReturn: 180,
+    tradeBonus: 50,
+    withdrawSpeed: 'fast',
     features: [
       'Daily returns of 2.0%',
       '90-day duration',
@@ -51,6 +60,27 @@ const DEFAULT_PLANS = [
       'Trade fee discount 50%',
       'Exclusive market insights',
       'Dedicated account manager',
+    ],
+  },
+  {
+    name: 'level4',
+    level: 4,
+    displayName: 'Elite',
+    price: 5000,
+    dailyReturn: 2.5,
+    duration: 120,
+    maxReturn: 300,
+    tradeBonus: 75,
+    withdrawSpeed: 'instant',
+    features: [
+      'Daily returns of 2.5%',
+      '120-day duration',
+      'Up to 300% total return',
+      'Elite 24/7 support',
+      'Trade fee discount 75%',
+      'Exclusive market insights',
+      'Dedicated account manager',
+      'Early access to new features',
     ],
   },
 ];

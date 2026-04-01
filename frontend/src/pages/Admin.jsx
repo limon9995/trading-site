@@ -861,7 +861,7 @@ export default function Admin() {
             ) : (
               <div className="divide-y divide-light-border/30">
                 {planPurchases.map((p) => {
-                  const planIcons = { starter: '🌱', pro: '🚀', vip: '👑' };
+                  const planIcons = { level1: '🌱', level2: '🚀', level3: '👑', level4: '💠' };
                   return (
                     <div key={p._id} className="px-4 py-3 flex items-center gap-3">
                       <div className="w-10 h-10 rounded-full flex items-center justify-center text-xl flex-shrink-0"
