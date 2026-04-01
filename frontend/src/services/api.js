@@ -15,9 +15,14 @@ const storage = {
   },
 };
 
+const configuredBaseURL =
+  import.meta.env.VITE_API_URL ||
+  import.meta.env.VITE_API_BASE_URL ||
+  '/api';
+
 // Base API instance
 const api = axios.create({
-  baseURL: import.meta.env.VITE_API_URL || '/api',
+  baseURL: configuredBaseURL,
   timeout: 10000,
   headers: { 'Content-Type': 'application/json' },
 });
