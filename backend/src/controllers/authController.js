@@ -12,6 +12,8 @@ const RESET_OTP_EXPIRY = 10 * 60 * 1000; // 10 minutes
 const registerOtpStore = new Map(); // email -> { otp, expiresAt, pendingData }
 const REGISTER_OTP_EXPIRY = 10 * 60 * 1000;
 
+const normalizeEmail = (email = '') => email.toLowerCase().trim();
+
 // Generate JWT token
 const generateToken = (userId) => {
   return jwt.sign({ id: userId }, process.env.JWT_SECRET, {
@@ -27,16 +29,22 @@ const sendRegisterOtp = async (req, res) => {
     if (username.length < 3 || username.length > 20) return res.status(400).json({ error: 'Username must be 3-20 characters.' });
     if (password.length < 6) return res.status(400).json({ error: 'Password must be at least 6 characters.' });
 
-    const existingUser = await User.findOne({ $or: [{ email: email.toLowerCase().trim() }, { username }] });
+    const normalizedEmail = normalizeEmail(email);
+
+    const existingUser = await User.findOne({ $or: [{ email: normalizedEmail }, { username }] });
     if (existingUser) {
-      const field = existingUser.email === email.toLowerCase().trim() ? 'Email' : 'Username';
+      const field = existingUser.email === normalizedEmail ? 'Email' : 'Username';
       return res.status(409).json({ error: `${field} already in use.` });
     }
 
     const otp = Math.floor(100000 + Math.random() * 900000).toString();
-    registerOtpStore.set(email, { otp, expiresAt: Date.now() + REGISTER_OTP_EXPIRY, pendingData: req.body });
+    registerOtpStore.set(normalizedEmail, {
+      otp,
+      expiresAt: Date.now() + REGISTER_OTP_EXPIRY,
+      pendingData: { ...req.body, email: normalizedEmail },
+    });
 
-    await sendRegisterOTP(email, otp, username);
+    await sendRegisterOTP(normalizedEmail, otp, username);
     res.json({ message: 'OTP sent to your email.' });
   } catch (err) {
     console.error('Send register OTP error:', err);
@@ -48,13 +56,14 @@ const sendRegisterOtp = async (req, res) => {
 const register = async (req, res) => {
   try {
     const { email, otp } = req.body;
+    const normalizedEmail = normalizeEmail(email);
 
     // OTP verification
     if (!otp) return res.status(400).json({ error: 'OTP is required.' });
-    const record = registerOtpStore.get(email);
+    const record = registerOtpStore.get(normalizedEmail);
     if (!record) return res.status(400).json({ error: 'No OTP found. Please request a new one.' });
     if (Date.now() > record.expiresAt) {
-      registerOtpStore.delete(email);
+      registerOtpStore.delete(normalizedEmail);
       return res.status(400).json({ error: 'OTP expired. Please try again.' });
     }
     if (record.otp !== otp.trim()) return res.status(400).json({ error: 'Invalid OTP.' });
@@ -62,13 +71,13 @@ const register = async (req, res) => {
     const { username, password, referralCode } = record.pendingData;
 
     // Double-check uniqueness
-    const existingUser = await User.findOne({ $or: [{ email: email.toLowerCase().trim() }, { username }] });
+    const existingUser = await User.findOne({ $or: [{ email: normalizedEmail }, { username }] });
     if (existingUser) {
-      const field = existingUser.email === email.toLowerCase().trim() ? 'Email' : 'Username';
+      const field = existingUser.email === normalizedEmail ? 'Email' : 'Username';
       return res.status(409).json({ error: `${field} already in use.` });
     }
 
-    const newUser = new User({ username, email, password });
+    const newUser = new User({ username, email: normalizedEmail, password });
 
     if (referralCode) {
       const referrer = await User.findOne({ referralCode: referralCode.toUpperCase() });
@@ -80,7 +89,7 @@ const register = async (req, res) => {
     }
 
     await newUser.save();
-    registerOtpStore.delete(email);
+    registerOtpStore.delete(normalizedEmail);
 
     const token = generateToken(newUser._id);
     res.status(201).json({ message: 'Account created successfully!', token, user: newUser.toSafeObject() });
@@ -206,14 +215,15 @@ const forgotPassword = async (req, res) => {
   try {
     const { email } = req.body;
     if (!email) return res.status(400).json({ error: 'Email is required.' });
+    const normalizedEmail = normalizeEmail(email);
 
-    const user = await User.findOne({ email: email.toLowerCase().trim() });
+    const user = await User.findOne({ email: normalizedEmail });
     if (!user) return res.status(404).json({ error: 'No account found with this email.' });
 
     const otp = Math.floor(100000 + Math.random() * 900000).toString();
-    resetOtpStore.set(email, { otp, expiresAt: Date.now() + RESET_OTP_EXPIRY, userId: user._id });
+    resetOtpStore.set(normalizedEmail, { otp, expiresAt: Date.now() + RESET_OTP_EXPIRY, userId: user._id });
 
-    await sendPasswordResetOTP(email, otp, user.username);
+    await sendPasswordResetOTP(normalizedEmail, otp, user.username);
     res.json({ message: 'OTP sent to your email.' });
   } catch (err) {
     console.error('Forgot password error:', err);
@@ -226,17 +236,18 @@ const verifyResetOtp = async (req, res) => {
   try {
     const { email, otp } = req.body;
     if (!email || !otp) return res.status(400).json({ error: 'Email and OTP are required.' });
+    const normalizedEmail = normalizeEmail(email);
 
-    const record = resetOtpStore.get(email);
+    const record = resetOtpStore.get(normalizedEmail);
     if (!record) return res.status(400).json({ error: 'No OTP request found. Please try again.' });
     if (Date.now() > record.expiresAt) {
-      resetOtpStore.delete(email);
+      resetOtpStore.delete(normalizedEmail);
       return res.status(400).json({ error: 'OTP has expired. Please request a new one.' });
     }
     if (record.otp !== otp.trim()) return res.status(400).json({ error: 'Invalid OTP.' });
 
     // Mark as verified (keep in store for reset step)
-    resetOtpStore.set(email, { ...record, verified: true });
+    resetOtpStore.set(normalizedEmail, { ...record, verified: true });
     res.json({ message: 'OTP verified.' });
   } catch (err) {
     console.error('Verify reset OTP error:', err);
@@ -250,13 +261,14 @@ const resetPassword = async (req, res) => {
     const { email, otp, newPassword } = req.body;
     if (!email || !otp || !newPassword) return res.status(400).json({ error: 'All fields are required.' });
     if (newPassword.length < 6) return res.status(400).json({ error: 'Password must be at least 6 characters.' });
+    const normalizedEmail = normalizeEmail(email);
 
-    const record = resetOtpStore.get(email);
+    const record = resetOtpStore.get(normalizedEmail);
     if (!record || !record.verified || record.otp !== otp.trim()) {
       return res.status(400).json({ error: 'Invalid or expired session. Please start over.' });
     }
     if (Date.now() > record.expiresAt) {
-      resetOtpStore.delete(email);
+      resetOtpStore.delete(normalizedEmail);
       return res.status(400).json({ error: 'Session expired. Please start over.' });
     }
 
@@ -265,7 +277,7 @@ const resetPassword = async (req, res) => {
 
     user.password = newPassword; // pre-save hook will hash it
     await user.save();
-    resetOtpStore.delete(email);
+    resetOtpStore.delete(normalizedEmail);
 
     res.json({ message: 'Password reset successfully. You can now log in.' });
   } catch (err) {

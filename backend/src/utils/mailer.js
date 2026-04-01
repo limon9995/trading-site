@@ -1,5 +1,11 @@
 const nodemailer = require('nodemailer');
 
+const validateMailerEnv = () => {
+  if (!process.env.GMAIL_USER || !process.env.GMAIL_PASS) {
+    throw new Error('Missing GMAIL_USER or GMAIL_PASS environment variables.');
+  }
+};
+
 const transporter = nodemailer.createTransport({
   host: 'smtp.gmail.com',
   port: 587,
@@ -10,11 +16,22 @@ const transporter = nodemailer.createTransport({
   },
 });
 
+const sendMail = async (mailOptions) => {
+  validateMailerEnv();
+
+  try {
+    return await transporter.sendMail(mailOptions);
+  } catch (error) {
+    console.error('SMTP sendMail error:', error);
+    throw new Error(`OTP email could not be sent: ${error.message}`);
+  }
+};
+
 /**
  * Send OTP email for withdrawal verification
  */
 const sendWithdrawOTP = async (toEmail, otp, amount) => {
-  await transporter.sendMail({
+  await sendMail({
     from: `"CryptoTrade Security" <${process.env.GMAIL_USER}>`,
     to: toEmail,
     subject: '🔐 Withdrawal Verification OTP',
@@ -46,7 +63,7 @@ const sendWithdrawOTP = async (toEmail, otp, amount) => {
  * Send OTP email for registration verification
  */
 const sendRegisterOTP = async (toEmail, otp, username) => {
-  await transporter.sendMail({
+  await sendMail({
     from: `"CryptoTrade Security" <${process.env.GMAIL_USER}>`,
     to: toEmail,
     subject: '✅ Verify Your Email — CryptoTrade',
@@ -76,7 +93,7 @@ const sendRegisterOTP = async (toEmail, otp, username) => {
  * Send OTP email for password reset
  */
 const sendPasswordResetOTP = async (toEmail, otp, username) => {
-  await transporter.sendMail({
+  await sendMail({
     from: `"CryptoTrade Security" <${process.env.GMAIL_USER}>`,
     to: toEmail,
     subject: '🔑 Password Reset OTP',
