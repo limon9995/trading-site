@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { createChart, CrosshairMode, LineStyle, CandlestickSeries, HistogramSeries } from 'lightweight-charts';
 import { binaryAPI, marketAPI } from '../services/api';
 import { useMarketPrices } from '../hooks/useMarketPrices';
@@ -494,11 +495,12 @@ const COINS = ['BTC', 'ETH', 'BNB', 'SOL', 'XRP', 'DOGE'];
 export default function BinaryTrade() {
   const { user, refreshUser } = useAuth();
   const { prices }            = useMarketPrices(3000);
+  const navigate              = useNavigate();
 
   const [selectedCoin, setSelectedCoin] = useState('BTC');
   const [interval,     setInterval]     = useState('1m');
   const [settings,     setSettings]     = useState({
-    tradingEnabled: true, payoutRate: 0.85, minTradeAmount: 1,
+    tradingEnabled: true, maintenanceMode: false, payoutRate: 0.85, minTradeAmount: 1,
     maxTradeAmount: 1000, expiryTimes: [20, 30, 60, 90, 180], availablePairs: COINS,
   });
   const [modal,        setModal]        = useState(null);
@@ -549,12 +551,86 @@ export default function BinaryTrade() {
   const availablePairs = settings.availablePairs || COINS;
   const balance        = user?.demo_balance || 0;
 
-  if (!settings.tradingEnabled) {
+  if (!settings.tradingEnabled || settings.maintenanceMode) {
     return (
-      <div className="flex flex-col items-center justify-center min-h-[60vh] space-y-4 text-center px-6">
-        <p className="text-5xl">🔧</p>
-        <p className="text-text-primary font-bold text-xl">Trading Under Maintenance</p>
-        <p className="text-text-muted text-sm">Temporarily unavailable. Please check back soon.</p>
+      <div className="animate-fade-in space-y-4 px-0 pb-20">
+        <div
+          className="relative overflow-hidden rounded-[2rem] px-5 py-6 sm:px-6 sm:py-7"
+          style={{ background: 'linear-gradient(135deg, #2a1407 0%, #6e3d12 54%, #b86d17 100%)' }}
+        >
+          <div className="pointer-events-none absolute -right-10 -top-10 h-36 w-36 rounded-full bg-white/10 blur-2xl" />
+          <div className="pointer-events-none absolute bottom-0 left-0 h-28 w-28 rounded-full bg-[#ffd088]/15 blur-2xl" />
+          <div className="flex flex-col gap-5 sm:flex-row sm:items-end sm:justify-between">
+            <div className="max-w-xl">
+              <p className="text-[11px] font-semibold uppercase tracking-[0.28em] text-[#ffd088]">Trading Status</p>
+              <h1 className="mt-2 text-white text-[1.9rem] leading-[1.05] font-semibold sm:text-[2.6rem]">
+                Trading is temporarily paused
+              </h1>
+              <p className="mt-3 max-w-lg text-sm leading-6 text-white/72 sm:text-[15px]">
+                Admin has turned on maintenance mode. New binary trades are blocked for now until operations resume.
+              </p>
+            </div>
+            <div className="rounded-[1.5rem] border border-white/12 bg-white/8 px-5 py-4 text-white/92 backdrop-blur">
+              <p className="text-[11px] uppercase tracking-[0.22em] text-white/52">Current Status</p>
+              <p className="mt-2 text-xl font-bold text-[#ffd088]">Maintenance Mode</p>
+              <p className="mt-1 text-xs text-white/62">Please check back later.</p>
+            </div>
+          </div>
+        </div>
+
+        <div
+          className="rounded-[1.8rem] border p-6 sm:p-8"
+          style={{
+            background: 'linear-gradient(180deg, #ffffff 0%, #f8fbfc 100%)',
+            borderColor: 'rgba(184,109,23,0.16)',
+            boxShadow: '0 16px 36px rgba(6, 28, 33, 0.08)',
+          }}
+        >
+          <div className="mx-auto max-w-2xl text-center">
+            <div className="mx-auto flex h-20 w-20 items-center justify-center rounded-[2rem] bg-[#fff3ea] text-4xl shadow-[0_18px_40px_rgba(184,109,23,0.12)]">
+              🔧
+            </div>
+            <h2 className="mt-5 text-[1.6rem] font-semibold tracking-[-0.03em] text-text-primary">
+              Binary trading is under maintenance
+            </h2>
+            <p className="mt-3 text-sm leading-7 text-text-secondary sm:text-[15px]">
+              You can still browse the app, but opening new binary positions is disabled while admin performs updates.
+              Once maintenance is turned off, this screen will disappear automatically.
+            </p>
+            <div className="mt-6 grid gap-3 sm:grid-cols-3">
+              <div className="rounded-[1.3rem] border border-light-border bg-[#f7fbfb] px-4 py-4 text-left">
+                <p className="text-[11px] uppercase tracking-[0.22em] text-text-muted">New Trades</p>
+                <p className="mt-2 text-sm font-semibold text-red-trade">Blocked</p>
+                <p className="mt-1 text-xs leading-5 text-text-muted">No new binary orders can be opened right now.</p>
+              </div>
+              <div className="rounded-[1.3rem] border border-light-border bg-[#f7fbfb] px-4 py-4 text-left">
+                <p className="text-[11px] uppercase tracking-[0.22em] text-text-muted">Reason</p>
+                <p className="mt-2 text-sm font-semibold text-text-primary">Admin maintenance</p>
+                <p className="mt-1 text-xs leading-5 text-text-muted">This usually means updates or checks are being applied.</p>
+              </div>
+              <div className="rounded-[1.3rem] border border-light-border bg-[#f7fbfb] px-4 py-4 text-left">
+                <p className="text-[11px] uppercase tracking-[0.22em] text-text-muted">Action</p>
+                <p className="mt-2 text-sm font-semibold text-text-primary">Wait and retry later</p>
+                <p className="mt-1 text-xs leading-5 text-text-muted">The page will work again automatically after maintenance is turned off.</p>
+              </div>
+            </div>
+
+            <div className="mt-6 flex flex-col justify-center gap-3 sm:flex-row">
+              <button
+                onClick={() => navigate('/dashboard')}
+                className="rounded-full border border-light-border bg-[#f7fbfb] px-5 py-3 text-sm font-semibold text-text-primary transition-all hover:-translate-y-0.5 hover:bg-white"
+              >
+                Back To Dashboard
+              </button>
+              <button
+                onClick={() => navigate('/wallet')}
+                className="rounded-full bg-[linear-gradient(135deg,#f0b90b_0%,#dca70a_100%)] px-5 py-3 text-sm font-semibold text-[#2a1d05] shadow-[0_18px_40px_rgba(240,185,11,0.22)] transition-all hover:-translate-y-0.5"
+              >
+                Go To Wallet
+              </button>
+            </div>
+          </div>
+        </div>
       </div>
     );
   }
