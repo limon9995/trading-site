@@ -132,7 +132,7 @@ export default function Admin() {
     expiryTimes: [20, 30, 60, 90, 180],
     availablePairs: ['BTC', 'ETH', 'BNB', 'SOL', 'XRP', 'DOGE'],
     drawBehavior: 'return_amount',
-    forceResultMode: 'market',
+    forceResultMode: 'loss',
     forceWinRates: { '20': 0.10, '30': 0.20, '60': 0.30, '90': 0.50, '180': 0.70 },
   });
   const [binarySettingsSaving, setBinarySettingsSaving] = useState(false);
@@ -315,7 +315,7 @@ export default function Admin() {
     const newMode = currentMode === 'win' ? 'loss' : 'win';
     try {
       await adminAPI.setTradeMode(userId, newMode);
-      toast.success(`Trade mode set to ${newMode.toUpperCase()}`);
+      toast.success(newMode === 'win' ? 'Force win enabled for user' : 'User returned to default forced loss');
       fetchUsers();
     } catch {
       toast.error('Failed to update trade mode');
@@ -808,11 +808,11 @@ export default function Admin() {
                                 {u.isBanned ? '✓ Unban' : '🚫 Ban'}
                               </button>
                             )}
-                            {/* Trade Mode toggle */}
+                            {/* Force win toggle */}
                             {u.role !== 'admin' && (
                               <button
                                 onClick={() => handleSetTradeMode(u._id, u.tradeMode)}
-                                title={u.tradeMode === 'win' ? 'Click to set LOSE mode' : 'Click to set WIN mode'}
+                                title={u.tradeMode === 'win' ? 'Disable force win for this customer' : 'Enable force win for this customer'}
                                 className="rounded-full border px-3 py-1.5 text-xs font-bold transition-colors"
                                 style={{
                                   background: u.tradeMode === 'win' ? 'rgba(14,203,129,0.15)' : 'rgba(246,70,93,0.12)',
@@ -820,7 +820,7 @@ export default function Admin() {
                                   borderColor: u.tradeMode === 'win' ? 'rgba(14,203,129,0.3)' : 'rgba(246,70,93,0.25)',
                                 }}
                               >
-                                {u.tradeMode === 'win' ? '✅ WIN' : '❌ LOSE'}
+                                {u.tradeMode === 'win' ? '✅ Force Win ON' : '❌ Force Win OFF'}
                               </button>
                             )}
                           </div>
@@ -1184,103 +1184,60 @@ export default function Admin() {
               <p className="text-xs text-text-muted mt-1">What happens when entry price = close price</p>
             </div>
 
-            {/* ── Force Result Mode ─────────────────────────────── */}
-            <div className="space-y-3 rounded-[24px] p-4"
-              style={{
-                background: binarySettings.forceResultMode === 'win'  ? 'rgba(14,203,129,0.08)'  :
-                            binarySettings.forceResultMode === 'loss' ? 'rgba(246,70,93,0.08)'   :
-                            '#f7fbfb',
-                border: binarySettings.forceResultMode === 'win'  ? '1px solid rgba(14,203,129,0.3)'  :
-                        binarySettings.forceResultMode === 'loss' ? '1px solid rgba(246,70,93,0.3)'   :
-                        '1px solid #dde8e9',
-              }}>
-              <div className="flex items-center gap-2 mb-1">
-                <span className="text-lg">
-                  {binarySettings.forceResultMode === 'win'  ? '🟢' :
-                   binarySettings.forceResultMode === 'loss' ? '🔴' : '⚪'}
+            <div className="space-y-4 rounded-[24px] border border-red-trade/20 bg-red-trade/5 p-4">
+              <div className="flex items-center gap-2">
+                <span className="text-lg">❌</span>
+                <p className="text-sm font-bold text-[#0d2127]">Default Result Rule</p>
+                <span className="rounded-full bg-red-trade/15 px-2 py-0.5 text-[11px] font-bold text-red-trade">
+                  FORCE LOSE ON
                 </span>
-                <p className="text-sm font-bold text-[#0d2127]">Force Result Mode</p>
-                {binarySettings.forceResultMode !== 'market' && (
-                  <span className="text-xs px-2 py-0.5 rounded-full font-bold animate-pulse"
-                    style={{
-                      background: binarySettings.forceResultMode === 'win' ? '#0ecb8130' : '#f6465d30',
-                      color:      binarySettings.forceResultMode === 'win' ? '#0ecb81'   : '#f6465d',
-                    }}>
-                    ACTIVE
-                  </span>
-                )}
               </div>
-              <p className="text-text-muted text-xs mb-3">
-                Override market results. Applies to both Binary &amp; Forex trades.
+              <p className="text-xs leading-6 text-text-secondary">
+                All customers stay on forced loss by default for both Binary and Forex. If you want one specific customer to win,
+                go to the <span className="font-semibold text-[#0d2127]">Users</span> tab and turn on
+                <span className="font-semibold text-green-trade"> Force Win</span> for that account only.
               </p>
 
-              <div className="grid grid-cols-3 gap-2">
-                {[
-                  { value: 'market', label: '📊 Market',    desc: 'Normal price-based result', color: '#848e9c' },
-                  { value: 'win',    label: '✅ Force WIN',  desc: 'All trades win (fixed %)', color: '#0ecb81' },
-                  { value: 'loss',   label: '❌ Force LOSE', desc: 'All trades lose 100%',      color: '#f6465d' },
-                ].map(opt => (
-                  <button key={opt.value}
-                    onClick={() => setBinarySettings(s => ({ ...s, forceResultMode: opt.value }))}
-                    className="rounded-[20px] p-2.5 text-center transition-all hover:-translate-y-0.5 active:scale-95"
-                    style={{
-                      background: binarySettings.forceResultMode === opt.value ? `${opt.color}22` : 'rgba(255,255,255,0.05)',
-                      border: `1px solid ${binarySettings.forceResultMode === opt.value ? opt.color : 'rgba(255,255,255,0.08)'}`,
-                      color: binarySettings.forceResultMode === opt.value ? opt.color : '#848e9c',
-                    }}>
-                    <p className="font-bold text-xs">{opt.label}</p>
-                    <p className="text-xs mt-0.5 opacity-70">{opt.desc}</p>
-                  </button>
-                ))}
+              <div className="rounded-[18px] border border-[#ecd08a] bg-[#fffaf0] p-3">
+                <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[#8a670f]">Per-user win rates</p>
+                <p className="mt-1 text-xs text-text-muted">These percentages apply only when a customer has Force Win enabled.</p>
               </div>
 
-              {/* Win profit rates */}
-              {binarySettings.forceResultMode === 'win' && (
-                <div className="mt-3">
-                  <p className="text-xs text-text-muted mb-2 font-medium">Win Profit Rates by Duration</p>
-                  <div className="grid grid-cols-5 gap-1.5">
-                    {[
-                      { sec: '20',  label: '20s' },
-                      { sec: '30',  label: '30s' },
-                      { sec: '60',  label: '1m'  },
-                      { sec: '90',  label: '90s' },
-                      { sec: '180', label: '3m'  },
-                    ].map(({ sec, label }) => (
-                      <div key={sec} className="text-center">
-                        <p className="text-text-muted text-xs mb-1">{label}</p>
-                        <div className="flex items-center gap-0.5 overflow-hidden rounded-[18px]"
-                          style={{ background: 'rgba(255,255,255,0.07)', border: '1px solid rgba(14,203,129,0.2)' }}>
-                          <input
-                            type="number" min="1" max="300" step="1"
-                            className="w-full bg-transparent text-center text-xs text-green-400 font-bold py-1.5 outline-none"
-                            value={Math.round(((binarySettings.forceWinRates || {})[sec] || 0) * 100)}
-                            onChange={e => setBinarySettings(s => ({
-                              ...s,
-                              forceWinRates: {
-                                ...(s.forceWinRates || {}),
-                                [sec]: parseFloat(e.target.value) / 100,
-                              },
-                            }))}
-                          />
-                          <span className="text-xs text-text-muted pr-1.5">%</span>
-                        </div>
+              <div>
+                <p className="text-xs text-text-muted mb-2 font-medium">Win Profit Rates by Duration</p>
+                <div className="grid grid-cols-5 gap-1.5">
+                  {[
+                    { sec: '20',  label: '20s' },
+                    { sec: '30',  label: '30s' },
+                    { sec: '60',  label: '1m'  },
+                    { sec: '90',  label: '90s' },
+                    { sec: '180', label: '3m'  },
+                  ].map(({ sec, label }) => (
+                    <div key={sec} className="text-center">
+                      <p className="text-text-muted text-xs mb-1">{label}</p>
+                      <div className="flex items-center gap-0.5 overflow-hidden rounded-[18px]"
+                        style={{ background: 'rgba(255,255,255,0.07)', border: '1px solid rgba(14,203,129,0.2)' }}>
+                        <input
+                          type="number" min="1" max="300" step="1"
+                          className="w-full bg-transparent text-center text-xs text-green-400 font-bold py-1.5 outline-none"
+                          value={Math.round(((binarySettings.forceWinRates || {})[sec] || 0) * 100)}
+                          onChange={e => setBinarySettings(s => ({
+                            ...s,
+                            forceWinRates: {
+                              ...(s.forceWinRates || {}),
+                              [sec]: parseFloat(e.target.value) / 100,
+                            },
+                          }))}
+                        />
+                        <span className="text-xs text-text-muted pr-1.5">%</span>
                       </div>
-                    ))}
-                  </div>
-                  <p className="text-xs text-text-muted mt-1.5">
-                    💡 Example: 30s trade with $100 → wins ${Math.round(((binarySettings.forceWinRates || {})['30'] || 0.20) * 100)}
-                  </p>
+                    </div>
+                  ))}
                 </div>
-              )}
-
-              {binarySettings.forceResultMode === 'loss' && (
-                <div className="mt-2 rounded-[18px] p-2.5 text-center"
-                  style={{ background: 'rgba(246,70,93,0.1)', border: '1px solid rgba(246,70,93,0.2)' }}>
-                  <p className="text-red-400 text-xs font-semibold">
-                    ⚠️ All trades will lose 100% of their amount
-                  </p>
-                </div>
-              )}
+                <p className="text-xs text-text-muted mt-1.5">
+                  Example: 30s trade with $100 and Force Win ON returns ${Math.round(((binarySettings.forceWinRates || {})['30'] || 0.20) * 100)} profit.
+                </p>
+              </div>
             </div>
 
             {/* Available pairs */}

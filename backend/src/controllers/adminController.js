@@ -486,7 +486,10 @@ const setTradeMode = async (req, res) => {
 
     const user = await User.findByIdAndUpdate(req.params.id, update, { new: true });
     if (!user) return res.status(404).json({ error: 'User not found' });
-    res.json({ message: `Trade mode set to ${tradeMode}`, tradeMode: user.tradeMode });
+    res.json({
+      message: tradeMode === 'win' ? 'Force win enabled for user' : 'User returned to default forced loss',
+      tradeMode: user.tradeMode,
+    });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }

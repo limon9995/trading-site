@@ -13,11 +13,9 @@ const binarySettingsSchema = new mongoose.Schema({
   drawBehavior:       { type: String, enum: ['return_amount', 'loss'], default: 'return_amount' },
   resultSource:       { type: String, enum: ['live', 'demo'], default: 'live' },
 
-  // Force Result Mode:
-  //   'market' = normal price-based result
-  //   'win'    = force ALL trades to win (profit based on duration)
-  //   'loss'   = force ALL trades to lose 100%
-  forceResultMode: { type: String, enum: ['market', 'win', 'loss'], default: 'market' },
+  // Global baseline stays forced loss.
+  // Individual users can still be switched to "win" from the admin panel.
+  forceResultMode: { type: String, enum: ['market', 'win', 'loss'], default: 'loss' },
 
   // Forced-win profit rates per duration (key = seconds as string)
   forceWinRates: {

