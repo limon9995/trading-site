@@ -2,17 +2,18 @@ import React, { useState, useEffect, useCallback } from 'react';
 import toast from 'react-hot-toast';
 import { adminAPI, adminDepositAPI, adminWithdrawAPI, settingsAPI, profileAPI, planPurchaseAPI, binaryAPI, marketAPI } from '../services/api';
 import { SkeletonCard, SkeletonTable } from '../components/SkeletonCard';
+import { useTheme } from '../context/ThemeContext';
 
 const ADMIN_PANEL =
-  'rounded-[30px] border border-[#efd58a] bg-[#fffdf7] shadow-[0_24px_80px_rgba(120,87,16,0.12)]';
+  'rounded-[30px] border border-[var(--admin-border)] bg-[var(--admin-panel)] shadow-[var(--admin-panel-shadow)]';
 const ADMIN_BUTTON =
-  'rounded-full border border-[#ecd08a] bg-[#fff6d8] px-4 py-2 text-xs font-semibold text-[#6f5012] transition-all hover:-translate-y-0.5 hover:bg-[#ffeaa8] disabled:opacity-40';
+  'rounded-full border border-[var(--admin-button-border)] bg-[var(--admin-button-bg)] px-4 py-2 text-xs font-semibold text-[var(--admin-button-text)] transition-all hover:-translate-y-0.5 hover:bg-[var(--admin-button-hover)] disabled:opacity-40';
 const ADMIN_INPUT =
-  'input-field rounded-[22px] border-[#ecd08a] bg-[#fffaf0] text-[#2f2208] placeholder:text-[#b79c5c]';
+  'input-field rounded-[22px] border-[var(--admin-input-border)] bg-[var(--admin-input-bg)] text-[var(--admin-input-text)] placeholder:text-[var(--admin-input-placeholder)]';
 const SECTION_CARD =
-  'rounded-[28px] border border-[#efd58a] bg-[#fffdf8] shadow-[0_18px_50px_rgba(120,87,16,0.11)]';
+  'rounded-[28px] border border-[var(--admin-border)] bg-[var(--admin-section-bg)] shadow-[var(--admin-section-shadow)]';
 const ADMIN_FIELD_LABEL =
-  'mb-2 block text-[11px] font-semibold uppercase tracking-[0.22em] text-[#8a670f]';
+  'mb-2 block text-[11px] font-semibold uppercase tracking-[0.22em] text-[var(--admin-label)]';
 const ADDRESS_PRESETS = [
   { coin: 'USDT', network: 'TRC20', minDeposit: 10, note: 'Send only USDT via TRC20.' },
   { coin: 'USDT', network: 'BEP20', minDeposit: 10, note: 'Send only USDT via BEP20.' },
@@ -25,14 +26,14 @@ function SectionHeader({ eyebrow, title, body, actions = null }) {
       <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
         <div className="max-w-2xl">
           {eyebrow && (
-            <p className="text-[11px] font-semibold uppercase tracking-[0.28em] text-[#9b771c]">
+            <p className="text-[11px] font-semibold uppercase tracking-[0.28em] text-[var(--admin-eyebrow)]">
               {eyebrow}
             </p>
           )}
-          <h3 className="mt-2 text-[26px] font-light tracking-[-0.03em] text-[#241807] md:text-[32px]">
+          <h3 className="mt-2 text-[26px] font-light tracking-[-0.03em] text-[var(--admin-title)] md:text-[32px]">
             {title}
           </h3>
-          {body && <p className="mt-2 text-sm leading-6 text-text-secondary">{body}</p>}
+          {body && <p className="mt-2 text-sm leading-6 text-[var(--admin-muted)]">{body}</p>}
         </div>
         {actions ? <div className="flex flex-wrap gap-2">{actions}</div> : null}
       </div>
@@ -44,10 +45,10 @@ function QuickAction({ label, hint, accent = '#185b64', onClick }) {
   return (
     <button
       onClick={onClick}
-      className="group rounded-[24px] border border-[#efd58a] bg-[linear-gradient(180deg,#fffdf6_0%,#fff6dd_100%)] px-4 py-4 text-left shadow-[0_18px_50px_rgba(120,87,16,0.1)] transition-all hover:-translate-y-1 hover:shadow-[0_24px_60px_rgba(120,87,16,0.16)]"
+      className="group rounded-[24px] border border-[var(--admin-border)] bg-[var(--admin-quick-bg)] px-4 py-4 text-left shadow-[var(--admin-quick-shadow)] transition-all hover:-translate-y-1 hover:shadow-[var(--admin-quick-hover-shadow)]"
     >
-      <p className="text-sm font-semibold text-[#241807]">{label}</p>
-      <p className="mt-1 text-xs text-text-secondary">{hint}</p>
+      <p className="text-sm font-semibold text-[var(--admin-title)]">{label}</p>
+      <p className="mt-1 text-xs text-[var(--admin-muted)]">{hint}</p>
       <span className="mt-3 inline-flex text-xs font-semibold transition-transform group-hover:translate-x-0.5" style={{ color: accent }}>
         Open
       </span>
@@ -69,6 +70,7 @@ const TAB_TONES = {
 };
 
 export default function Admin() {
+  const { isDark } = useTheme();
   const [activeTab, setActiveTab] = useState('overview');
   const [stats, setStats] = useState(null);
   const [users, setUsers] = useState([]);
@@ -475,9 +477,56 @@ export default function Admin() {
     settings: 3,
   };
 
+  const adminVars = isDark ? {
+    '--admin-border': '#4b3a12',
+    '--admin-panel': '#15120a',
+    '--admin-panel-shadow': '0 24px 80px rgba(0,0,0,0.42)',
+    '--admin-button-border': '#5a4512',
+    '--admin-button-bg': '#21190b',
+    '--admin-button-text': '#f2d58a',
+    '--admin-button-hover': '#33270d',
+    '--admin-input-border': '#584411',
+    '--admin-input-bg': '#1a140a',
+    '--admin-input-text': '#f7e5b0',
+    '--admin-input-placeholder': '#9b8249',
+    '--admin-section-bg': '#17130b',
+    '--admin-section-shadow': '0 18px 50px rgba(0,0,0,0.34)',
+    '--admin-label': '#c9a64b',
+    '--admin-eyebrow': '#d9b85f',
+    '--admin-title': '#fff4cf',
+    '--admin-muted': '#bba97a',
+    '--admin-quick-bg': 'linear-gradient(180deg,#1d160b_0%,#251c0d_100%)',
+    '--admin-quick-shadow': '0 18px 50px rgba(0,0,0,0.28)',
+    '--admin-quick-hover-shadow': '0 24px 60px rgba(0,0,0,0.38)',
+  } : {
+    '--admin-border': '#efd58a',
+    '--admin-panel': '#fffdf7',
+    '--admin-panel-shadow': '0 24px 80px rgba(120,87,16,0.12)',
+    '--admin-button-border': '#ecd08a',
+    '--admin-button-bg': '#fff6d8',
+    '--admin-button-text': '#6f5012',
+    '--admin-button-hover': '#ffeaa8',
+    '--admin-input-border': '#ecd08a',
+    '--admin-input-bg': '#fffaf0',
+    '--admin-input-text': '#2f2208',
+    '--admin-input-placeholder': '#b79c5c',
+    '--admin-section-bg': '#fffdf8',
+    '--admin-section-shadow': '0 18px 50px rgba(120,87,16,0.11)',
+    '--admin-label': '#8a670f',
+    '--admin-eyebrow': '#9b771c',
+    '--admin-title': '#241807',
+    '--admin-muted': '#6f6a57',
+    '--admin-quick-bg': 'linear-gradient(180deg,#fffdf6_0%,#fff6dd_100%)',
+    '--admin-quick-shadow': '0 18px 50px rgba(120,87,16,0.1)',
+    '--admin-quick-hover-shadow': '0 24px 60px rgba(120,87,16,0.16)',
+  };
+
   return (
-    <div className="space-y-6 animate-fade-in">
-      <div className="overflow-hidden rounded-[34px] bg-[linear-gradient(135deg,#1f1605_0%,#5c4310_45%,#b78710_100%)] px-6 py-6 text-white shadow-[0_30px_90px_rgba(98,70,10,0.34)] md:px-8">
+    <div className="space-y-6 animate-fade-in text-[var(--admin-title)]" style={adminVars}>
+      <div
+        className="overflow-hidden rounded-[34px] px-6 py-6 text-white shadow-[0_30px_90px_rgba(98,70,10,0.34)] md:px-8"
+        style={{ background: isDark ? 'linear-gradient(135deg,#090805_0%,#2c220d_45%,#6f5311_100%)' : 'linear-gradient(135deg,#1f1605_0%,#5c4310_45%,#b78710_100%)' }}
+      >
         <div className="flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between">
           <div className="max-w-2xl">
             <span className="inline-flex rounded-full border border-[#f7d76b]/40 bg-[#f0b90b]/18 px-4 py-1.5 text-[11px] font-semibold uppercase tracking-[0.28em] text-[#ffe7a0]">
@@ -519,11 +568,11 @@ export default function Admin() {
             style={{
               borderColor: activeTab === key ? TAB_TONES[key].accent : '#d9e6e7',
               background: activeTab === key
-                ? `linear-gradient(135deg, ${TAB_TONES[key].glow} 0%, rgba(255,255,255,0.98) 65%)`
-                : '#ffffff',
+                ? `linear-gradient(135deg, ${TAB_TONES[key].glow} 0%, ${isDark ? 'rgba(28,22,11,0.98)' : 'rgba(255,255,255,0.98)'} 65%)`
+                : (isDark ? '#17130b' : '#ffffff'),
               boxShadow: activeTab === key
                 ? `0 18px 40px ${TAB_TONES[key].glow}`
-                : '0 18px 50px rgba(8,35,41,0.05)',
+                : (isDark ? '0 18px 50px rgba(0,0,0,0.28)' : '0 18px 50px rgba(8,35,41,0.05)'),
             }}
           >
             <div className="flex items-center justify-between gap-3">
@@ -536,8 +585,8 @@ export default function Admin() {
             </div>
             <div className="mt-3 flex items-start justify-between gap-3">
               <div>
-                <p className="text-sm font-semibold text-[#241807]">{fullLabel}</p>
-                <p className="mt-1 text-xs leading-5 text-text-secondary">{desc}</p>
+                <p className="text-sm font-semibold text-[var(--admin-title)]">{fullLabel}</p>
+                <p className="mt-1 text-xs leading-5 text-[var(--admin-muted)]">{desc}</p>
               </div>
               <span
                 className="rounded-full px-2.5 py-1 text-[11px] font-bold"
@@ -603,7 +652,7 @@ export default function Admin() {
             <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
               <div className={`${ADMIN_PANEL} p-6`}>
                 <p className="text-xs text-text-muted uppercase tracking-wider mb-1">Total Users</p>
-                <p className="text-[34px] font-semibold text-[#0d2127]">{stats.stats.totalUsers.toLocaleString()}</p>
+                <p className="text-[34px] font-semibold text-[var(--admin-title)]">{stats.stats.totalUsers.toLocaleString()}</p>
                 <p className="mt-2 text-xs text-text-secondary">All registered platform members</p>
               </div>
               <div className={`${ADMIN_PANEL} p-6`}>
@@ -618,7 +667,7 @@ export default function Admin() {
               </div>
               <div className={`${ADMIN_PANEL} p-6`}>
                 <p className="text-xs text-text-muted uppercase tracking-wider mb-1">Recharge Amount</p>
-                <p className="text-[34px] font-semibold text-[#0d2127]">${(stats.stats.totalRechargeAmount || 0).toLocaleString(undefined, { maximumFractionDigits: 0 })}</p>
+                <p className="text-[34px] font-semibold text-[var(--admin-title)]">${(stats.stats.totalRechargeAmount || 0).toLocaleString(undefined, { maximumFractionDigits: 0 })}</p>
                 <p className="mt-2 text-xs text-text-secondary">Total incoming recharge volume</p>
               </div>
             </div>
@@ -627,9 +676,9 @@ export default function Admin() {
           {!stats ? null : (
             <div className="grid grid-cols-1 gap-4 xl:grid-cols-[1.2fr_0.8fr]">
               <div className={`${ADMIN_PANEL} overflow-hidden`}>
-                <div className="border-b border-[#e3ecec] px-6 py-5">
-                  <h3 className="text-[24px] font-light tracking-[-0.03em] text-[#0d2127]">Recent Platform Trades</h3>
-                  <p className="mt-1 text-sm text-text-secondary">A quick pulse on the latest market activity happening across user accounts.</p>
+                <div className="border-b border-[var(--admin-border)] px-6 py-5">
+                  <h3 className="text-[24px] font-light tracking-[-0.03em] text-[var(--admin-title)]">Recent Platform Trades</h3>
+                  <p className="mt-1 text-sm text-[var(--admin-muted)]">A quick pulse on the latest market activity happening across user accounts.</p>
                 </div>
                 {stats?.recentTrades?.length > 0 ? (
                   <div className="divide-y divide-light-border/50">
@@ -650,19 +699,19 @@ export default function Admin() {
                 )}
               </div>
               <div className={`${ADMIN_PANEL} p-6`}>
-                <h3 className="text-[24px] font-light tracking-[-0.03em] text-[#0d2127]">Operations Notes</h3>
+                <h3 className="text-[24px] font-light tracking-[-0.03em] text-[var(--admin-title)]">Operations Notes</h3>
                 <div className="mt-4 space-y-3">
-                  <div className="rounded-[22px] border border-[#dde8e9] bg-[#f7fbfb] p-4">
-                    <p className="text-sm font-semibold text-[#0d2127]">Users tab</p>
-                    <p className="mt-1 text-xs leading-5 text-text-secondary">Best place to search accounts, adjust balances, promote admins, or switch trade mode.</p>
+                  <div className="rounded-[22px] border border-[var(--admin-border)] bg-[var(--admin-input-bg)] p-4">
+                    <p className="text-sm font-semibold text-[var(--admin-title)]">Users tab</p>
+                    <p className="mt-1 text-xs leading-5 text-[var(--admin-muted)]">Best place to search accounts, adjust balances, promote admins, or switch trade mode.</p>
                   </div>
-                  <div className="rounded-[22px] border border-[#dde8e9] bg-[#f7fbfb] p-4">
-                    <p className="text-sm font-semibold text-[#0d2127]">Deposit and withdrawal tabs</p>
-                    <p className="mt-1 text-xs leading-5 text-text-secondary">Use these queues for money movement review. Each request stays visually separate for faster approve or reject decisions.</p>
+                  <div className="rounded-[22px] border border-[var(--admin-border)] bg-[var(--admin-input-bg)] p-4">
+                    <p className="text-sm font-semibold text-[var(--admin-title)]">Deposit and withdrawal tabs</p>
+                    <p className="mt-1 text-xs leading-5 text-[var(--admin-muted)]">Use these queues for money movement review. Each request stays visually separate for faster approve or reject decisions.</p>
                   </div>
-                  <div className="rounded-[22px] border border-[#dde8e9] bg-[#f7fbfb] p-4">
-                    <p className="text-sm font-semibold text-[#0d2127]">Plans and settings</p>
-                    <p className="mt-1 text-xs leading-5 text-text-secondary">Monitor revenue, purchase history, support links, and product-level controls from a cleaner layout.</p>
+                  <div className="rounded-[22px] border border-[var(--admin-border)] bg-[var(--admin-input-bg)] p-4">
+                    <p className="text-sm font-semibold text-[var(--admin-title)]">Plans and settings</p>
+                    <p className="mt-1 text-xs leading-5 text-[var(--admin-muted)]">Monitor revenue, purchase history, support links, and product-level controls from a cleaner layout.</p>
                   </div>
                 </div>
               </div>
@@ -683,7 +732,7 @@ export default function Admin() {
           {/* Search */}
           <div className="grid grid-cols-1 gap-4 xl:grid-cols-[0.75fr_1.25fr]">
             <div className={`${ADMIN_PANEL} max-w-xl p-4`}>
-              <label className="mb-2 block text-xs font-semibold uppercase tracking-[0.24em] text-[#6d8185]">Find User</label>
+              <label className="mb-2 block text-xs font-semibold uppercase tracking-[0.24em] text-[var(--admin-eyebrow)]">Find User</label>
               <input
                 type="text"
                 placeholder="Search by username or email..."
@@ -695,17 +744,17 @@ export default function Admin() {
 
             <div className="grid grid-cols-1 gap-3 md:grid-cols-3">
               <div className={`${ADMIN_PANEL} p-4`}>
-                <p className="text-xs uppercase tracking-[0.24em] text-[#6d8185]">Loaded Users</p>
-                <p className="mt-2 text-2xl font-semibold text-[#0d2127]">{users.length}</p>
+                <p className="text-xs uppercase tracking-[0.24em] text-[var(--admin-eyebrow)]">Loaded Users</p>
+                <p className="mt-2 text-2xl font-semibold text-[var(--admin-title)]">{users.length}</p>
                 <p className="mt-1 text-xs text-text-secondary">Current page snapshot</p>
               </div>
               <div className={`${ADMIN_PANEL} p-4`}>
-                <p className="text-xs uppercase tracking-[0.24em] text-[#6d8185]">Admins Visible</p>
+                <p className="text-xs uppercase tracking-[0.24em] text-[var(--admin-eyebrow)]">Admins Visible</p>
                 <p className="mt-2 text-2xl font-semibold text-[#b8860b]">{users.filter((u) => u.role === 'admin').length}</p>
                 <p className="mt-1 text-xs text-text-secondary">Accounts with admin access</p>
               </div>
               <div className={`${ADMIN_PANEL} p-4`}>
-                <p className="text-xs uppercase tracking-[0.24em] text-[#6d8185]">Blocked Visible</p>
+                <p className="text-xs uppercase tracking-[0.24em] text-[var(--admin-eyebrow)]">Blocked Visible</p>
                 <p className="mt-2 text-2xl font-semibold text-red-trade">{users.filter((u) => u.isBanned).length}</p>
                 <p className="mt-1 text-xs text-text-secondary">Banned accounts on this page</p>
               </div>
@@ -717,7 +766,7 @@ export default function Admin() {
               <div className="overflow-x-auto">
                 <table className="w-full text-sm">
                   <thead>
-                    <tr className="border-b border-light-border bg-[#f7fbfb] text-xs uppercase tracking-wider text-text-muted">
+                    <tr className="border-b border-light-border bg-[var(--admin-input-bg)] text-xs uppercase tracking-wider text-[var(--admin-muted)]">
                       <th className="px-5 py-3 text-left">User</th>
                       <th className="px-5 py-3 text-right">Balance</th>
                       <th className="px-5 py-3 text-center">Role</th>

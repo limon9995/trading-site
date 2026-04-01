@@ -1,6 +1,7 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import { useTheme } from '../context/ThemeContext';
 
 function AdminBrand() {
   return (
@@ -19,6 +20,7 @@ function AdminBrand() {
 export default function AdminShell({ children }) {
   const navigate = useNavigate();
   const { user, logout } = useAuth();
+  const { isDark, toggleTheme } = useTheme();
 
   const handleLogout = () => {
     logout();
@@ -26,18 +28,54 @@ export default function AdminShell({ children }) {
   };
 
   return (
-    <div className="min-h-screen bg-[radial-gradient(circle_at_top_left,rgba(240,185,11,0.16),transparent_24%),linear-gradient(180deg,#fffaf0_0%,#f7edd1_100%)]">
-      <header className="sticky top-0 z-40 border-b border-[#ead18a] bg-[rgba(255,248,229,0.92)] backdrop-blur-xl">
+    <div
+      className="min-h-screen transition-colors"
+      style={{
+        background: isDark
+          ? 'radial-gradient(circle at top left, rgba(240,185,11,0.10), transparent 24%), linear-gradient(180deg, #090805 0%, #100d07 100%)'
+          : 'radial-gradient(circle at top left, rgba(240,185,11,0.16), transparent 24%), linear-gradient(180deg,#fffaf0 0%,#f7edd1 100%)',
+      }}
+    >
+      <header
+        className="sticky top-0 z-40 backdrop-blur-xl"
+        style={{
+          borderBottom: `1px solid ${isDark ? '#4b3a12' : '#ead18a'}`,
+          background: isDark ? 'rgba(16,13,7,0.92)' : 'rgba(255,248,229,0.92)',
+        }}
+      >
         <div className="mx-auto flex max-w-7xl flex-col gap-4 px-4 py-4 md:flex-row md:items-center md:justify-between md:px-6">
           <AdminBrand />
 
           <div className="flex flex-wrap items-center gap-3">
-            <div className="rounded-full border border-[#ead18a] bg-[#fff3cb] px-4 py-2 text-sm font-medium text-[#6f5012]">
+            <button
+              onClick={toggleTheme}
+              className="rounded-full px-4 py-2 text-sm font-semibold transition-all hover:-translate-y-0.5"
+              style={{
+                border: `1px solid ${isDark ? '#5a4512' : '#ead18a'}`,
+                background: isDark ? '#19130a' : '#fff3cb',
+                color: isDark ? '#f2d58a' : '#6f5012',
+              }}
+            >
+              {isDark ? 'Light Mode' : 'Dark Mode'}
+            </button>
+            <div
+              className="rounded-full px-4 py-2 text-sm font-medium"
+              style={{
+                border: `1px solid ${isDark ? '#5a4512' : '#ead18a'}`,
+                background: isDark ? '#19130a' : '#fff3cb',
+                color: isDark ? '#f2d58a' : '#6f5012',
+              }}
+            >
               {user?.username || 'Admin'}
             </div>
             <button
               onClick={() => navigate('/dashboard')}
-              className="rounded-full border border-[#ead18a] bg-[#fff8e5] px-4 py-2 text-sm font-semibold text-[#6f5012] transition-all hover:-translate-y-0.5 hover:bg-[#ffe8a1]"
+              className="rounded-full px-4 py-2 text-sm font-semibold transition-all hover:-translate-y-0.5"
+              style={{
+                border: `1px solid ${isDark ? '#5a4512' : '#ead18a'}`,
+                background: isDark ? '#19130a' : '#fff8e5',
+                color: isDark ? '#f2d58a' : '#6f5012',
+              }}
             >
               Back To User App
             </button>
