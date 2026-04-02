@@ -84,10 +84,11 @@ export default function Navbar({ onMenuClick }) {
           <div ref={dropRef} className="relative">
             <button
               onClick={() => setLangOpen(v => !v)}
-              className="flex items-center gap-1.5 rounded-[16px] px-2.5 py-2 text-text-secondary transition-all hover:-translate-y-0.5 hover:bg-[#f7fbfb]"
+              className="flex items-center gap-1.5 rounded-[14px] border border-[#d9e6e7] bg-[#f7fbfb] px-3 py-2 text-text-secondary transition-all hover:-translate-y-0.5 hover:bg-white"
             >
-              <span className="text-lg leading-none">{currentLang.flag}</span>
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="w-3 h-3 text-text-muted">
+              <span className="text-base leading-none">{currentLang.flag}</span>
+              <span className="text-xs font-semibold text-text-primary hidden sm:block">{currentLang.code.toUpperCase()}</span>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" className="w-3 h-3 text-text-muted">
                 <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
               </svg>
             </button>
