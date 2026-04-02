@@ -108,7 +108,7 @@ export default function Layout() {
   const [langSearch, setLangSearch] = useState('');
   const { user, logout } = useAuth();
   const { isDark, toggleTheme } = useTheme();
-  const { i18n } = useTranslation();
+  const { t, i18n } = useTranslation();
   const { prices } = useMarketPrices();
   const navigate = useNavigate();
   const searchRef = useRef(null);
