@@ -4,6 +4,15 @@ import { useAuth } from '../context/AuthContext';
 import { useTheme } from '../context/ThemeContext';
 import { useMarketPrices } from '../hooks/useMarketPrices';
 import NotificationFeed from './NotificationFeed';
+import { useTranslation } from 'react-i18next';
+
+const LANGUAGES = [
+  { code: 'en', label: 'English',   flag: '🇺🇸' },
+  { code: 'pt', label: 'Português', flag: '🇧🇷' },
+  { code: 'zh', label: '中文',       flag: '🇨🇳' },
+  { code: 'es', label: 'Español',   flag: '🇪🇸' },
+  { code: 'fr', label: 'Français',  flag: '🇫🇷' },
+];
 
 function ShellBrand() {
   return (
@@ -110,11 +119,28 @@ export default function Layout() {
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [searchOpen, setSearchOpen] = useState(false);
+  const [langOpen, setLangOpen] = useState(false);
+  const [langSearch, setLangSearch] = useState('');
   const { user, logout } = useAuth();
   const { isDark, toggleTheme } = useTheme();
+  const { i18n } = useTranslation();
   const { prices } = useMarketPrices();
   const navigate = useNavigate();
   const searchRef = useRef(null);
+  const langRef = useRef(null);
+
+  const currentLang = LANGUAGES.find(l => l.code === i18n.language) || LANGUAGES[0];
+
+  const handleLangChange = (code) => {
+    i18n.changeLanguage(code);
+    localStorage.setItem('lang', code);
+    setLangOpen(false);
+    setLangSearch('');
+  };
+
+  const filteredLangs = LANGUAGES.filter(l =>
+    l.label.toLowerCase().includes(langSearch.toLowerCase())
+  );
 
   useEffect(() => {
     const handler = (e) => {
@@ -122,9 +148,17 @@ export default function Layout() {
         setSearchOpen(false);
         setSearchQuery('');
       }
+      if (langRef.current && !langRef.current.contains(e.target)) {
+        setLangOpen(false);
+        setLangSearch('');
+      }
     };
     document.addEventListener('mousedown', handler);
-    return () => document.removeEventListener('mousedown', handler);
+    document.addEventListener('touchstart', handler);
+    return () => {
+      document.removeEventListener('mousedown', handler);
+      document.removeEventListener('touchstart', handler);
+    };
   }, []);
 
   const handleLogout = () => {
@@ -239,8 +273,69 @@ export default function Layout() {
             </div>
           </div>
 
-          {/* Right: Theme toggle + Bell + Admin */}
+          {/* Right: Lang + Theme toggle + Bell + Admin */}
           <div className="flex items-center gap-1">
+
+            {/* Language selector */}
+            <div ref={langRef} className="relative">
+              <button
+                onClick={() => setLangOpen(v => !v)}
+                className="flex items-center gap-1 rounded-[14px] px-2 py-2 transition-colors"
+                style={{ color: isDark ? '#9BA3A6' : '#566367' }}
+              >
+                <span className="text-base leading-none">{currentLang.flag}</span>
+                <span className="text-xs font-semibold hidden sm:block" style={{ color: isDark ? '#dce2e4' : '#1a2a2e' }}>{currentLang.code.toUpperCase()}</span>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" className="w-3 h-3">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
+                </svg>
+              </button>
+
+              {langOpen && (
+                <div
+                  className="absolute right-0 top-full mt-2 w-52 overflow-hidden rounded-[20px] shadow-[0_20px_60px_rgba(8,35,41,0.28)]"
+                  style={{ background: '#0e1e24', border: '1px solid rgba(255,255,255,0.09)', zIndex: 60 }}
+                >
+                  <div className="px-3 pt-3 pb-2">
+                    <div className="flex items-center gap-2 rounded-[12px] px-3 py-2" style={{ background: 'rgba(255,255,255,0.07)' }}>
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="w-3.5 h-3.5 flex-shrink-0" style={{ color: 'rgba(255,255,255,0.4)' }}>
+                        <circle cx="11" cy="11" r="8"/><path strokeLinecap="round" d="M21 21l-4.35-4.35"/>
+                      </svg>
+                      <input
+                        value={langSearch}
+                        onChange={e => setLangSearch(e.target.value)}
+                        placeholder="Search language..."
+                        className="flex-1 bg-transparent text-xs text-white outline-none"
+                        style={{ '::placeholder': { color: 'rgba(255,255,255,0.35)' } }}
+                        autoFocus
+                      />
+                    </div>
+                  </div>
+                  <div className="pb-2">
+                    {filteredLangs.map(lang => (
+                      <button
+                        key={lang.code}
+                        onClick={() => handleLangChange(lang.code)}
+                        className="flex w-full items-center gap-3 px-4 py-3 text-left transition-colors"
+                        style={{ background: lang.code === i18n.language ? 'rgba(238,130,103,0.15)' : 'transparent' }}
+                      >
+                        <span className="text-xl leading-none">{lang.flag}</span>
+                        <span className={`text-sm font-medium ${lang.code === i18n.language ? '' : ''}`}
+                          style={{ color: lang.code === i18n.language ? '#EE8267' : 'rgba(255,255,255,0.8)' }}>
+                          {lang.label}
+                        </span>
+                        {lang.code === i18n.language && (
+                          <span className="ml-auto text-xs" style={{ color: '#EE8267' }}>✓</span>
+                        )}
+                      </button>
+                    ))}
+                    {filteredLangs.length === 0 && (
+                      <p className="px-4 py-3 text-xs" style={{ color: 'rgba(255,255,255,0.4)' }}>No results</p>
+                    )}
+                  </div>
+                </div>
+              )}
+            </div>
+
             {/* Theme toggle */}
             <button
               onClick={toggleTheme}
