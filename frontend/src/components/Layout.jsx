@@ -16,15 +16,14 @@ const LANGUAGES = [
 
 function ShellBrand() {
   return (
-    <div className="flex items-center gap-2">
-      <div className="relative w-7 h-7">
-        <div className="absolute inset-0 rounded-full border-[4px] border-cyan-500 opacity-90" />
-        <div className="absolute inset-[5px] rounded-full border-[3px] border-cyan-500 opacity-90" />
-        <div className="absolute left-0 top-1/2 -translate-y-1/2 w-4 h-[4px] rounded-full bg-cyan-500" />
-      </div>
-      <div className="leading-none" style={{ color: 'var(--cex-text)' }}>
-        <span className="text-[16px] font-light tracking-tight">CEX</span>
-        <span className="text-[16px] font-light opacity-60">.IO</span>
+    <div className="flex items-center">
+      <div className="relative w-9 h-9">
+        <svg viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-9 h-9">
+          <circle cx="20" cy="20" r="19" stroke="#00c9c9" strokeWidth="3" fill="none" opacity="0.9"/>
+          <circle cx="20" cy="20" r="11" stroke="#00c9c9" strokeWidth="2.5" fill="none" opacity="0.9"/>
+          <path d="M4 20 Q4 20 14 20" stroke="#00c9c9" strokeWidth="3" strokeLinecap="round"/>
+          <path d="M20 4 Q20 4 20 14" stroke="#00c9c9" strokeWidth="2" strokeLinecap="round" opacity="0.5"/>
+        </svg>
       </div>
     </div>
   );
@@ -203,9 +202,9 @@ export default function Layout() {
           </button>
 
           {/* Center: Logo + Search */}
-          <div className="flex-1 mx-3 flex items-center gap-2">
+          <div className="flex-1 mx-4 flex items-center gap-3">
             {/* Logo */}
-            <div className="hidden xs:flex items-center mr-2 flex-shrink-0">
+            <div className="flex items-center flex-shrink-0">
               <ShellBrand />
             </div>
 
@@ -351,11 +350,6 @@ export default function Layout() {
                   <path strokeLinecap="round" strokeLinejoin="round" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"/>
                 </svg>
               )}
-            </button>
-            <button className="w-9 h-9 rounded-2xl flex items-center justify-center transition-colors" style={{ color: isDark ? '#9BA3A6' : '#566367' }}>
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" className="w-5 h-5">
-                <path strokeLinecap="round" strokeLinejoin="round" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
-              </svg>
             </button>
             {user?.role === 'admin' && (
               <button onClick={() => navigate('/admin')} className="text-xs font-bold px-3 py-2 rounded-full text-white shadow-sm" style={{ background: 'linear-gradient(135deg, #F4927E 0%, #EE8267 100%)' }}>
