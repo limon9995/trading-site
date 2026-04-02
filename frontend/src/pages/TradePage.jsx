@@ -20,9 +20,9 @@ export default function TradePage() {
           onClick={() => setTab('binary')}
           className="flex flex-1 items-center justify-center gap-1.5 rounded-[22px] py-3 text-xs font-bold transition-all active:scale-95"
           style={{
-            background: tab === 'binary' ? 'linear-gradient(135deg,#f0b90b,#da9d08)' : 'transparent',
-            color: tab === 'binary' ? '#1d1402' : 'rgba(255,255,255,0.58)',
-            boxShadow: tab === 'binary' ? '0 10px 24px rgba(240,185,11,0.22)' : 'none',
+            background: tab === 'binary' ? 'linear-gradient(135deg,#EE8267,#e5604a)' : 'transparent',
+            color: tab === 'binary' ? '#fff' : 'rgba(255,255,255,0.58)',
+            boxShadow: tab === 'binary' ? '0 10px 24px rgba(238,130,103,0.28)' : 'none',
           }}>
           <span>⚡</span>
           <span>Binary</span>

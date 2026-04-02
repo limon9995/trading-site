@@ -649,7 +649,7 @@ export default function BinaryTrade() {
               </button>
               <button
                 onClick={() => navigate('/wallet')}
-                className="rounded-full bg-[linear-gradient(135deg,#f0b90b_0%,#dca70a_100%)] px-5 py-3 text-sm font-semibold text-[#2a1d05] shadow-[0_18px_40px_rgba(240,185,11,0.22)] transition-all hover:-translate-y-0.5"
+                className="rounded-full bg-[#EE8267] px-5 py-3 text-sm font-semibold text-white shadow-[0_18px_40px_rgba(238,130,103,0.28)] transition-all hover:-translate-y-0.5"
               >
                 Go To Wallet
               </button>
@@ -682,11 +682,11 @@ export default function BinaryTrade() {
               <button key={coin} onClick={() => setSelectedCoin(coin)}
                 className="flex-shrink-0 flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold transition-all active:scale-95"
                 style={{
-                  background: active ? '#f0b90b' : 'rgba(255,255,255,0.07)',
-                  color: active ? '#1b1302' : 'rgba(255,255,255,0.65)',
+                  background: active ? '#EE8267' : 'rgba(255,255,255,0.07)',
+                  color: active ? '#fff' : 'rgba(255,255,255,0.65)',
                 }}>
                 {coin}
-                <span className={`${chg >= 0 ? (active ? 'text-green-800' : 'text-green-trade') : (active ? 'text-red-800' : 'text-red-trade')}`}>
+                <span className={`${chg >= 0 ? 'text-green-trade' : 'text-red-trade'}`} style={active ? { opacity: 0.85 } : {}}>
                   {chg >= 0 ? '+' : ''}{chg.toFixed(1)}%
                 </span>
               </button>
@@ -709,8 +709,8 @@ export default function BinaryTrade() {
               <button key={value} onClick={() => setInterval(value)}
                 className="px-2.5 py-1 rounded-full text-xs font-semibold transition-all"
                 style={{
-                  background: interval === value ? '#f0b90b' : 'rgba(255,255,255,0.07)',
-                  color: interval === value ? '#201500' : 'rgba(255,255,255,0.55)',
+                  background: interval === value ? '#EE8267' : 'rgba(255,255,255,0.07)',
+                  color: interval === value ? '#fff' : 'rgba(255,255,255,0.55)',
                 }}>
                 {label}
               </button>
@@ -731,11 +731,11 @@ export default function BinaryTrade() {
         {/* Header */}
         <div className="flex items-center justify-between px-4 py-3 border-b border-white/6">
           <div className="flex items-center gap-2">
-            <span className="text-[#f0b90b] text-base">⏱</span>
+            <span className="text-[#EE8267] text-base">⏱</span>
             <span className="text-white font-bold text-base">Short Term Trade</span>
           </div>
           <span className="px-3 py-1 rounded-full text-xs font-bold"
-            style={{ background: 'rgba(240,185,11,0.14)', color: '#f0b90b', border: '1px solid rgba(240,185,11,0.28)' }}>
+            style={{ background: 'rgba(238,130,103,0.14)', color: '#EE8267', border: '1px solid rgba(238,130,103,0.28)' }}>
             {selectedCoin}/USDT
           </span>
         </div>
@@ -770,8 +770,8 @@ export default function BinaryTrade() {
                 <button key={t} onClick={() => setDuration(t)}
                   className="px-4 py-2 rounded-[0.75rem] text-sm font-semibold transition-all active:scale-95"
                   style={{
-                    background: duration === t ? '#f0b90b' : 'rgba(255,255,255,0.07)',
-                    color: duration === t ? '#1b1302' : 'rgba(255,255,255,0.65)',
+                    background: duration === t ? '#EE8267' : 'rgba(255,255,255,0.07)',
+                    color: duration === t ? '#fff' : 'rgba(255,255,255,0.65)',
                     border: duration === t ? 'none' : '1px solid rgba(255,255,255,0.1)',
                   }}>
                   {t < 60 ? `${t}s` : `${t / 60}m`}
@@ -791,7 +791,7 @@ export default function BinaryTrade() {
                 className="flex-1 bg-transparent text-white text-sm outline-none placeholder:text-white/28" />
               <button onClick={() => { setAmount(String(Math.floor(balance * 100) / 100)); setTradeError(''); }}
                 className="text-xs font-bold px-2.5 py-1 rounded-lg"
-                style={{ background: 'rgba(240,185,11,0.18)', color: '#f0b90b' }}>
+                style={{ background: 'rgba(238,130,103,0.18)', color: '#EE8267' }}>
                 ALL
               </button>
             </div>

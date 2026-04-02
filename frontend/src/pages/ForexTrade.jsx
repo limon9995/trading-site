@@ -326,11 +326,11 @@ export default function ForexTrade() {
                   className={`flex-shrink-0 rounded-[1rem] border px-3 py-2 text-left transition-all ${active ? '-translate-y-0.5' : 'hover:-translate-y-0.5'}`}
                   style={{
                     minWidth: 88,
-                    background: active ? 'rgba(240,185,11,0.14)' : 'rgba(255,255,255,0.05)',
-                    borderColor: active ? 'rgba(240,185,11,0.35)' : 'rgba(255,255,255,0.08)',
+                    background: active ? 'rgba(238,130,103,0.14)' : 'rgba(255,255,255,0.05)',
+                    borderColor: active ? 'rgba(238,130,103,0.35)' : 'rgba(255,255,255,0.08)',
                   }}
                 >
-                  <p className={`text-sm font-bold ${active ? 'text-[#f0b90b]' : 'text-white'}`}>{c}</p>
+                  <p className={`text-sm font-bold ${active ? 'text-[#EE8267]' : 'text-white'}`}>{c}</p>
                   <p className={`mt-1 text-xs font-medium ${chg >= 0 ? 'text-green-trade' : 'text-red-trade'}`}>
                     {chg >= 0 ? '+' : ''}{chg.toFixed(2)}%
                   </p>
@@ -365,7 +365,7 @@ export default function ForexTrade() {
                   key={value}
                   onClick={() => setInterval(value)}
                   className={`rounded-full px-4 py-2 text-sm font-semibold transition-all ${
-                    interval === value ? 'bg-[#f0b90b] text-[#201500]' : 'bg-white/6 text-white/60 hover:text-white'
+                    interval === value ? 'bg-[#EE8267] text-[#fff]' : 'bg-white/6 text-white/60 hover:text-white'
                   }`}
                 >
                   {label}
@@ -450,7 +450,7 @@ export default function ForexTrade() {
         <div className="mb-3 grid grid-cols-3 gap-2 text-center text-xs sm:text-sm">
           <div className="rounded-[1rem] bg-white/6 px-3 py-2">
             <p className="text-white/38">Leverage</p>
-            <p className="mt-1 font-semibold text-[#f0b90b]">{leverage}x</p>
+            <p className="mt-1 font-semibold text-[#EE8267]">{leverage}x</p>
           </div>
           <div className="rounded-[1rem] bg-white/6 px-3 py-2">
             <p className="text-white/38">Margin</p>
@@ -492,7 +492,7 @@ export default function ForexTrade() {
               <button key={lev} onClick={() => setLeverage(lev)}
                 className="px-3.5 py-1.5 rounded-full text-xs font-bold transition-all hover:-translate-y-0.5"
                 style={{
-                  background: leverage === lev ? '#f0b90b' : 'rgba(255,255,255,0.06)',
+                  background: leverage === lev ? '#EE8267' : 'rgba(255,255,255,0.06)',
                   color: leverage === lev ? '#1b1302' : 'rgba(255,255,255,0.72)',
                 }}>
                 {lev}x
@@ -517,7 +517,7 @@ export default function ForexTrade() {
               </button>
             ))}
             <button onClick={() => { setAmount(String(Math.floor(balance * 100) / 100)); setError(''); }}
-              className="rounded-full bg-[#f0b90b]/14 px-3 py-1.5 text-xs font-medium text-[#f0b90b]">
+              className="rounded-full bg-[#EE8267]/14 px-3 py-1.5 text-xs font-medium text-[#EE8267]">
               Max
             </button>
           </div>
@@ -531,13 +531,13 @@ export default function ForexTrade() {
             </div>
             <div>
               <p className="text-white/42">Leverage</p>
-              <p className="font-bold text-[#f0b90b]">{leverage}x</p>
+              <p className="font-bold text-[#EE8267]">{leverage}x</p>
             </div>
           </div>
         )}
 
         <button onClick={() => setShowSlTp(p => !p)}
-          className="mt-3 flex items-center gap-1 text-xs font-medium text-[#f0b90b]">
+          className="mt-3 flex items-center gap-1 text-xs font-medium text-[#EE8267]">
           {showSlTp ? '▲' : '▼'} {showSlTp ? 'Hide' : 'Add'} Stop Loss / Take Profit
         </button>
 
