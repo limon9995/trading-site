@@ -9,5 +9,6 @@
   "settings": { "title": "Settings", "profileInfo": "Profile Information", "referral": "Referral Code", "copy": "Copy", "copied": "Copied!", "changePassword": "Change Password" },
   "plans": { "title": "Investment Plans", "balance": "Balance", "current": "Current", "active": "ACTIVE", "purchase": "Purchase Plan", "cancel": "Cancel", "confirm": "Confirm Purchase", "dailyReturn": "Daily Return", "duration": "Duration", "maxReturn": "Max Return" },
   "support": { "title": "Customer Service", "telegram": "Telegram Support", "email": "Email Support", "tapMessage": "Tap to message us →", "tapEmail": "Tap to send email →", "responseTimes": "Response Times" },
-  "common": { "loading": "Loading...", "error": "Something went wrong", "retry": "Retry", "back": "Back", "save": "Save", "cancel": "Cancel", "confirm": "Confirm", "submit": "Submit", "close": "Close", "search": "Search" }
+  "common": { "loading": "Loading...", "error": "Something went wrong", "retry": "Retry", "back": "Back", "save": "Save", "cancel": "Cancel", "confirm": "Confirm", "submit": "Submit", "close": "Close", "search": "Search" },
+  "newCoins": { "title": "New coins and upcoming launches", "subtitle": "Discover the latest listings and upcoming token launches.", "newListing": "New Listing", "upcoming": "Upcoming", "recentlyListed": "Recently listed on our platform with live rates", "comingSoon": "Coins launching soon on our platform" }
 }

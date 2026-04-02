@@ -9,5 +9,6 @@
   "settings": { "title": "Configuración", "profileInfo": "Información de Perfil", "referral": "Código de Referido", "copy": "Copiar", "copied": "¡Copiado!", "changePassword": "Cambiar Contraseña" },
   "plans": { "title": "Planes de Inversión", "balance": "Saldo", "current": "Actual", "active": "ACTIVO", "purchase": "Comprar Plan", "cancel": "Cancelar", "confirm": "Confirmar Compra", "dailyReturn": "Rendimiento Diario", "duration": "Duración", "maxReturn": "Rendimiento Máximo" },
   "support": { "title": "Servicio al Cliente", "telegram": "Soporte Telegram", "email": "Soporte por Email", "tapMessage": "Toca para enviarnos un mensaje →", "tapEmail": "Toca para enviar email →", "responseTimes": "Tiempos de Respuesta" },
-  "common": { "loading": "Cargando...", "error": "Algo salió mal", "retry": "Reintentar", "back": "Volver", "save": "Guardar", "cancel": "Cancelar", "confirm": "Confirmar", "submit": "Enviar", "close": "Cerrar", "search": "Buscar" }
+  "common": { "loading": "Cargando...", "error": "Algo salió mal", "retry": "Reintentar", "back": "Volver", "save": "Guardar", "cancel": "Cancelar", "confirm": "Confirmar", "submit": "Enviar", "close": "Cerrar", "search": "Buscar" },
+  "newCoins": { "title": "Nuevas monedas y próximos lanzamientos", "subtitle": "Descubre los últimos listados y próximos lanzamientos de tokens.", "newListing": "Nuevo Listado", "upcoming": "Próximamente", "recentlyListed": "Listados recientemente en nuestra plataforma con precios en vivo", "comingSoon": "Monedas que se lanzarán pronto en nuestra plataforma" }
 }

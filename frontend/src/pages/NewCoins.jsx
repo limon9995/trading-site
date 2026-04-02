@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useMarketPrices } from '../hooks/useMarketPrices';
+import { useTranslation } from 'react-i18next';
 
 const PANEL = 'rounded-[30px] border border-[#d9e6e7] bg-white shadow-[0_24px_80px_rgba(8,35,41,0.08)]';
 
@@ -32,6 +33,7 @@ function formatPrice(price) {
 }
 
 export default function NewCoins() {
+  const { t } = useTranslation();
   const { prices } = useMarketPrices();
   const [tab, setTab] = useState('new');
 
@@ -40,8 +42,8 @@ export default function NewCoins() {
   return (
     <div className="pb-2 space-y-4">
       <div className="overflow-hidden rounded-[34px] bg-[linear-gradient(135deg,#0b2026_0%,#114850_48%,#1b6d71_100%)] px-6 py-7 text-white shadow-[0_28px_90px_rgba(8,32,38,0.28)] md:px-8">
-        <h1 className="text-[34px] font-light tracking-[-0.03em]">New coins and upcoming launches</h1>
-        <p className="mt-3 max-w-xl text-sm leading-6 text-white/68 md:text-base">This discovery page now follows the same premium shell language as trading and wallet.</p>
+        <h1 className="text-[34px] font-light tracking-[-0.03em]">{t('newCoins.title')}</h1>
+        <p className="mt-3 max-w-xl text-sm leading-6 text-white/68 md:text-base">{t('newCoins.subtitle')}</p>
       </div>
 
       {/* Tabs */}
@@ -54,7 +56,7 @@ export default function NewCoins() {
               : 'text-text-muted'
           }`}
         >
-          🆕 New Listing
+          🆕 {t('newCoins.newListing')}
         </button>
         <button
           onClick={() => setTab('upcoming')}
@@ -64,14 +66,14 @@ export default function NewCoins() {
               : 'text-text-muted'
           }`}
         >
-          🚀 Upcoming
+          🚀 {t('newCoins.upcoming')}
         </button>
       </div>
 
       {/* New Listing */}
       {tab === 'new' && (
         <div className="space-y-2">
-          <p className="text-[11px] text-text-muted">Recently listed on our platform with live rates</p>
+          <p className="text-[11px] text-text-muted">{t('newCoins.recentlyListed')}</p>
           {newCoins.length === 0 ? (
             Array.from({ length: 4 }).map((_, i) => (
               <div key={i} className="h-16 bg-light-card/50 rounded-xl animate-pulse" />
@@ -119,7 +121,7 @@ export default function NewCoins() {
       {/* Upcoming */}
       {tab === 'upcoming' && (
         <div className="space-y-2">
-          <p className="text-[11px] text-text-muted">Coins launching soon on our platform</p>
+          <p className="text-[11px] text-text-muted">{t('newCoins.comingSoon')}</p>
           {UPCOMING_COINS.map(coin => (
             <div
               key={coin.symbol}
