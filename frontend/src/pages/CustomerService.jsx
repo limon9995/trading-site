@@ -20,12 +20,6 @@ export default function CustomerService() {
 
   return (
     <div className="space-y-4 animate-fade-in">
-      <div className="rounded-[34px] p-6 text-white shadow-[0_28px_90px_rgba(8,32,38,0.28)]"
-        style={{ background: 'linear-gradient(135deg,#0b2026 0%, #114850 52%, #1b6d71 100%)' }}>
-        <h2 className="text-[34px] font-light tracking-[-0.03em]">Customer service</h2>
-        <p className="mt-3 text-sm text-white/68 md:text-base">Support contacts and response channels now match the same polished shell as the rest of the app.</p>
-      </div>
-
       {loading ? (
         <div className="space-y-3">
           {[1, 2].map(i => <div key={i} className={`${PANEL} h-20 p-5 animate-pulse`} />)}

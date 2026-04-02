@@ -166,34 +166,6 @@ export default function Deposit() {
 
   return (
     <div className="max-w-4xl space-y-6 animate-fade-in">
-      <div className="overflow-hidden rounded-[34px] bg-[linear-gradient(135deg,#0b2026_0%,#10454e_46%,#1a6d71_100%)] px-6 py-7 text-white shadow-[0_28px_90px_rgba(8,32,38,0.28)] md:px-8">
-        <div className="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
-          <div className="max-w-2xl">
-            <span className="inline-flex rounded-full border border-white/15 bg-white/10 px-4 py-1.5 text-[11px] font-semibold uppercase tracking-[0.28em] text-[#96e5e6]">
-              Deposit Desk
-            </span>
-            <h2 className="mt-4 text-[36px] font-light leading-[1.04] tracking-[-0.03em] md:text-[48px]">Deposit with a cleaner, guided exchange-style flow.</h2>
-            <p className="mt-3 max-w-xl text-sm leading-6 text-white/68 md:text-base">
-              Select the asset, confirm the network, upload proof and submit a review-ready request in one polished layout.
-            </p>
-          </div>
-          <div className="grid gap-3 sm:grid-cols-3 lg:min-w-[420px]">
-            <div className="rounded-[24px] border border-white/12 bg-white/8 px-5 py-4 backdrop-blur">
-              <p className="text-[11px] uppercase tracking-[0.24em] text-white/48">Coins</p>
-              <p className="mt-2 text-[28px] font-semibold text-white">{coins.length}</p>
-            </div>
-            <div className="rounded-[24px] border border-white/12 bg-white/8 px-5 py-4 backdrop-blur">
-              <p className="text-[11px] uppercase tracking-[0.24em] text-white/48">Requests</p>
-              <p className="mt-2 text-[28px] font-semibold text-white">{history.length}</p>
-            </div>
-            <div className="rounded-[24px] border border-white/12 bg-white/8 px-5 py-4 backdrop-blur">
-              <p className="text-[11px] uppercase tracking-[0.24em] text-white/48">Review</p>
-              <p className="mt-2 text-[28px] font-semibold text-white">~30m</p>
-            </div>
-          </div>
-        </div>
-      </div>
-
       <div className={`${DEPOSIT_PANEL} overflow-hidden`}>
         {/* Step 1: Select Coin */}
         <div className="border-b border-[#e3ecec] px-6 py-5">

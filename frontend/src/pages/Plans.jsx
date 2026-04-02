@@ -247,32 +247,6 @@ export default function Plans() {
 
   return (
     <div className="space-y-6 animate-fade-in pb-4">
-      <div className="overflow-hidden rounded-[34px] bg-[linear-gradient(135deg,#0b2026_0%,#114850_48%,#1b6d71_100%)] px-6 py-7 text-white shadow-[0_28px_90px_rgba(8,32,38,0.28)] md:px-8">
-        <div className="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
-          <div className="max-w-2xl">
-            <span className="inline-flex rounded-full border border-white/15 bg-white/10 px-4 py-1.5 text-[11px] font-semibold uppercase tracking-[0.28em] text-[#96e5e6]">
-              VIP Plans
-            </span>
-            <h1 className="mt-4 text-[36px] font-light leading-[1.04] tracking-[-0.03em] md:text-[48px]">Unlock higher returns with premium VIP investment levels.</h1>
-            <p className="mt-3 max-w-xl text-sm leading-6 text-white/68 md:text-base">Plans, active status, balance info and purchase flow now follow the same polished exchange-grade system as the rest of the app.</p>
-          </div>
-          <div className="grid gap-3 sm:grid-cols-3 lg:min-w-[460px]">
-            <div className="rounded-[24px] border border-white/12 bg-white/8 px-5 py-4 backdrop-blur">
-              <p className="text-[11px] uppercase tracking-[0.24em] text-white/48">Balance</p>
-              <p className="mt-2 text-[28px] font-semibold text-white">${usdtBalance.toFixed(2)}</p>
-            </div>
-            <div className="rounded-[24px] border border-white/12 bg-white/8 px-5 py-4 backdrop-blur">
-              <p className="text-[11px] uppercase tracking-[0.24em] text-white/48">Plans</p>
-              <p className="mt-2 text-[28px] font-semibold text-white">{sortedPlans.length}</p>
-            </div>
-            <div className="rounded-[24px] border border-white/12 bg-white/8 px-5 py-4 backdrop-blur">
-              <p className="text-[11px] uppercase tracking-[0.24em] text-white/48">Current</p>
-              <p className="mt-2 text-[20px] font-semibold text-white capitalize">{currentPlanName === 'none' ? 'None' : currentPlanName}</p>
-            </div>
-          </div>
-        </div>
-      </div>
-
       {/* Active Plan Banner */}
       {currentPlanName !== 'none' && myPlan?.isActive && (() => {
         const s = LEVEL_STYLES[currentPlanName];

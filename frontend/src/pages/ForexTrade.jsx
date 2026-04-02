@@ -208,13 +208,18 @@ export default function ForexTrade() {
   const [loading,    setLoading]    = useState(false);
   const [positions,  setPositions]  = useState([]);
   const [history,    setHistory]    = useState([]);
-  const [tab,        setTab]        = useState('positions');
+  const [tab,        setTab]        = useState('chart');
   const [toast,      setToast]      = useState(null);
 
   const coinData     = prices[coin];
   const currentPrice = coinData?.price || 0;
   const change24h    = coinData?.change24h || 0;
   const balance      = user?.demo_balance || 0;
+  const marketStats = [
+    { label: '24h High', value: coinData?.high24h ? coinData.high24h.toLocaleString('en-US', { maximumFractionDigits: 2 }) : '---' },
+    { label: '24h Low', value: coinData?.low24h ? coinData.low24h.toLocaleString('en-US', { maximumFractionDigits: 2 }) : '---' },
+    { label: '24h Volume', value: coinData?.volume24h ? `${(coinData.volume24h / 1e6).toFixed(2)}M` : '---' },
+  ];
 
   useEffect(() => { loadPositions(); loadHistory(); }, []);
 
@@ -262,7 +267,7 @@ export default function ForexTrade() {
   };
 
   return (
-    <div className="space-y-4 pb-28">
+    <div className="space-y-4 pb-40">
 
       {/* Toast */}
       {toast && (
@@ -272,126 +277,191 @@ export default function ForexTrade() {
         </div>
       )}
 
-      {/* Balance */}
       <div
-        className="rounded-[2rem] px-5 py-5 sm:px-6 sm:py-6"
-        style={{ background: 'linear-gradient(135deg, #0E2026 0%, #145863 58%, #1f6f78 100%)' }}
-      >
-        <div className="flex flex-col gap-5 sm:flex-row sm:items-end sm:justify-between">
-          <div className="max-w-xl">
-            <p className="text-[11px] font-semibold uppercase tracking-[0.28em] text-[#71d4db]">Forex Trading</p>
-            <h1 className="mt-2 text-white text-[1.9rem] leading-[1.05] font-semibold sm:text-[2.6rem]">
-              Leveraged positions in the same premium exchange shell
-            </h1>
-            <p className="mt-3 max-w-lg text-sm leading-6 text-white/68 sm:text-[15px]">
-              Open buy or sell positions, manage leverage, and monitor PnL from a cleaner unified interface.
-            </p>
-          </div>
-          <div className="grid grid-cols-2 gap-3 sm:min-w-[290px]">
-            <div className="rounded-[1.35rem] border border-white/10 bg-white/6 px-4 py-3 backdrop-blur">
-              <p className="text-white/56 text-[11px] uppercase tracking-[0.22em]">Balance</p>
-              <p className="mt-2 text-white font-bold text-lg sm:text-xl">${balance.toLocaleString('en-US', { minimumFractionDigits: 2 })}</p>
-            </div>
-            <div className="rounded-[1.35rem] border border-white/10 bg-white/6 px-4 py-3 backdrop-blur text-right">
-              <p className="text-white/56 text-[11px] uppercase tracking-[0.22em]">Open Positions</p>
-              <p className="mt-2 text-[#ffd07d] font-bold text-lg sm:text-xl">{positions.length}</p>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div
-        className="rounded-[1.8rem] p-3 sm:p-4"
+        className="overflow-hidden rounded-[2rem]"
         style={{
-          background: 'linear-gradient(180deg, #ffffff 0%, #f8fbfc 100%)',
-          border: '1px solid rgba(64,191,201,0.14)',
-          boxShadow: '0 16px 36px rgba(6, 28, 33, 0.08)',
+          background: 'linear-gradient(180deg, #07151a 0%, #0b1e24 100%)',
+          border: '1px solid rgba(255,255,255,0.06)',
+          boxShadow: '0 22px 50px rgba(6, 28, 33, 0.28)',
         }}
       >
-        <div className="flex items-center justify-between gap-3 mb-3">
-          <div>
-            <p className="text-[11px] uppercase tracking-[0.24em] text-text-muted">Markets</p>
-            <p className="text-sm font-semibold text-text-primary">Rotate major pairs and keep the same order flow</p>
-          </div>
-          <div className="hidden sm:flex items-center gap-2 rounded-full bg-[#eef5f6] px-3 py-1.5 text-xs text-text-secondary">
-            <span className="h-2.5 w-2.5 rounded-full bg-[#3dc5ce]" />
-            Live pricing
-          </div>
-        </div>
-        <div className="flex gap-2 overflow-x-auto pb-1 scrollbar-hide">
-        {COINS.map(c => {
-          const p = prices[c]; const chg = p?.change24h || 0;
-          return (
-            <button key={c} onClick={() => setCoin(c)}
-              className={`flex-shrink-0 px-3 py-2.5 rounded-[1.15rem] transition-all ${coin === c ? 'text-text-primary -translate-y-0.5' : 'text-text-muted hover:text-text-primary hover:-translate-y-0.5'}`}
-              style={{ background: coin === c ? 'rgba(244,146,126,0.12)' : '#eef5f6', border: coin === c ? '1px solid rgba(244,146,126,0.42)' : '1px solid rgba(13,80,86,0.08)', minWidth: 82 }}>
-              <p className="text-xs font-bold">{c}</p>
-              <p className={`text-xs mt-0.5 ${chg >= 0 ? 'text-green-trade' : 'text-red-trade'}`}>{chg >= 0 ? '+' : ''}{chg.toFixed(2)}%</p>
-            </button>
-          );
-        })}
-        </div>
-      </div>
+        <div className="border-b border-white/6 px-4 pb-4 pt-4 sm:px-5">
+          <div className="flex items-start justify-between gap-3">
+            <div className="min-w-0">
+              <div className="flex items-center gap-2">
+                <button
+                  className="rounded-full bg-white/6 px-3 py-1.5 text-sm font-semibold text-white transition-all hover:bg-white/10"
+                  onClick={() => setTab('chart')}
+                >
+                  {coin}/USDT
+                </button>
+                <span className={`text-sm font-semibold ${change24h >= 0 ? 'text-green-trade' : 'text-red-trade'}`}>
+                  {change24h >= 0 ? '+' : '-'}{Math.abs(change24h).toFixed(2)}%
+                </span>
+              </div>
+              <p className="mt-3 text-[2rem] font-bold leading-none text-white sm:text-[2.6rem]">
+                ${currentPrice ? currentPrice.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 4 }) : '---'}
+              </p>
+              <p className="mt-2 text-sm text-white/58">
+                Balance ${balance.toLocaleString('en-US', { minimumFractionDigits: 2 })} · Open {positions.length} position{positions.length === 1 ? '' : 's'}
+              </p>
+            </div>
 
-      {/* Chart card */}
-      <div className="rounded-[2rem] overflow-hidden" style={{ background: '#0E2026', border: '1px solid rgba(255,255,255,0.08)', boxShadow: '0 22px 50px rgba(6, 28, 33, 0.24)' }}>
-        {/* Price header */}
-        <div className="flex flex-col gap-4 px-4 pt-4 pb-3 sm:flex-row sm:items-start sm:justify-between sm:px-5 sm:pt-5">
-          <div className="min-w-0">
-            <p className="text-sm text-text-muted">{coin}/USDT · Forex</p>
-            <p className="truncate text-[2rem] font-bold text-white sm:text-[2.4rem] lg:text-[2.8rem]">
-              ${currentPrice ? currentPrice.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 4 }) : '---'}
-            </p>
-            <p className={`mt-1 text-sm font-semibold sm:text-lg ${change24h >= 0 ? 'text-green-trade' : 'text-red-trade'}`}>
-              {change24h >= 0 ? '▲' : '▼'} {Math.abs(change24h).toFixed(2)}% (24h)
-            </p>
-          </div>
-          <div className="flex-shrink-0 rounded-[1.15rem] bg-white/5 px-4 py-3 sm:min-w-[160px]">
-            {coinData && <p className="text-sm text-text-muted sm:text-base">Vol: <span className="font-semibold text-white">${(coinData.volume24h / 1e6).toFixed(1)}M</span></p>}
-            <div className="mt-2 flex items-center gap-2 justify-start sm:justify-end">
-              <div className="h-2.5 w-2.5 rounded-full bg-green-trade animate-pulse" />
-              <span className="text-sm text-green-trade">Live</span>
+            <div className="flex flex-col items-end gap-2">
+              <div className="flex items-center gap-1.5 rounded-full border border-green-trade/30 bg-green-trade/10 px-3 py-1 text-xs font-semibold text-green-trade">
+                <span className="h-1.5 w-1.5 rounded-full bg-green-trade animate-pulse" />
+                Live
+              </div>
             </div>
           </div>
+
+          <div className="mt-4 flex gap-2 overflow-x-auto pb-1 scrollbar-hide">
+            {COINS.map(c => {
+              const chg = prices[c]?.change24h || 0;
+              const active = coin === c;
+              return (
+                <button
+                  key={c}
+                  onClick={() => setCoin(c)}
+                  className={`flex-shrink-0 rounded-[1rem] border px-3 py-2 text-left transition-all ${active ? '-translate-y-0.5' : 'hover:-translate-y-0.5'}`}
+                  style={{
+                    minWidth: 88,
+                    background: active ? 'rgba(240,185,11,0.14)' : 'rgba(255,255,255,0.05)',
+                    borderColor: active ? 'rgba(240,185,11,0.35)' : 'rgba(255,255,255,0.08)',
+                  }}
+                >
+                  <p className={`text-sm font-bold ${active ? 'text-[#f0b90b]' : 'text-white'}`}>{c}</p>
+                  <p className={`mt-1 text-xs font-medium ${chg >= 0 ? 'text-green-trade' : 'text-red-trade'}`}>
+                    {chg >= 0 ? '+' : ''}{chg.toFixed(2)}%
+                  </p>
+                </button>
+              );
+            })}
+          </div>
+
+          <div className="mt-4 flex gap-2 border-b border-white/6 pb-3 text-sm">
+            {[
+              { id: 'chart', label: 'Chart' },
+              { id: 'positions', label: `Positions${positions.length ? ` (${positions.length})` : ''}` },
+              { id: 'history', label: 'History' },
+            ].map(item => (
+              <button
+                key={item.id}
+                onClick={() => setTab(item.id)}
+                className={`rounded-full px-4 py-2 font-semibold transition-all ${tab === item.id ? 'bg-white text-[#091318]' : 'text-white/56 hover:text-white'}`}
+              >
+                {item.label}
+              </button>
+            ))}
+          </div>
+
         </div>
 
-        {/* Interval selector */}
-        <div className="flex gap-2 px-4 pb-3 overflow-x-auto scrollbar-hide sm:px-5">
-          {INTERVALS.map(({ label, value }) => (
-            <button key={value} onClick={() => setInterval(value)}
-              className={`px-4 py-2 rounded-full text-sm font-semibold transition-all ${interval === value ? 'text-white' : 'text-text-muted hover:text-white'}`}
-              style={{ background: interval === value ? 'rgba(238,130,103,0.5)' : 'rgba(255,255,255,0.07)' }}>
-              {label}
-            </button>
-          ))}
-        </div>
+        {tab === 'chart' && (
+          <>
+            <div className="flex gap-2 overflow-x-auto px-4 pb-2 pt-3 scrollbar-hide sm:px-5">
+              {INTERVALS.map(({ label, value }) => (
+                <button
+                  key={value}
+                  onClick={() => setInterval(value)}
+                  className={`rounded-full px-4 py-2 text-sm font-semibold transition-all ${
+                    interval === value ? 'bg-[#f0b90b] text-[#201500]' : 'bg-white/6 text-white/60 hover:text-white'
+                  }`}
+                >
+                  {label}
+                </button>
+              ))}
+            </div>
 
-        {/* Chart */}
-        <div className="h-[320px] px-2 pb-3 sm:h-[420px] lg:h-[560px]">
-          <CandlestickChart key={`${coin}_${interval}`} symbol={coin} interval={interval} currentPrice={currentPrice} />
-        </div>
+            <div className="h-[520px] px-2 pb-4 sm:h-[680px] lg:h-[820px]">
+              <CandlestickChart key={`${coin}_${interval}`} symbol={coin} interval={interval} currentPrice={currentPrice} />
+            </div>
+          </>
+        )}
+
+        {tab === 'positions' && (
+          <div className="px-4 py-4 sm:px-5">
+            {positions.length === 0 ? (
+              <div className="rounded-[1.8rem] border border-white/10 bg-white/4 px-6 py-12 text-center text-white/56">
+                <p className="mb-2 text-3xl">📉</p>
+                <p className="text-sm">No open positions</p>
+                <p className="mt-1 text-xs">Place a Buy or Sell order from the trade dock below.</p>
+              </div>
+            ) : (
+              <div className="space-y-2">
+                {positions.map(pos => (
+                  <PositionCard key={pos._id} trade={pos} currentPrice={prices[pos.coin]?.price} onClose={handleClose} />
+                ))}
+              </div>
+            )}
+          </div>
+        )}
+
+        {tab === 'history' && (
+          <div className="px-4 py-4 sm:px-5">
+            {history.length === 0 ? (
+              <div className="rounded-[1.8rem] border border-white/10 bg-white/4 px-6 py-12 text-center text-white/56">
+                <p className="mb-2 text-3xl">📊</p>
+                <p className="text-sm">No trade history</p>
+              </div>
+            ) : (
+              <div className="space-y-2">
+                {history.map(trade => {
+                  const won = trade.pnl >= 0;
+                  const isBuy = trade.type === 'buy';
+                  return (
+                    <div key={trade._id} className="rounded-[1.6rem] p-4"
+                      style={{ background: 'linear-gradient(180deg, #ffffff 0%, #f8fbfc 100%)', border: `1px solid ${won ? 'rgba(14,203,129,0.18)' : 'rgba(246,70,93,0.18)'}`, boxShadow: '0 16px 34px rgba(6, 28, 33, 0.08)' }}>
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-2">
+                          <div className={`px-2 py-0.5 rounded-lg text-xs font-bold ${isBuy ? 'bg-green-trade/20 text-green-trade' : 'bg-red-trade/20 text-red-trade'}`}>
+                            {isBuy ? '▲ BUY' : '▼ SELL'}
+                          </div>
+                          <div>
+                            <p className="text-text-primary font-semibold text-sm">{trade.coin}/USDT</p>
+                            <p className="text-text-muted text-xs">{trade.leverage}x · {trade.status}</p>
+                          </div>
+                        </div>
+                        <div className="text-right">
+                          <p className={`font-bold text-sm ${won ? 'text-green-trade' : 'text-red-trade'}`}>
+                            {won ? '+' : ''}{trade.pnl?.toFixed(2)} USDT
+                          </p>
+                          <p className="text-text-muted text-xs">${trade.amount?.toFixed(2)} margin</p>
+                        </div>
+                      </div>
+                      <div className="flex flex-wrap justify-between mt-2 text-xs text-text-muted gap-1">
+                        <span>Entry: <span className="text-text-primary">${trade.entryPrice?.toLocaleString('en-US', { minimumFractionDigits: 2 })}</span></span>
+                        <span>Close: <span className="text-text-primary">${trade.closePrice?.toLocaleString('en-US', { minimumFractionDigits: 2 })}</span></span>
+                        <span>{new Date(trade.closedAt || trade.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+          </div>
+        )}
       </div>
 
-      {/* ── Order Panel ──────────────────────────────────────────── */}
       <div
-        className="rounded-[1.8rem] p-4 space-y-4"
-        style={{
-          background: 'linear-gradient(180deg, #ffffff 0%, #f8fbfc 100%)',
-          border: '1px solid rgba(64,191,201,0.14)',
-          boxShadow: '0 16px 36px rgba(6, 28, 33, 0.08)',
-        }}
+        className="sticky bottom-20 z-30 rounded-[2rem] border border-white/8 px-3 py-3 backdrop-blur-xl sm:bottom-6 sm:px-4"
+        style={{ background: 'rgba(7, 21, 26, 0.92)', boxShadow: '0 24px 50px rgba(6, 28, 33, 0.3)' }}
       >
-        <div className="flex items-start justify-between gap-3">
-          <div>
-            <p className="text-[11px] uppercase tracking-[0.24em] text-text-muted">Place Order</p>
-            <p className="mt-1 text-sm font-semibold text-text-primary">Choose direction, leverage, and optional protection</p>
+        <div className="mb-3 grid grid-cols-3 gap-2 text-center text-xs sm:text-sm">
+          <div className="rounded-[1rem] bg-white/6 px-3 py-2">
+            <p className="text-white/38">Leverage</p>
+            <p className="mt-1 font-semibold text-[#f0b90b]">{leverage}x</p>
           </div>
-          <div className="rounded-full bg-[#eef5f6] px-3 py-1.5 text-xs font-medium text-text-secondary">
-            Margin mode
+          <div className="rounded-[1rem] bg-white/6 px-3 py-2">
+            <p className="text-white/38">Margin</p>
+            <p className="mt-1 font-semibold text-white">${amount || '0'}</p>
+          </div>
+          <div className="rounded-[1rem] bg-white/6 px-3 py-2">
+            <p className="text-white/38">Open</p>
+            <p className="mt-1 font-semibold text-white">{positions.length}</p>
           </div>
         </div>
 
-        {/* Buy / Sell */}
         <div className="grid grid-cols-2 gap-2">
           <button onClick={() => setTradeType('buy')}
             className="py-3.5 rounded-full text-sm font-bold transition-all active:scale-95 hover:-translate-y-0.5"
@@ -415,16 +485,15 @@ export default function ForexTrade() {
           </button>
         </div>
 
-        {/* Leverage */}
-        <div>
-          <p className="text-text-muted text-xs mb-2">Leverage</p>
+        <div className="mt-3">
+          <p className="mb-2 text-xs text-white/42">Leverage</p>
           <div className="flex gap-1.5 flex-wrap">
             {LEVERAGE_OPTIONS.map(lev => (
               <button key={lev} onClick={() => setLeverage(lev)}
                 className="px-3.5 py-1.5 rounded-full text-xs font-bold transition-all hover:-translate-y-0.5"
                 style={{
-                  background: leverage === lev ? '#0075bb' : '#eef5f6',
-                  color: leverage === lev ? '#fff' : '#51636b',
+                  background: leverage === lev ? '#f0b90b' : 'rgba(255,255,255,0.06)',
+                  color: leverage === lev ? '#1b1302' : 'rgba(255,255,255,0.72)',
                 }}>
                 {lev}x
               </button>
@@ -432,49 +501,43 @@ export default function ForexTrade() {
           </div>
         </div>
 
-        {/* Amount */}
-        <div>
-          <div className="flex justify-between mb-1.5">
-            <p className="text-text-muted text-xs">Amount (USDT)</p>
-            <p className="text-text-muted text-xs">Balance: <span className="text-white font-semibold">${balance.toFixed(2)}</span></p>
+        <div className="mt-3">
+          <div className="mb-1.5 flex justify-between">
+            <p className="text-xs text-white/42">Margin (USDT)</p>
+            <p className="text-xs text-white/42">Balance: <span className="font-semibold text-white">${balance.toFixed(2)}</span></p>
           </div>
           <input type="number" value={amount} onChange={e => { setAmount(e.target.value); setError(''); }}
             placeholder="Enter margin amount"
-            className="w-full px-4 py-3.5 rounded-[1.15rem] text-text-primary text-sm font-semibold outline-none"
-            style={{ background: '#eef5f6', border: '1px solid rgba(13,80,86,0.08)' }} />
+            className="w-full rounded-[1.15rem] border border-white/8 bg-white/6 px-4 py-3.5 text-sm font-semibold text-white outline-none placeholder:text-white/26" />
           <div className="flex gap-1.5 mt-2 flex-wrap">
             {[10, 25, 50, 100, 200].map(q => (
               <button key={q} onClick={() => { setAmount(String(q)); setError(''); }}
-                className="px-3 py-1.5 rounded-full text-xs font-medium text-text-muted hover:text-text-primary transition-colors"
-                style={{ background: '#eef5f6' }}>
+                className="rounded-full bg-white/6 px-3 py-1.5 text-xs font-medium text-white/68 transition-colors hover:text-white">
                 ${q}
               </button>
             ))}
             <button onClick={() => { setAmount(String(Math.floor(balance * 100) / 100)); setError(''); }}
-              className="px-3 py-1.5 rounded-full text-xs font-medium text-yellow-700"
-              style={{ background: 'rgba(252,213,53,0.1)' }}>
+              className="rounded-full bg-[#f0b90b]/14 px-3 py-1.5 text-xs font-medium text-[#f0b90b]">
               Max
             </button>
           </div>
         </div>
 
-        {/* Position size preview */}
         {parseFloat(amount) > 0 && (
-          <div className="grid grid-cols-2 gap-2 p-3 rounded-[1.15rem] text-xs" style={{ background: '#eef5f6', border: '1px solid rgba(13,80,86,0.08)' }}>
+          <div className="mt-3 grid grid-cols-2 gap-2 rounded-[1.15rem] border border-white/8 bg-white/6 p-3 text-xs">
             <div>
-              <p className="text-text-muted">Position Size</p>
-              <p className="text-text-primary font-bold">${(parseFloat(amount) * leverage).toFixed(2)}</p>
+              <p className="text-white/42">Position Size</p>
+              <p className="font-bold text-white">${(parseFloat(amount) * leverage).toFixed(2)}</p>
             </div>
             <div>
-              <p className="text-text-muted">Leverage</p>
-              <p className="text-yellow-400 font-bold">{leverage}x</p>
+              <p className="text-white/42">Leverage</p>
+              <p className="font-bold text-[#f0b90b]">{leverage}x</p>
             </div>
           </div>
         )}
 
-        {/* SL / TP toggle */}
         <button onClick={() => setShowSlTp(p => !p)}
-          className="text-xs text-brand-primary flex items-center gap-1 font-medium">
+          className="mt-3 flex items-center gap-1 text-xs font-medium text-[#f0b90b]">
           {showSlTp ? '▲' : '▼'} {showSlTp ? 'Hide' : 'Add'} Stop Loss / Take Profit
         </button>
 
@@ -500,7 +563,7 @@ export default function ForexTrade() {
         {error && <p className="text-red-trade text-xs text-center">{error}</p>}
 
         <button onClick={handleOpen} disabled={loading || !tradeType || !amount}
-          className="w-full py-3.5 rounded-full font-bold text-sm transition-all active:scale-95 hover:-translate-y-0.5 disabled:opacity-50"
+          className="mt-3 w-full py-3.5 rounded-full font-bold text-sm transition-all active:scale-95 hover:-translate-y-0.5 disabled:opacity-50"
           style={{
             background: !tradeType ? 'rgba(255,255,255,0.1)'
               : tradeType === 'buy' ? 'linear-gradient(135deg,#0ecb81,#06a860)'
@@ -509,78 +572,6 @@ export default function ForexTrade() {
           }}>
           {loading ? 'Opening...' : !tradeType ? 'Select Buy or Sell' : `Open ${tradeType === 'buy' ? '▲ Long' : '▼ Short'} · ${leverage}x`}
         </button>
-      </div>
-
-      {/* ── Positions / History Tabs ──────────────────────────────── */}
-      <div>
-        <div className="flex gap-1 p-1 rounded-full mb-3 bg-light-card border border-light-border">
-          {['positions', 'history'].map(t => (
-            <button key={t} onClick={() => setTab(t)}
-              className={`flex-1 py-2.5 rounded-full text-sm font-semibold capitalize transition-all ${tab === t ? 'text-white' : 'text-text-muted'}`}
-              style={{ background: tab === t ? 'rgba(0,117,187,0.72)' : 'transparent' }}>
-              {t === 'positions' ? `Positions${positions.length > 0 ? ` (${positions.length})` : ''}` : 'History'}
-            </button>
-          ))}
-        </div>
-
-        {tab === 'positions' ? (
-          positions.length === 0 ? (
-            <div className="rounded-[1.8rem] border border-[rgba(64,191,201,0.12)] bg-white px-6 py-12 text-center text-text-muted shadow-[0_16px_34px_rgba(6,28,33,0.06)]">
-              <p className="text-3xl mb-2">📉</p>
-              <p className="text-sm">No open positions</p>
-              <p className="text-xs mt-1">Place a Buy or Sell order above</p>
-            </div>
-          ) : (
-            <div className="space-y-2">
-              {positions.map(pos => (
-                <PositionCard key={pos._id} trade={pos}
-                  currentPrice={prices[pos.coin]?.price}
-                  onClose={handleClose} />
-              ))}
-            </div>
-          )
-        ) : (
-          history.length === 0 ? (
-            <div className="rounded-[1.8rem] border border-[rgba(64,191,201,0.12)] bg-white px-6 py-12 text-center text-text-muted shadow-[0_16px_34px_rgba(6,28,33,0.06)]">
-              <p className="text-3xl mb-2">📊</p>
-              <p className="text-sm">No trade history</p>
-            </div>
-          ) : (
-            <div className="space-y-2">
-              {history.map(trade => {
-                const won = trade.pnl >= 0;
-                const isBuy = trade.type === 'buy';
-                return (
-                  <div key={trade._id} className="rounded-[1.6rem] p-4"
-                    style={{ background: 'linear-gradient(180deg, #ffffff 0%, #f8fbfc 100%)', border: `1px solid ${won ? 'rgba(14,203,129,0.18)' : 'rgba(246,70,93,0.18)'}`, boxShadow: '0 16px 34px rgba(6, 28, 33, 0.08)' }}>
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-2">
-                        <div className={`px-2 py-0.5 rounded-lg text-xs font-bold ${isBuy ? 'bg-green-trade/20 text-green-trade' : 'bg-red-trade/20 text-red-trade'}`}>
-                          {isBuy ? '▲ BUY' : '▼ SELL'}
-                        </div>
-                        <div>
-                          <p className="text-text-primary font-semibold text-sm">{trade.coin}/USDT</p>
-                          <p className="text-text-muted text-xs">{trade.leverage}x · {trade.status}</p>
-                        </div>
-                      </div>
-                      <div className="text-right">
-                        <p className={`font-bold text-sm ${won ? 'text-green-trade' : 'text-red-trade'}`}>
-                          {won ? '+' : ''}{trade.pnl?.toFixed(2)} USDT
-                        </p>
-                        <p className="text-text-muted text-xs">${trade.amount?.toFixed(2)} margin</p>
-                      </div>
-                    </div>
-                    <div className="flex flex-wrap justify-between mt-2 text-xs text-text-muted gap-1">
-                      <span>Entry: <span className="text-text-primary">${trade.entryPrice?.toLocaleString('en-US', { minimumFractionDigits: 2 })}</span></span>
-                      <span>Close: <span className="text-text-primary">${trade.closePrice?.toLocaleString('en-US', { minimumFractionDigits: 2 })}</span></span>
-                      <span>{new Date(trade.closedAt || trade.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-          )
-        )}
       </div>
     </div>
   );

@@ -682,15 +682,9 @@ export default function BinaryTrade() {
             </div>
 
             <div className="flex flex-col items-end gap-2">
-              <div className="rounded-[1.1rem] bg-white/6 px-3 py-2 text-right">
-                <p className="text-[11px] uppercase tracking-[0.18em] text-white/42">Live</p>
-                <p className="mt-1 text-sm font-semibold text-white">
-                  {coinData?.volume24h ? `${(coinData.volume24h / 1e6).toFixed(1)}M` : '---'}
-                </p>
-              </div>
-              <div className="flex items-center gap-2 rounded-full border border-green-trade/30 bg-green-trade/10 px-3 py-1 text-xs font-semibold text-green-trade">
-                <span className="h-2 w-2 rounded-full bg-green-trade animate-pulse" />
-                Market Open
+              <div className="flex items-center gap-1.5 rounded-full border border-green-trade/30 bg-green-trade/10 px-3 py-1 text-xs font-semibold text-green-trade">
+                <span className="h-1.5 w-1.5 rounded-full bg-green-trade animate-pulse" />
+                Live
               </div>
             </div>
           </div>
@@ -735,19 +729,11 @@ export default function BinaryTrade() {
             ))}
           </div>
 
-          <div className="mt-4 grid grid-cols-3 gap-2 sm:gap-3">
-            {marketStats.map(item => (
-              <div key={item.label} className="rounded-[1rem] bg-white/5 px-3 py-3">
-                <p className="text-[10px] uppercase tracking-[0.18em] text-white/38">{item.label}</p>
-                <p className="mt-1 text-sm font-semibold text-white sm:text-base">{item.value}</p>
-              </div>
-            ))}
-          </div>
         </div>
 
         {tradeView === 'chart' && (
           <>
-            <div className="flex gap-2 overflow-x-auto px-4 pb-3 pt-4 scrollbar-hide sm:px-5">
+            <div className="flex gap-2 overflow-x-auto px-4 pb-2 pt-3 scrollbar-hide sm:px-5">
               {INTERVALS.map(({ label, value }) => (
                 <button
                   key={value}
@@ -761,7 +747,7 @@ export default function BinaryTrade() {
               ))}
             </div>
 
-            <div className="h-[420px] px-2 pb-4 sm:h-[560px] lg:h-[680px]">
+            <div className="h-[520px] px-2 pb-4 sm:h-[680px] lg:h-[820px]">
               <CandlestickChart
                 key={`${selectedCoin}_${interval}`}
                 symbol={selectedCoin}

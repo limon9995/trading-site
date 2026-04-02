@@ -100,11 +100,6 @@ export default function Transfer() {
 
   return (
     <div className="space-y-6 animate-fade-in pb-4">
-      <div className="overflow-hidden rounded-[34px] bg-[linear-gradient(135deg,#0b2026_0%,#114850_48%,#1b6d71_100%)] px-6 py-7 text-white shadow-[0_28px_90px_rgba(8,32,38,0.28)] md:px-8">
-        <h1 className="text-[36px] font-light leading-[1.04] tracking-[-0.03em] md:text-[46px]">Transfer funds instantly between users.</h1>
-        <p className="mt-3 max-w-xl text-sm leading-6 text-white/68 md:text-base">The transfer flow now matches the same premium exchange shell as wallet, deposit and withdraw.</p>
-      </div>
-
       {/* Balance banner */}
       <div className="rounded-2xl px-5 py-4 flex items-center justify-between"
         style={{ background: 'linear-gradient(135deg, #0E2026, #185B64)', border: '1px solid #E8EAED' }}

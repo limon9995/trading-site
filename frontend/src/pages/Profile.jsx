@@ -80,36 +80,6 @@ export default function Profile() {
 
   return (
     <div className="space-y-5 animate-fade-in">
-      <div className="overflow-hidden rounded-[34px] bg-[linear-gradient(135deg,#0b2026_0%,#114850_48%,#1b6d71_100%)] px-6 py-7 text-white shadow-[0_28px_90px_rgba(8,32,38,0.28)] md:px-8">
-        <div className="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
-          <div className="flex items-center gap-4">
-            <div className="flex h-20 w-20 items-center justify-center rounded-full border border-white/12 bg-white/10 text-3xl font-semibold text-white backdrop-blur">
-              {user?.username?.[0]?.toUpperCase()}
-            </div>
-            <div>
-              <span className="inline-flex rounded-full border border-white/15 bg-white/10 px-4 py-1.5 text-[11px] font-semibold uppercase tracking-[0.28em] text-[#96e5e6]">
-                Account Profile
-              </span>
-              <h2 className="mt-3 text-[34px] font-light leading-[1.04] tracking-[-0.03em]">{user?.username}</h2>
-              <p className="mt-1 text-sm text-white/68">{user?.email}</p>
-              <span className={`mt-2 inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-medium ${kycConfig.cls}`}>
-                {kycConfig.icon} KYC: {kycConfig.label}
-              </span>
-            </div>
-          </div>
-          <div className="grid gap-3 sm:grid-cols-2 lg:min-w-[320px]">
-            <div className="rounded-[24px] border border-white/12 bg-white/8 px-5 py-4 backdrop-blur">
-              <p className="text-[11px] uppercase tracking-[0.24em] text-white/48">Review</p>
-              <p className="mt-2 text-[28px] font-semibold text-white capitalize">{kycConfig.label}</p>
-            </div>
-            <div className="rounded-[24px] border border-white/12 bg-white/8 px-5 py-4 backdrop-blur">
-              <p className="text-[11px] uppercase tracking-[0.24em] text-white/48">Security</p>
-              <p className="mt-2 text-[28px] font-semibold text-white">Ready</p>
-            </div>
-          </div>
-        </div>
-      </div>
-
       <div className="grid grid-cols-2 gap-1.5 rounded-[28px] border border-[#d9e6e7] bg-white p-1.5 shadow-[0_18px_50px_rgba(8,35,41,0.07)]">
         {[['kyc', 'Update KYC'], ['password', 'Change Password']].map(([key, label]) => (
           <button

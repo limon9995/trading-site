@@ -143,24 +143,6 @@ export default function Dashboard() {
         </div>
       </div>
 
-      {/* ── Promo Banner — CEX.IO style ─────────────────────────────── */}
-      <div className="rounded-[30px] p-5 flex items-center gap-4 relative overflow-hidden"
-        style={{ background: 'linear-gradient(135deg, #0f545a 0%, #114147 100%)', border: '1px solid rgba(244,146,126,0.2)', boxShadow: '0 18px 40px rgba(24,91,100,0.18)' }}>
-        <div className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0"
-          style={{ background: 'rgba(238,130,103,0.2)' }}>
-          <span className="text-xl">🚀</span>
-        </div>
-        <div className="flex-1 min-w-0">
-          <p className="font-bold text-white text-sm">Start Earning Daily Returns</p>
-          <p className="text-white/60 text-xs mt-0.5">Investment plans — up to 2.5% daily profit</p>
-        </div>
-        <Link to="/plans"
-          className="flex-shrink-0 text-xs font-bold px-3 py-2 rounded-full transition-all active:scale-95"
-          style={{ background: '#EE8267', color: '#fff' }}>
-          View →
-        </Link>
-      </div>
-
       {/* ── Hot Markets — CEX.IO style ──────────────────────────────── */}
       <div className="rounded-[30px] overflow-hidden cex-surface">
         <div className="flex items-center justify-between px-4 py-3.5 border-b border-light-border">
