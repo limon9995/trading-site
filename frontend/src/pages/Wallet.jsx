@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import toast from 'react-hot-toast';
+import { useTranslation } from 'react-i18next';
 import { walletAPI, rechargeAPI } from '../services/api';
 import { useMarketPrices } from '../hooks/useMarketPrices';
 import AnimatedNumber from '../components/AnimatedNumber';
@@ -35,6 +36,7 @@ function BalanceCard({ icon, label, amount, usdValue, color = 'text-text-primary
 const QUICK_AMOUNTS = [50, 100, 500, 1000, 5000, 10000];
 
 export default function Wallet() {
+  const { t } = useTranslation();
   const [wallet, setWallet] = useState(null);
   const [loadingWallet, setLoadingWallet] = useState(true);
   const [rechargeAmount, setRechargeAmount] = useState('');
@@ -140,7 +142,7 @@ export default function Wallet() {
         <div className="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
           <div className="max-w-2xl">
             <span className="inline-flex rounded-full border border-white/15 bg-white/10 px-4 py-1.5 text-[11px] font-semibold uppercase tracking-[0.28em] text-[#91dde2]">
-              Wallet Center
+              {t('wallet.title')}
             </span>
             <h1 className="mt-4 max-w-xl text-[36px] font-light leading-[1.04] tracking-[-0.03em] md:text-[48px]">
               Manage balances, rewards and funding in one premium wallet.
@@ -151,12 +153,12 @@ export default function Wallet() {
           </div>
           <div className="grid gap-3 sm:grid-cols-3 lg:min-w-[520px]">
             <div className="rounded-[26px] border border-white/12 bg-white/8 px-5 py-4 backdrop-blur">
-              <p className="text-[11px] uppercase tracking-[0.24em] text-white/48">Portfolio</p>
+              <p className="text-[11px] uppercase tracking-[0.24em] text-white/48">{t('wallet.totalBalance')}</p>
               <p className="mt-2 text-[28px] font-semibold text-white">${(wallet?.totalBalance || 0).toFixed(2)}</p>
               <p className="mt-1 text-xs text-white/58">All balances combined</p>
             </div>
             <div className="rounded-[26px] border border-white/12 bg-white/8 px-5 py-4 backdrop-blur">
-              <p className="text-[11px] uppercase tracking-[0.24em] text-white/48">Referrals</p>
+              <p className="text-[11px] uppercase tracking-[0.24em] text-white/48">{t('wallet.referral')}</p>
               <p className="mt-2 text-[28px] font-semibold text-white">{wallet?.referralCount || 0}</p>
               <p className="mt-1 text-xs text-white/58">${(wallet?.referralEarnings || 0).toFixed(2)} earned</p>
             </div>
@@ -241,7 +243,7 @@ export default function Wallet() {
       <div className={`${PANEL} p-6 md:p-7`}>
         <div className="mb-5 flex flex-wrap items-center justify-between gap-3">
           <div>
-            <h3 className="text-[28px] font-light tracking-[-0.03em] text-[#0d2127]">Add Funds</h3>
+            <h3 className="text-[28px] font-light tracking-[-0.03em] text-[#0d2127]">{t('wallet.recharge')}</h3>
             <p className="mt-1 text-sm text-[#567176]">Fast internal top-up flow with bonus preview and clean credit summary.</p>
           </div>
           <span className="rounded-full border border-[#b9d0d2] bg-[#f2fbfb] px-4 py-1.5 text-[11px] font-semibold uppercase tracking-[0.24em] text-[#1b7578]">
@@ -337,7 +339,7 @@ export default function Wallet() {
       <div className={`${PANEL} overflow-hidden`}>
         <div className="flex items-center justify-between border-b border-[#e4ecec] px-6 py-5">
           <div>
-            <h3 className="text-[26px] font-light tracking-[-0.03em] text-[#0d2127]">Current Holdings</h3>
+            <h3 className="text-[26px] font-light tracking-[-0.03em] text-[#0d2127]">{t('wallet.holdings')}</h3>
             <p className="mt-1 text-sm text-[#5b7377]">A clearer exchange-style snapshot of your active crypto positions.</p>
           </div>
           <Link to="/trade" className="rounded-full border border-[#bed3d5] bg-[#f4fbfb] px-4 py-2 text-sm font-semibold text-[#1a7578] transition-all hover:-translate-y-0.5">Trade →</Link>

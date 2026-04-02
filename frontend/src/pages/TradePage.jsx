@@ -1,4 +1,5 @@
 import { Suspense, lazy, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 
 const BinaryTrade = lazy(() => import('./BinaryTrade'));
 const ForexTrade = lazy(() => import('./ForexTrade'));
@@ -11,6 +12,7 @@ const InlineTradeLoader = ({ label }) => (
 );
 
 export default function TradePage() {
+  const { t } = useTranslation();
   const [tab, setTab] = useState('binary');
 
   return (
@@ -25,7 +27,7 @@ export default function TradePage() {
             boxShadow: tab === 'binary' ? '0 10px 24px rgba(238,130,103,0.28)' : 'none',
           }}>
           <span>⚡</span>
-          <span>Binary</span>
+          <span>{t('tradePage.binary')}</span>
         </button>
         <button
           onClick={() => setTab('forex')}
@@ -36,11 +38,11 @@ export default function TradePage() {
             boxShadow: tab === 'forex' ? '0 10px 24px rgba(14,32,38,0.24)' : 'none',
           }}>
           <span>📈</span>
-          <span>Forex</span>
+          <span>{t('tradePage.forex')}</span>
         </button>
       </div>
 
-      <Suspense fallback={<InlineTradeLoader label={`Loading ${tab} trading...`} />}>
+      <Suspense fallback={<InlineTradeLoader label={t('common.loading')} />}>
         {tab === 'binary' ? <BinaryTrade /> : <ForexTrade />}
       </Suspense>
     </div>

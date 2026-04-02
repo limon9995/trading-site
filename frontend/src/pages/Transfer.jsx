@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import toast from 'react-hot-toast';
+import { useTranslation } from 'react-i18next';
 import { transferAPI, walletAPI } from '../services/api';
 
 const QUICK_AMOUNTS = [10, 50, 100, 500];
@@ -23,6 +24,7 @@ function StatusBadge({ status }) {
 }
 
 export default function Transfer() {
+  const { t } = useTranslation();
   const [recipient, setRecipient] = useState('');
   const [amount, setAmount] = useState('');
   const [note, setNote] = useState('');
@@ -105,7 +107,7 @@ export default function Transfer() {
         style={{ background: 'linear-gradient(135deg, #0E2026, #185B64)', border: '1px solid #E8EAED' }}
       >
         <div>
-          <p className="text-xs text-white/60">YOUR USDT BALANCE</p>
+          <p className="text-xs text-white/60">{t('transfer.balance')}</p>
           <p className="text-2xl font-black text-white mt-0.5">
             ${balance.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
           </p>
@@ -115,11 +117,11 @@ export default function Transfer() {
 
       {/* Transfer Form */}
       <div className={`${PANEL} p-6 space-y-4`}>
-        <h3 className="font-bold text-text-primary text-base">Send to User</h3>
+        <h3 className="font-bold text-text-primary text-base">{t('transfer.sendToUser')}</h3>
 
         {/* Recipient */}
         <div className="space-y-1.5">
-          <label className="text-sm text-text-secondary">Recipient (username or email)</label>
+          <label className="text-sm text-text-secondary">{t('transfer.recipient')}</label>
           <input
             type="text"
             value={recipient}
@@ -131,7 +133,7 @@ export default function Transfer() {
 
         {/* Amount */}
         <div className="space-y-1.5">
-          <label className="text-sm text-text-secondary">Amount (USDT)</label>
+          <label className="text-sm text-text-secondary">{t('transfer.amount')}</label>
           <div className="relative">
             <span className="absolute left-4 top-1/2 -translate-y-1/2 font-semibold text-sm text-text-muted">$</span>
             <input
@@ -165,7 +167,7 @@ export default function Transfer() {
 
         {/* Note (optional) */}
         <div className="space-y-1.5">
-          <label className="text-sm text-text-secondary">Note (optional)</label>
+          <label className="text-sm text-text-secondary">{t('transfer.note')}</label>
           <input
             type="text"
             value={note}
@@ -182,14 +184,14 @@ export default function Transfer() {
           disabled={!recipient.trim() || !amount || parseFloat(amount) <= 0}
           className="btn-primary w-full disabled:opacity-40 disabled:cursor-not-allowed"
         >
-          Review Transfer
+          {t('transfer.confirm')}
         </button>
       </div>
 
       {/* Transfer History */}
       <div className={`${PANEL} overflow-hidden`}>
         <div className="px-5 py-4 border-b border-light-border">
-          <h3 className="font-bold text-text-primary">Transfer History</h3>
+          <h3 className="font-bold text-text-primary">{t('transfer.history')}</h3>
         </div>
 
         {historyLoading ? (
@@ -199,7 +201,7 @@ export default function Transfer() {
         ) : history.length === 0 ? (
           <div className="px-5 py-14 text-center">
             <span className="text-4xl">↕️</span>
-            <p className="text-sm text-text-secondary mt-3">No transfers yet</p>
+            <p className="text-sm text-text-secondary mt-3">{t('transfer.noHistory')}</p>
             <p className="text-xs text-text-muted mt-1">Your transfer history will appear here</p>
           </div>
         ) : (

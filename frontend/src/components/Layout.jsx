@@ -63,20 +63,20 @@ function DrawerSvgIcon({ paths, color }) {
   );
 }
 
-const drawerItems = [
-  { to: '/dashboard',    label: 'Dashboard',        color: '#EE8267' },
-  { to: '/profile',      label: 'Profile & KYC',    color: '#185B64' },
-  { to: '/deposit',      label: 'Deposit',          color: '#0ECB81' },
-  { to: '/transfer',     label: 'Transfer',         color: '#536DFE' },
-  { to: '/withdraw',     label: 'Withdraw',         color: '#f6465d' },
-  { to: '/wallet',       label: 'Wallet',           color: '#EE8267' },
-  { to: '/plans',        label: 'Invest Plans',     color: '#a855f7' },
-  { to: '/trading',      label: 'Markets',          color: '#0ECB81' },
-  { to: '/new-coins',    label: 'New Coins',        color: '#f97316' },
-  { to: '/transactions', label: 'Transactions',     color: '#566367' },
-  { to: '/support',      label: 'Customer Service', color: '#06b6d4' },
-  { to: '/recovery',     label: 'Recovery',         color: '#f6465d' },
-  { to: '/settings',     label: 'Settings',         color: '#566367' },
+const DRAWER_ROUTES = [
+  { to: '/dashboard',    key: 'dashboard', color: '#EE8267' },
+  { to: '/profile',      key: 'profile',   color: '#185B64' },
+  { to: '/deposit',      key: 'deposit',   color: '#0ECB81' },
+  { to: '/transfer',     key: 'transfer',  color: '#536DFE' },
+  { to: '/withdraw',     key: 'withdraw',  color: '#f6465d' },
+  { to: '/wallet',       key: 'wallet',    color: '#EE8267' },
+  { to: '/plans',        key: 'plans',     color: '#a855f7' },
+  { to: '/trading',      key: 'markets',   color: '#0ECB81' },
+  { to: '/new-coins',    key: 'newCoins',  color: '#f97316' },
+  { to: '/transactions', key: 'transactions', color: '#566367' },
+  { to: '/support',      key: 'support',   color: '#06b6d4' },
+  { to: '/recovery',     key: 'recovery',  color: '#f6465d' },
+  { to: '/settings',     key: 'settings',  color: '#566367' },
 ];
 
 function HomeIcon({ active }) {
@@ -413,8 +413,8 @@ export default function Layout() {
 
             {/* Nav items */}
             <nav className="flex-1 px-2 py-3 overflow-y-auto space-y-0.5">
-              {drawerItems.map(({ to, label, color }) => (
-                <NavLink key={to + label} to={to} onClick={() => setDrawerOpen(false)}
+              {DRAWER_ROUTES.map(({ to, key, color }) => (
+                <NavLink key={to} to={to} onClick={() => setDrawerOpen(false)}
                   className={({ isActive }) =>
                     `flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all ${
                       isActive ? 'text-brand-primary bg-brand-primary/8' : 'hover:text-brand-primary'
@@ -427,7 +427,7 @@ export default function Layout() {
                       style={{ background: color + '15', border: `1px solid ${color}25` }}>
                       <DrawerSvgIcon paths={DRAWER_ICON_PATHS[to] || [[]]} color={color} />
                     </span>
-                    {label}
+                    {t(`layout.${key}`)}
                   </>
                 </NavLink>
               ))}
@@ -444,7 +444,7 @@ export default function Layout() {
                       style={{ background: '#EE826715', border: '1px solid #EE826730' }}>
                       <DrawerSvgIcon paths={DRAWER_ICON_PATHS['/admin'] || [[]]} color="#EE8267" />
                     </span>
-                    Admin Panel
+                    {t('layout.admin')}
                   </>
                 </NavLink>
               )}
@@ -459,7 +459,7 @@ export default function Layout() {
                     <path strokeLinecap="round" strokeLinejoin="round" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
                   </svg>
                 </span>
-                Logout
+                {t('layout.logout')}
               </button>
             </div>
           </div>

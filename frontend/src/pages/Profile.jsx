@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import toast from 'react-hot-toast';
+import { useTranslation } from 'react-i18next';
 import { useAuth } from '../context/AuthContext';
 import { authAPI, profileAPI } from '../services/api';
 
@@ -23,6 +24,7 @@ const PROFILE_INPUT =
   'input-field rounded-[22px] border-[#d7e4e5] bg-[#f7fbfb]';
 
 export default function Profile() {
+  const { t } = useTranslation();
   const { user, refreshUser } = useAuth();
   const [tab, setTab] = useState('kyc'); // 'kyc' | 'password'
   const [saving, setSaving] = useState(false);
@@ -81,7 +83,7 @@ export default function Profile() {
   return (
     <div className="space-y-5 animate-fade-in">
       <div className="grid grid-cols-2 gap-1.5 rounded-[28px] border border-[#d9e6e7] bg-white p-1.5 shadow-[0_18px_50px_rgba(8,35,41,0.07)]">
-        {[['kyc', 'Update KYC'], ['password', 'Change Password']].map(([key, label]) => (
+        {[['kyc', t('profile.kyc')], ['password', t('profile.changePassword')]].map(([key, label]) => (
           <button
             key={key}
             onClick={() => setTab(key)}
@@ -104,8 +106,8 @@ export default function Profile() {
             <div className="rounded-xl p-4 flex items-center gap-3" style={{ background: 'rgba(234,179,8,0.1)', border: '1px solid rgba(234,179,8,0.3)' }}>
               <span className="text-2xl">🕐</span>
               <div>
-                <p className="text-sm font-semibold text-yellow-400">KYC Under Review</p>
-                <p className="text-xs text-text-muted mt-0.5">Your information is being verified. Usually takes 24 hours.</p>
+                <p className="text-sm font-semibold text-yellow-400">{t('profile.kycUnderReview')}</p>
+                <p className="text-xs text-text-muted mt-0.5">{t('profile.kycUnderReviewDesc')}</p>
               </div>
             </div>
           )}
@@ -113,8 +115,8 @@ export default function Profile() {
             <div className="rounded-xl p-4 flex items-center gap-3" style={{ background: 'rgba(14,203,129,0.1)', border: '1px solid rgba(14,203,129,0.3)' }}>
               <span className="text-2xl">✅</span>
               <div>
-                <p className="text-sm font-semibold text-green-trade">KYC Verified</p>
-                <p className="text-xs text-text-muted mt-0.5">Your identity has been successfully verified.</p>
+                <p className="text-sm font-semibold text-green-trade">{t('profile.kycVerified')}</p>
+                <p className="text-xs text-text-muted mt-0.5">{t('profile.kycVerifiedDesc')}</p>
               </div>
             </div>
           )}
@@ -122,23 +124,23 @@ export default function Profile() {
             <div className="rounded-xl p-4 flex items-center gap-3" style={{ background: 'rgba(242,60,72,0.1)', border: '1px solid rgba(242,60,72,0.3)' }}>
               <span className="text-2xl">❌</span>
               <div>
-                <p className="text-sm font-semibold text-red-trade">KYC Rejected</p>
-                <p className="text-xs text-text-muted mt-0.5">Please update your information and resubmit.</p>
+                <p className="text-sm font-semibold text-red-trade">{t('profile.kycRejected')}</p>
+                <p className="text-xs text-text-muted mt-0.5">{t('profile.kycRejectedDesc')}</p>
               </div>
             </div>
           )}
 
-          <p className="text-xs text-text-muted font-medium uppercase tracking-wider">Personal Information</p>
+          <p className="text-xs text-text-muted font-medium uppercase tracking-wider">{t('profile.personalInfo')}</p>
 
           {/* Name row */}
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <label className="text-xs text-text-muted mb-1.5 block">First Name</label>
+              <label className="text-xs text-text-muted mb-1.5 block">{t('profile.firstName')}</label>
               <input name="firstName" value={form.firstName} onChange={handleChange}
                 className={PROFILE_INPUT} placeholder="John" disabled={isVerified || isPending} />
             </div>
             <div>
-              <label className="text-xs text-text-muted mb-1.5 block">Last Name</label>
+              <label className="text-xs text-text-muted mb-1.5 block">{t('profile.lastName')}</label>
               <input name="lastName" value={form.lastName} onChange={handleChange}
                 className={PROFILE_INPUT} placeholder="Doe" disabled={isVerified || isPending} />
             </div>
@@ -146,29 +148,29 @@ export default function Profile() {
 
           {/* Mobile */}
           <div>
-            <label className="text-xs text-text-muted mb-1.5 block">Mobile Number</label>
+            <label className="text-xs text-text-muted mb-1.5 block">{t('profile.mobile')}</label>
             <input name="mobile" value={form.mobile} onChange={handleChange}
               className={PROFILE_INPUT} placeholder="+880 1XXX XXXXXX" type="tel"
               disabled={isVerified || isPending} />
           </div>
 
-          <p className="text-xs text-text-muted font-medium uppercase tracking-wider pt-2">Address</p>
+          <p className="text-xs text-text-muted font-medium uppercase tracking-wider pt-2">{t('profile.address')}</p>
 
           {/* Address */}
           <div>
-            <label className="text-xs text-text-muted mb-1.5 block">Street Address</label>
+            <label className="text-xs text-text-muted mb-1.5 block">{t('profile.streetAddress')}</label>
             <input name="address" value={form.address} onChange={handleChange}
               className={PROFILE_INPUT} placeholder="House/Road/Area" disabled={isVerified || isPending} />
           </div>
 
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <label className="text-xs text-text-muted mb-1.5 block">City</label>
+              <label className="text-xs text-text-muted mb-1.5 block">{t('profile.city')}</label>
               <input name="city" value={form.city} onChange={handleChange}
                 className={PROFILE_INPUT} placeholder="Dhaka" disabled={isVerified || isPending} />
             </div>
             <div>
-              <label className="text-xs text-text-muted mb-1.5 block">ZIP Code</label>
+              <label className="text-xs text-text-muted mb-1.5 block">{t('profile.zip')}</label>
               <input name="zipCode" value={form.zipCode} onChange={handleChange}
                 className={PROFILE_INPUT} placeholder="1200" disabled={isVerified || isPending} />
             </div>
@@ -176,16 +178,16 @@ export default function Profile() {
 
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <label className="text-xs text-text-muted mb-1.5 block">State / Division</label>
+              <label className="text-xs text-text-muted mb-1.5 block">{t('profile.state')}</label>
               <input name="state" value={form.state} onChange={handleChange}
                 className={PROFILE_INPUT} placeholder="Dhaka" disabled={isVerified || isPending} />
             </div>
             <div>
-              <label className="text-xs text-text-muted mb-1.5 block">Country</label>
+              <label className="text-xs text-text-muted mb-1.5 block">{t('profile.country')}</label>
               <select name="country" value={form.country} onChange={handleChange}
                 className={PROFILE_INPUT} disabled={isVerified || isPending}
                 style={{ fontSize: '16px' }}>
-                <option value="">Select country</option>
+                <option value="">{t('profile.selectCountry')}</option>
                 {COUNTRIES.map(c => <option key={c} value={c}>{c}</option>)}
               </select>
             </div>
@@ -195,7 +197,7 @@ export default function Profile() {
             <button onClick={handleSaveKyc} disabled={saving}
               className="flex h-14 w-full items-center justify-center gap-2 rounded-full bg-[#ee8267] text-sm font-semibold text-white shadow-[0_18px_40px_rgba(238,130,103,0.28)] transition-all hover:-translate-y-0.5 hover:bg-[#e8775a]">
               {saving && <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />}
-              {saving ? 'Saving...' : 'Submit for Verification'}
+              {saving ? t('common.loading') : t('profile.submit')}
             </button>
           )}
         </div>
@@ -204,21 +206,21 @@ export default function Profile() {
       {/* Change Password Tab */}
       {tab === 'password' && (
         <div className={`${PROFILE_PANEL} space-y-4 p-6`}>
-          <p className="text-xs text-text-muted font-medium uppercase tracking-wider">Change Password</p>
+          <p className="text-xs text-text-muted font-medium uppercase tracking-wider">{t('profile.changePassword')}</p>
           <div>
-            <label className="text-xs text-text-muted mb-1.5 block">Current Password</label>
+            <label className="text-xs text-text-muted mb-1.5 block">{t('profile.currentPassword')}</label>
             <input type="password" value={pwForm.currentPassword}
               onChange={e => setPwForm(f => ({ ...f, currentPassword: e.target.value }))}
               className={PROFILE_INPUT} placeholder="••••••••" />
           </div>
           <div>
-            <label className="text-xs text-text-muted mb-1.5 block">New Password</label>
+            <label className="text-xs text-text-muted mb-1.5 block">{t('profile.newPassword')}</label>
             <input type="password" value={pwForm.newPassword}
               onChange={e => setPwForm(f => ({ ...f, newPassword: e.target.value }))}
               className={PROFILE_INPUT} placeholder="Min 6 characters" />
           </div>
           <div>
-            <label className="text-xs text-text-muted mb-1.5 block">Confirm New Password</label>
+            <label className="text-xs text-text-muted mb-1.5 block">{t('profile.confirmPassword')}</label>
             <input type="password" value={pwForm.confirmPassword}
               onChange={e => setPwForm(f => ({ ...f, confirmPassword: e.target.value }))}
               className={PROFILE_INPUT} placeholder="Repeat new password" />
@@ -226,7 +228,7 @@ export default function Profile() {
           <button onClick={handleChangePassword} disabled={pwSaving}
             className="flex h-14 w-full items-center justify-center gap-2 rounded-full bg-[#ee8267] text-sm font-semibold text-white shadow-[0_18px_40px_rgba(238,130,103,0.28)] transition-all hover:-translate-y-0.5 hover:bg-[#e8775a]">
             {pwSaving && <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />}
-            {pwSaving ? 'Updating...' : 'Change Password'}
+            {pwSaving ? t('common.loading') : t('profile.changePassword')}
           </button>
         </div>
       )}

@@ -15,7 +15,9 @@
       "WebFetch(domain:blog.cex.io)",
       "Bash(node -e \"require\\(''dotenv''\\).config\\(\\); console.log\\(''PORT:'', process.env.PORT\\); console.log\\(''MONGO_URI:'', process.env.MONGO_URI ? ''set'' : ''NOT SET''\\); console.log\\(''JWT_SECRET:'', process.env.JWT_SECRET ? ''set'' : ''NOT SET''\\);\")",
       "Bash(timeout 10 node -e \":*)",
-      "Bash(timeout 15 node -e \":*)"
+      "Bash(timeout 15 node -e \":*)",
+      "WebFetch(domain:cexhd.co)",
+      "Bash(npm run:*)"
     ]
   }
 }

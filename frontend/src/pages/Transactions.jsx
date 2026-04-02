@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import toast from 'react-hot-toast';
+import { useTranslation } from 'react-i18next';
 import { depositAPI, withdrawAPI } from '../services/api';
 
 const PANEL =
@@ -267,11 +268,12 @@ function WithdrawHistory() {
 
 // ── Main Transactions Component ───────────────────────────────────────────────
 export default function Transactions() {
+  const { t } = useTranslation();
   const [activeTab, setActiveTab] = useState('deposit');
 
   const tabs = [
-    { id: 'deposit', label: 'Deposit History', icon: '📥' },
-    { id: 'withdraw', label: 'Withdraw History', icon: '📤' },
+    { id: 'deposit', label: t('transactions.deposits'), icon: '📥' },
+    { id: 'withdraw', label: t('transactions.withdrawals'), icon: '📤' },
   ];
 
   return (
