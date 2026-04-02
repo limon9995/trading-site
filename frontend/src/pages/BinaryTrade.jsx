@@ -728,7 +728,7 @@ export default function BinaryTrade() {
         </div>
 
         {/* Chart */}
-        <div className="h-[340px] px-1 pb-2 sm:h-[440px] lg:h-[560px]">
+        <div className="h-[420px] px-1 pb-2 sm:h-[540px] lg:h-[680px]">
           <CandlestickChart key={`${selectedCoin}_${interval}`} symbol={selectedCoin} interval={interval} currentPrice={currentPrice} />
         </div>
       </div>

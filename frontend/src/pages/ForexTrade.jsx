@@ -383,7 +383,7 @@ export default function ForexTrade() {
               ))}
             </div>
 
-            <div className="h-[520px] px-2 pb-4 sm:h-[680px] lg:h-[820px]">
+            <div className="h-[420px] px-1 pb-2 sm:h-[540px] lg:h-[680px]">
               <CandlestickChart key={`${coin}_${interval}`} symbol={coin} interval={interval} currentPrice={currentPrice} />
             </div>
           </>
