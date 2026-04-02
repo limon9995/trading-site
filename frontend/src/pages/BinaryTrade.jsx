@@ -42,8 +42,8 @@ function CandlestickChart({ symbol, interval, currentPrice }) {
         textColor: '#848e9c',
         timeVisible: true,
         secondsVisible: interval === '1m',
-        fixedRightEdge: true,
         rightOffset: 5,
+        lockVisibleTimeRangeOnResize: false,
       },
       handleScroll: {
         mouseWheel: true,

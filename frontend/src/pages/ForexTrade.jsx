@@ -43,7 +43,7 @@ function CandlestickChart({ symbol, interval, currentPrice }) {
         horzLine: { color: '#848e9c', style: LineStyle.Dashed, labelBackgroundColor: '#0E2026' },
       },
       rightPriceScale: { borderColor: 'rgba(255,255,255,0.06)', textColor: '#848e9c' },
-      timeScale: { borderColor: 'rgba(255,255,255,0.06)', textColor: '#848e9c', timeVisible: true, fixedRightEdge: true, rightOffset: 5 },
+      timeScale: { borderColor: 'rgba(255,255,255,0.06)', textColor: '#848e9c', timeVisible: true, rightOffset: 5 },
       handleScroll: {
         mouseWheel: true,
         pressedMouseMove: true,
