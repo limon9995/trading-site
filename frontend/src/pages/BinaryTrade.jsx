@@ -503,19 +503,25 @@ export default function BinaryTrade() {
     tradingEnabled: true, maintenanceMode: false, payoutRate: 0.85, minTradeAmount: 1,
     maxTradeAmount: 1000, expiryTimes: [20, 30, 60, 90, 180], availablePairs: COINS,
   });
-  const [modal,        setModal]        = useState(null);
   const [resultModal,  setResultModal]  = useState(null);
   const [activeTrades, setActiveTrades] = useState([]);
   const [history,      setHistory]      = useState([]);
-  const [tradeView,    setTradeView]    = useState('chart');
+  const [tradeView,    setTradeView]    = useState('active');
   const [toast,        setToast]        = useState(null);
+  const [duration,     setDuration]     = useState(null);
+  const [amount,       setAmount]       = useState('');
+  const [tradeError,   setTradeError]   = useState('');
+  const [placing,      setPlacing]      = useState(false);
 
   const coinData     = prices[selectedCoin];
   const currentPrice = coinData?.price || 0;
   const change24h    = coinData?.change24h || 0;
 
   useEffect(() => {
-    binaryAPI.getSettings().then(({ data }) => setSettings(data)).catch(() => {});
+    binaryAPI.getSettings().then(({ data }) => {
+      setSettings(data);
+      if (data.expiryTimes?.length > 0) setDuration(data.expiryTimes[1] || data.expiryTimes[0]);
+    }).catch(() => {});
     loadActiveTrades();
     loadHistory();
   }, []);
@@ -533,12 +539,26 @@ export default function BinaryTrade() {
     setTimeout(() => setToast(null), 3500);
   };
 
-  const handlePlaceTrade = async ({ coin, direction, amount, duration }) => {
-    await binaryAPI.place({ coin, direction, amount, duration });
-    setModal(null);
-    showToast(`${coin} ${direction === 'up' ? '▲ Long' : '▼ Short'} — $${amount} placed!`);
-    await loadActiveTrades();
-    if (refreshUser) refreshUser();
+  const handlePlaceDirect = async (direction) => {
+    const amt = parseFloat(amount);
+    if (!duration) return setTradeError('Select a duration');
+    if (!amt || amt <= 0) return setTradeError('Enter a valid amount');
+    if (amt < (settings.minTradeAmount || 1)) return setTradeError(`Minimum $${settings.minTradeAmount || 1}`);
+    if (amt > (settings.maxTradeAmount || 1000)) return setTradeError(`Maximum $${settings.maxTradeAmount || 1000}`);
+    if (amt > balance) return setTradeError('Insufficient balance');
+    setTradeError('');
+    setPlacing(true);
+    try {
+      await binaryAPI.place({ coin: selectedCoin, direction, amount: amt, duration });
+      showToast(`${selectedCoin} ${direction === 'up' ? '▲ Up' : '▼ Down'} — $${amt} placed!`);
+      setAmount('');
+      await loadActiveTrades();
+      if (refreshUser) refreshUser();
+    } catch (e) {
+      setTradeError(e.response?.data?.error || e.message || 'Failed to place trade');
+    } finally {
+      setPlacing(false);
+    }
   };
 
   const handleTradeSettled = result => {
@@ -641,140 +661,196 @@ export default function BinaryTrade() {
   }
 
   return (
-    <div className="space-y-4 animate-fade-in px-0 pb-40">
+    <div className="space-y-3 animate-fade-in px-0 pb-6">
       {toast && (
-        <div
-          className="fixed left-1/2 top-4 z-50 max-w-sm -translate-x-1/2 rounded-2xl px-4 py-3 text-center text-sm font-semibold shadow-xl pointer-events-none"
-          style={{ background: toast.type === 'success' ? '#0ecb81' : '#f6465d', color: '#000' }}
-        >
+        <div className="fixed left-1/2 top-4 z-50 max-w-sm -translate-x-1/2 rounded-2xl px-4 py-3 text-center text-sm font-semibold shadow-xl pointer-events-none"
+          style={{ background: toast.type === 'success' ? '#0ecb81' : '#f6465d', color: '#000' }}>
           {toast.msg}
         </div>
       )}
 
-      <div
-        className="overflow-hidden rounded-[2rem]"
-        style={{
-          background: 'linear-gradient(180deg, #07151a 0%, #0b1e24 100%)',
-          border: '1px solid rgba(255,255,255,0.06)',
-          boxShadow: '0 22px 50px rgba(6, 28, 33, 0.28)',
-        }}
-      >
-        <div className="border-b border-white/6 px-4 pb-4 pt-4 sm:px-5">
-          <div className="flex items-start justify-between gap-3">
-            <div className="min-w-0">
-              <div className="flex items-center gap-2">
-                <button
-                  className="rounded-full bg-white/6 px-3 py-1.5 text-sm font-semibold text-white transition-all hover:bg-white/10"
-                  onClick={() => setTradeView('chart')}
-                >
-                  {selectedCoin}/USDT
-                </button>
-                <span className={`text-sm font-semibold ${change24h >= 0 ? 'text-green-trade' : 'text-red-trade'}`}>
-                  {change24h >= 0 ? '+' : '-'}{Math.abs(change24h).toFixed(2)}%
+      {/* ── Chart Card ─────────────────────────────────────────────── */}
+      <div className="overflow-hidden rounded-[1.6rem]"
+        style={{ background: 'linear-gradient(180deg, #07151a 0%, #0b1e24 100%)', border: '1px solid rgba(255,255,255,0.06)' }}>
+
+        {/* Coin tabs */}
+        <div className="flex gap-2 overflow-x-auto px-3 pt-3 pb-2 scrollbar-hide border-b border-white/6">
+          {availablePairs.map(coin => {
+            const chg = prices[coin]?.change24h || 0;
+            const active = selectedCoin === coin;
+            return (
+              <button key={coin} onClick={() => setSelectedCoin(coin)}
+                className="flex-shrink-0 flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold transition-all active:scale-95"
+                style={{
+                  background: active ? '#f0b90b' : 'rgba(255,255,255,0.07)',
+                  color: active ? '#1b1302' : 'rgba(255,255,255,0.65)',
+                }}>
+                {coin}
+                <span className={`${chg >= 0 ? (active ? 'text-green-800' : 'text-green-trade') : (active ? 'text-red-800' : 'text-red-trade')}`}>
+                  {chg >= 0 ? '+' : ''}{chg.toFixed(1)}%
                 </span>
-              </div>
-              <p className="mt-3 text-[2rem] font-bold leading-none text-white sm:text-[2.6rem]">
-                ${currentPrice ? currentPrice.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 4 }) : '---'}
-              </p>
-              <p className="mt-2 text-sm text-white/58">
-                Balance ${balance.toLocaleString('en-US', { minimumFractionDigits: 2 })} · Payout {((settings.payoutRate || 0.85) * 100).toFixed(0)}%
-              </p>
-            </div>
+              </button>
+            );
+          })}
+        </div>
 
-            <div className="flex flex-col items-end gap-2">
-              <div className="flex items-center gap-1.5 rounded-full border border-green-trade/30 bg-green-trade/10 px-3 py-1 text-xs font-semibold text-green-trade">
-                <span className="h-1.5 w-1.5 rounded-full bg-green-trade animate-pulse" />
-                Live
-              </div>
-            </div>
+        {/* Price + interval row */}
+        <div className="flex items-center justify-between px-4 py-2">
+          <div className="flex items-center gap-2">
+            <span className="text-white font-bold text-lg">
+              {currentPrice ? currentPrice.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 4 }) : '---'}
+            </span>
+            <span className={`text-xs font-semibold ${change24h >= 0 ? 'text-green-trade' : 'text-red-trade'}`}>
+              {change24h >= 0 ? '+' : ''}{change24h.toFixed(2)}%
+            </span>
           </div>
-
-          <div className="mt-4 flex gap-2 overflow-x-auto pb-1 scrollbar-hide">
-            {availablePairs.map(coin => {
-              const chg = prices[coin]?.change24h || 0;
-              const active = selectedCoin === coin;
-              return (
-                <button
-                  key={coin}
-                  onClick={() => setSelectedCoin(coin)}
-                  className={`flex-shrink-0 rounded-[1rem] border px-3 py-2 text-left transition-all ${active ? '-translate-y-0.5' : 'hover:-translate-y-0.5'}`}
-                  style={{
-                    minWidth: 88,
-                    background: active ? 'rgba(240,185,11,0.14)' : 'rgba(255,255,255,0.05)',
-                    borderColor: active ? 'rgba(240,185,11,0.35)' : 'rgba(255,255,255,0.08)',
-                  }}
-                >
-                  <p className={`text-sm font-bold ${active ? 'text-[#f0b90b]' : 'text-white'}`}>{coin}</p>
-                  <p className={`mt-1 text-xs font-medium ${chg >= 0 ? 'text-green-trade' : 'text-red-trade'}`}>
-                    {chg >= 0 ? '+' : ''}{chg.toFixed(2)}%
-                  </p>
-                </button>
-              );
-            })}
-          </div>
-
-          <div className="mt-4 flex gap-2 border-b border-white/6 pb-3 text-sm">
-            {[
-              { id: 'chart', label: 'Chart' },
-              { id: 'active', label: `Active${activeTrades.length ? ` (${activeTrades.length})` : ''}` },
-              { id: 'history', label: 'History' },
-            ].map(tab => (
-              <button
-                key={tab.id}
-                onClick={() => setTradeView(tab.id)}
-                className={`rounded-full px-4 py-2 font-semibold transition-all ${tradeView === tab.id ? 'bg-white text-[#091318]' : 'text-white/56 hover:text-white'}`}
-              >
-                {tab.label}
+          <div className="flex gap-1">
+            {INTERVALS.map(({ label, value }) => (
+              <button key={value} onClick={() => setInterval(value)}
+                className="px-2.5 py-1 rounded-full text-xs font-semibold transition-all"
+                style={{
+                  background: interval === value ? '#f0b90b' : 'rgba(255,255,255,0.07)',
+                  color: interval === value ? '#201500' : 'rgba(255,255,255,0.55)',
+                }}>
+                {label}
               </button>
             ))}
           </div>
-
         </div>
 
-        {tradeView === 'chart' && (
-          <>
-            <div className="flex gap-2 overflow-x-auto px-4 pb-2 pt-3 scrollbar-hide sm:px-5">
-              {INTERVALS.map(({ label, value }) => (
-                <button
-                  key={value}
-                  onClick={() => setInterval(value)}
-                  className={`rounded-full px-4 py-2 text-sm font-semibold transition-all ${
-                    interval === value ? 'bg-[#f0b90b] text-[#201500]' : 'bg-white/6 text-white/60 hover:text-white'
-                  }`}
-                >
-                  {label}
+        {/* Chart */}
+        <div className="h-[340px] px-1 pb-2 sm:h-[440px] lg:h-[560px]">
+          <CandlestickChart key={`${selectedCoin}_${interval}`} symbol={selectedCoin} interval={interval} currentPrice={currentPrice} />
+        </div>
+      </div>
+
+      {/* ── Short Term Trade Panel ──────────────────────────────────── */}
+      <div className="overflow-hidden rounded-[1.6rem]"
+        style={{ background: 'linear-gradient(180deg, #0d1f26 0%, #0a1a20 100%)', border: '1px solid rgba(255,255,255,0.08)' }}>
+
+        {/* Header */}
+        <div className="flex items-center justify-between px-4 py-3 border-b border-white/6">
+          <div className="flex items-center gap-2">
+            <span className="text-[#f0b90b] text-base">⏱</span>
+            <span className="text-white font-bold text-base">Short Term Trade</span>
+          </div>
+          <span className="px-3 py-1 rounded-full text-xs font-bold"
+            style={{ background: 'rgba(240,185,11,0.14)', color: '#f0b90b', border: '1px solid rgba(240,185,11,0.28)' }}>
+            {selectedCoin}/USDT
+          </span>
+        </div>
+
+        <div className="p-4 space-y-3">
+          {/* Available Balance */}
+          <div className="flex items-center justify-between rounded-[0.9rem] px-4 py-3"
+            style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.07)' }}>
+            <div className="flex items-center gap-2 text-white/55 text-sm">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" className="w-4 h-4">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"/>
+              </svg>
+              <span>Available Balance</span>
+            </div>
+            <span className="text-white font-bold text-sm">{balance.toFixed(2)} USDT</span>
+          </div>
+
+          {/* Current Price */}
+          <div className="flex items-center justify-between rounded-[0.9rem] px-4 py-3"
+            style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.07)' }}>
+            <span className="text-white/55 text-sm">Current Price</span>
+            <span className="text-white font-bold text-xl">
+              ${currentPrice ? currentPrice.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 4 }) : '---'}
+            </span>
+          </div>
+
+          {/* Select Duration */}
+          <div>
+            <p className="text-white/45 text-xs mb-2">Select Duration</p>
+            <div className="flex gap-2 flex-wrap">
+              {(settings.expiryTimes || [20, 30, 60, 90, 180]).map(t => (
+                <button key={t} onClick={() => setDuration(t)}
+                  className="px-4 py-2 rounded-[0.75rem] text-sm font-semibold transition-all active:scale-95"
+                  style={{
+                    background: duration === t ? '#f0b90b' : 'rgba(255,255,255,0.07)',
+                    color: duration === t ? '#1b1302' : 'rgba(255,255,255,0.65)',
+                    border: duration === t ? 'none' : '1px solid rgba(255,255,255,0.1)',
+                  }}>
+                  {t < 60 ? `${t}s` : `${t / 60}m`}
                 </button>
               ))}
             </div>
+          </div>
 
-            <div className="h-[520px] px-2 pb-4 sm:h-[680px] lg:h-[820px]">
-              <CandlestickChart
-                key={`${selectedCoin}_${interval}`}
-                symbol={selectedCoin}
-                interval={interval}
-                currentPrice={currentPrice}
-              />
+          {/* Amount */}
+          <div>
+            <p className="text-white/45 text-xs mb-2">Amount (USDT)</p>
+            <div className="flex items-center gap-2 rounded-[0.9rem] px-4 py-3"
+              style={{ background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.1)' }}>
+              <input type="number" value={amount}
+                onChange={e => { setAmount(e.target.value); setTradeError(''); }}
+                placeholder="Enter amount"
+                className="flex-1 bg-transparent text-white text-sm outline-none placeholder:text-white/28" />
+              <button onClick={() => { setAmount(String(Math.floor(balance * 100) / 100)); setTradeError(''); }}
+                className="text-xs font-bold px-2.5 py-1 rounded-lg"
+                style={{ background: 'rgba(240,185,11,0.18)', color: '#f0b90b' }}>
+                ALL
+              </button>
             </div>
-          </>
-        )}
+            <div className="flex gap-2 mt-2">
+              {[10, 25, 50, 100].map(q => (
+                <button key={q} onClick={() => { setAmount(String(q)); setTradeError(''); }}
+                  className="flex-1 py-2 rounded-[0.75rem] text-xs font-semibold transition-all active:scale-95"
+                  style={{ background: 'rgba(255,255,255,0.07)', color: 'rgba(255,255,255,0.65)', border: '1px solid rgba(255,255,255,0.1)' }}>
+                  ${q}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {tradeError && <p className="text-red-trade text-xs text-center">{tradeError}</p>}
+
+          {/* Up / Down */}
+          <div className="grid grid-cols-2 gap-3 pt-1">
+            <button onClick={() => handlePlaceDirect('up')} disabled={placing || !currentPrice}
+              className="py-4 rounded-[1.1rem] font-bold text-base transition-all active:scale-95 disabled:opacity-50 flex items-center justify-center gap-1.5"
+              style={{ background: 'linear-gradient(135deg, #0ecb81 0%, #06a860 100%)', color: '#02160c' }}>
+              ↑ Up
+            </button>
+            <button onClick={() => handlePlaceDirect('down')} disabled={placing || !currentPrice}
+              className="py-4 rounded-[1.1rem] font-bold text-base transition-all active:scale-95 disabled:opacity-50 flex items-center justify-center gap-1.5"
+              style={{ background: 'linear-gradient(135deg, #7b1a28 0%, #5e1220 100%)', color: '#fff' }}>
+              ↓ Down
+            </button>
+          </div>
+        </div>
+      </div>
+
+      {/* ── Active / History ────────────────────────────────────────── */}
+      <div className="overflow-hidden rounded-[1.6rem]"
+        style={{ background: 'linear-gradient(180deg, #07151a 0%, #0b1e24 100%)', border: '1px solid rgba(255,255,255,0.06)' }}>
+        <div className="flex gap-2 px-4 pt-3 pb-2 border-b border-white/6">
+          {[
+            { id: 'active', label: `Active${activeTrades.length ? ` (${activeTrades.length})` : ''}` },
+            { id: 'history', label: 'History' },
+          ].map(t => (
+            <button key={t.id} onClick={() => setTradeView(t.id)}
+              className="px-4 py-2 rounded-full text-sm font-semibold transition-all"
+              style={tradeView === t.id ? { background: '#fff', color: '#091318' } : { color: 'rgba(255,255,255,0.45)' }}>
+              {t.label}
+            </button>
+          ))}
+        </div>
 
         {tradeView === 'active' && (
-          <div className="px-4 py-4 sm:px-5">
+          <div className="px-4 py-4">
             {activeTrades.length === 0 ? (
-              <div className="rounded-[1.8rem] border border-white/10 bg-white/4 px-6 py-12 text-center text-white/56">
-                <p className="mb-2 text-3xl">📊</p>
+              <div className="py-10 text-center text-white/40">
+                <p className="text-3xl mb-2">📊</p>
                 <p className="text-sm">No active trades</p>
-                <p className="mt-1 text-xs">Open a long or short position to see it here.</p>
               </div>
             ) : (
               <div className="space-y-2">
                 {activeTrades.map(trade => (
-                  <ActiveTradeCard
-                    key={trade._id}
-                    trade={trade}
-                    currentPrice={prices[trade.coin]?.price}
-                    onSettled={handleTradeSettled}
-                  />
+                  <ActiveTradeCard key={trade._id} trade={trade} currentPrice={prices[trade.coin]?.price} onSettled={handleTradeSettled} />
                 ))}
               </div>
             )}
@@ -782,10 +858,10 @@ export default function BinaryTrade() {
         )}
 
         {tradeView === 'history' && (
-          <div className="px-4 py-4 sm:px-5">
+          <div className="px-4 py-4">
             {history.length === 0 ? (
-              <div className="rounded-[1.8rem] border border-white/10 bg-white/4 px-6 py-12 text-center text-white/56">
-                <p className="mb-2 text-3xl">📈</p>
+              <div className="py-10 text-center text-white/40">
+                <p className="text-3xl mb-2">📈</p>
                 <p className="text-sm">No trade history</p>
               </div>
             ) : (
@@ -794,24 +870,20 @@ export default function BinaryTrade() {
                   const won = trade.status === 'won';
                   const isUp = trade.direction === 'up';
                   return (
-                    <div
-                      key={trade._id}
-                      className="rounded-[1.6rem] p-4"
+                    <div key={trade._id} className="rounded-[1.4rem] p-4"
                       style={{
                         background: 'linear-gradient(180deg, #ffffff 0%, #f8fbfc 100%)',
                         border: `1px solid ${won ? 'rgba(14,203,129,0.18)' : 'rgba(246,70,93,0.18)'}`,
-                        boxShadow: '0 16px 34px rgba(6, 28, 33, 0.08)',
-                      }}
-                    >
+                      }}>
                       <div className="flex items-center justify-between">
                         <div className="flex items-center gap-3">
-                          <div className={`flex h-10 w-10 items-center justify-center rounded-xl text-lg font-bold ${won ? 'bg-green-trade/20 text-green-trade' : 'bg-red-trade/20 text-red-trade'}`}>
+                          <div className={`flex h-9 w-9 items-center justify-center rounded-xl text-base font-bold ${won ? 'bg-green-trade/20 text-green-trade' : 'bg-red-trade/20 text-red-trade'}`}>
                             {won ? '✓' : '✗'}
                           </div>
                           <div>
                             <p className="text-sm font-semibold text-text-primary">{trade.coin}/USDT</p>
                             <p className={`mt-0.5 text-xs ${isUp ? 'text-green-trade' : 'text-red-trade'}`}>
-                              {isUp ? '▲ Long' : '▼ Short'} · {trade.duration}s
+                              {isUp ? '↑ Up' : '↓ Down'} · {trade.duration}s
                             </p>
                           </div>
                         </div>
@@ -836,64 +908,7 @@ export default function BinaryTrade() {
         )}
       </div>
 
-      <div className="sticky bottom-20 z-30 px-1 sm:bottom-6 sm:px-0">
-        <div
-          className="rounded-[2rem] border border-white/8 px-3 py-3 backdrop-blur-xl sm:px-4"
-          style={{ background: 'rgba(7, 21, 26, 0.92)', boxShadow: '0 24px 50px rgba(6, 28, 33, 0.3)' }}
-        >
-          <div className="mb-3 grid grid-cols-3 gap-2 text-center text-xs sm:text-sm">
-            <div className="rounded-[1rem] bg-white/6 px-3 py-2">
-              <p className="text-white/38">Min</p>
-              <p className="mt-1 font-semibold text-white">${settings.minTradeAmount}</p>
-            </div>
-            <div className="rounded-[1rem] bg-white/6 px-3 py-2">
-              <p className="text-white/38">Payout</p>
-              <p className="mt-1 font-semibold text-[#f0b90b]">{((settings.payoutRate || 0.85) * 100).toFixed(0)}%</p>
-            </div>
-            <div className="rounded-[1rem] bg-white/6 px-3 py-2">
-              <p className="text-white/38">Active</p>
-              <p className="mt-1 font-semibold text-white">{activeTrades.length}</p>
-            </div>
-          </div>
-
-          <div className="grid grid-cols-2 gap-3">
-            <button
-              onClick={() => setModal('up')}
-              disabled={!currentPrice}
-              className="rounded-[1.4rem] py-4 text-center font-bold transition-all active:scale-95 hover:-translate-y-0.5 disabled:opacity-50"
-              style={{ background: 'linear-gradient(135deg, #0ecb81 0%, #06a860 100%)', color: '#02160c', boxShadow: '0 10px 24px rgba(14,203,129,0.26)' }}
-            >
-              <p className="text-base sm:text-lg">Buy / Up</p>
-              <p className="mt-1 text-xl sm:text-2xl">${currentPrice ? currentPrice.toFixed(2) : '--'}</p>
-            </button>
-            <button
-              onClick={() => setModal('down')}
-              disabled={!currentPrice}
-              className="rounded-[1.4rem] py-4 text-center font-bold transition-all active:scale-95 hover:-translate-y-0.5 disabled:opacity-50"
-              style={{ background: 'linear-gradient(135deg, #f6465d 0%, #c9303f 100%)', color: '#fff', boxShadow: '0 10px 24px rgba(246,70,93,0.26)' }}
-            >
-              <p className="text-base sm:text-lg">Sell / Down</p>
-              <p className="mt-1 text-xl sm:text-2xl">${currentPrice ? currentPrice.toFixed(2) : '--'}</p>
-            </button>
-          </div>
-        </div>
-      </div>
-
-      {modal && (
-        <OrderModal
-          coin={selectedCoin}
-          direction={modal}
-          currentPrice={currentPrice}
-          settings={settings}
-          balance={balance}
-          onConfirm={handlePlaceTrade}
-          onClose={() => setModal(null)}
-        />
-      )}
-
-      {resultModal && (
-        <ResultModal result={resultModal} onClose={() => setResultModal(null)} />
-      )}
+      {resultModal && <ResultModal result={resultModal} onClose={() => setResultModal(null)} />}
     </div>
   );
 }
