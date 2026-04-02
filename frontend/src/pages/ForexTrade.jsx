@@ -93,7 +93,7 @@ function CandlestickChart({ symbol, interval, currentPrice }) {
           color: c.close >= c.open ? 'rgba(14,203,129,0.3)' : 'rgba(246,70,93,0.3)',
         })));
         lastCandleRef.current = unique[unique.length - 1] || null;
-        chartRef.current?.timeScale().fitContent();
+        chartRef.current?.timeScale().scrollToRealTime();
       } catch {}
     };
     load();

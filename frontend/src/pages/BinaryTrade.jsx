@@ -126,7 +126,7 @@ function CandlestickChart({ symbol, interval, currentPrice }) {
           }))
         );
         lastCandleRef.current = unique[unique.length - 1] || null;
-        chartRef.current?.timeScale().fitContent();
+        chartRef.current?.timeScale().scrollToRealTime();
       } catch {}
     };
 
