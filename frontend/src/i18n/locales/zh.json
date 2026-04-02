@@ -1,0 +1,13 @@
+{
+  "nav": { "trade": "立即交易", "dashboard": "仪表板", "trading": "交易", "transactions": "交易历史", "admin": "管理员" },
+  "dashboard": { "totalBalance": "总余额", "available": "可用", "openTrades": "开放交易", "plan": "计划", "addFunds": "+ 添加资金", "myWallet": "我的钱包", "hotMarkets": "热门市场", "viewAll": "查看全部 →", "recentTrades": "最近交易", "noTrades": "暂无交易", "startTrading": "开始交易", "startEarning": "开始赚取每日收益", "investPlans": "投资计划 — 每日最高2.5%利润", "view": "查看 →" },
+  "trade": { "shortTermTrade": "短期交易", "availableBalance": "可用余额", "currentPrice": "当前价格", "selectDuration": "选择时长", "amount": "金额 (USDT)", "enterAmount": "输入金额", "up": "涨", "down": "跌", "active": "活跃", "history": "历史", "noActiveTrades": "无活跃交易", "noHistory": "无交易历史" },
+  "deposit": { "title": "充值", "selectCoin": "第1步 — 选择币种", "selectNetwork": "第2步 — 选择网络", "address": "充值地址", "copy": "复制", "copied": "已复制!", "amount": "金额", "txHash": "交易哈希 (可选)", "uploadVoucher": "上传支付凭证", "submit": "提交充值申请" },
+  "withdraw": { "title": "提现", "selectCoin": "选择币种", "network": "网络", "address": "钱包地址", "amount": "金额", "fee": "手续费", "netAmount": "到账金额", "submit": "继续", "history": "历史" },
+  "wallet": { "title": "我的钱包", "totalBalance": "总余额", "usdt": "USDT余额", "recharge": "充值" },
+  "profile": { "title": "个人资料", "kyc": "更新KYC", "password": "修改密码", "submit": "提交审核", "changePassword": "修改密码", "currentPassword": "当前密码", "newPassword": "新密码", "confirmPassword": "确认新密码" },
+  "settings": { "title": "设置", "profileInfo": "个人信息", "referral": "推荐码", "copy": "复制", "copied": "已复制!", "changePassword": "修改密码" },
+  "plans": { "title": "投资计划", "balance": "余额", "current": "当前", "active": "活跃", "purchase": "购买计划", "cancel": "取消", "confirm": "确认购买", "dailyReturn": "每日收益", "duration": "期限", "maxReturn": "最大收益" },
+  "support": { "title": "客户服务", "telegram": "Telegram支持", "email": "邮件支持", "tapMessage": "点击发送消息 →", "tapEmail": "点击发送邮件 →", "responseTimes": "响应时间" },
+  "common": { "loading": "加载中...", "error": "出现错误", "retry": "重试", "back": "返回", "save": "保存", "cancel": "取消", "confirm": "确认", "submit": "提交", "close": "关闭", "search": "搜索" }
+}
