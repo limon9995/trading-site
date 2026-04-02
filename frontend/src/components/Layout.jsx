@@ -14,20 +14,6 @@ const LANGUAGES = [
   { code: 'fr', label: 'Français',  flag: '🇫🇷' },
 ];
 
-function ShellBrand() {
-  return (
-    <div className="flex items-center">
-      <div className="relative w-9 h-9">
-        <svg viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-9 h-9">
-          <circle cx="20" cy="20" r="19" stroke="#00c9c9" strokeWidth="3" fill="none" opacity="0.9"/>
-          <circle cx="20" cy="20" r="11" stroke="#00c9c9" strokeWidth="2.5" fill="none" opacity="0.9"/>
-          <path d="M4 20 Q4 20 14 20" stroke="#00c9c9" strokeWidth="3" strokeLinecap="round"/>
-          <path d="M20 4 Q20 4 20 14" stroke="#00c9c9" strokeWidth="2" strokeLinecap="round" opacity="0.5"/>
-        </svg>
-      </div>
-    </div>
-  );
-}
 
 const bottomNav = [
   { to: '/dashboard',    label: 'Home',    icon: HomeIcon },
@@ -192,20 +178,25 @@ export default function Layout() {
       <header className="fixed top-0 left-0 right-0 z-40 backdrop-blur-xl" style={{ background: isDark ? 'rgba(14,32,38,0.92)' : 'rgba(255,255,255,0.88)', borderBottom: isDark ? '1px solid rgba(255,255,255,0.08)' : '1px solid rgba(232,234,237,0.95)', height: 72 }}>
         <div className="flex items-center justify-between px-4 h-full max-w-2xl mx-auto lg:max-w-6xl">
 
-          {/* Left: Avatar → drawer */}
+          {/* Left: Logo → drawer */}
           <button
             onClick={() => setDrawerOpen(true)}
-            className="w-10 h-10 rounded-[18px] flex items-center justify-center font-bold text-sm text-white flex-shrink-0 shadow-sm"
-            style={{ background: 'linear-gradient(135deg, #F4927E 0%, #EE8267 100%)' }}
+            className="w-10 h-10 rounded-[18px] flex items-center justify-center flex-shrink-0"
           >
-            {user?.username?.[0]?.toUpperCase() || 'U'}
+            <svg viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-9 h-9">
+              <circle cx="20" cy="20" r="19" stroke="#00c9c9" strokeWidth="3" fill="none" opacity="0.9"/>
+              <circle cx="20" cy="20" r="11" stroke="#00c9c9" strokeWidth="2.5" fill="none" opacity="0.9"/>
+              <path d="M4 20 Q4 20 14 20" stroke="#00c9c9" strokeWidth="3" strokeLinecap="round"/>
+              <path d="M20 4 Q20 4 20 14" stroke="#00c9c9" strokeWidth="2" strokeLinecap="round" opacity="0.5"/>
+            </svg>
           </button>
 
-          {/* Center: Logo + Search */}
+          {/* Center: Brand text + Search */}
           <div className="flex-1 mx-4 flex items-center gap-3">
-            {/* Logo */}
-            <div className="flex items-center flex-shrink-0">
-              <ShellBrand />
+            {/* CEX.IO text */}
+            <div className="hidden xs:flex items-center flex-shrink-0 leading-none" style={{ color: 'var(--cex-text)' }}>
+              <span className="text-[16px] font-light tracking-tight">CEX</span>
+              <span className="text-[16px] font-light opacity-60">.IO</span>
             </div>
 
             {/* Search */}
@@ -291,7 +282,7 @@ export default function Layout() {
 
               {langOpen && (
                 <div
-                  className="absolute right-0 top-full mt-2 w-52 overflow-hidden rounded-[20px] shadow-[0_20px_60px_rgba(8,35,41,0.28)]"
+                  className="absolute right-0 top-full mt-2 w-56 rounded-[20px] shadow-[0_20px_60px_rgba(8,35,41,0.28)]"
                   style={{ background: '#0e1e24', border: '1px solid rgba(255,255,255,0.09)', zIndex: 60 }}
                 >
                   <div className="px-3 pt-3 pb-2">
@@ -317,7 +308,7 @@ export default function Layout() {
                         className="flex w-full items-center gap-3 px-4 py-3 text-left transition-colors"
                         style={{ background: lang.code === i18n.language ? 'rgba(238,130,103,0.15)' : 'transparent' }}
                       >
-                        <span className="text-xl leading-none">{lang.flag}</span>
+                        <span className="text-[22px] leading-none flex-shrink-0 w-7 text-center">{lang.flag}</span>
                         <span className={`text-sm font-medium ${lang.code === i18n.language ? '' : ''}`}
                           style={{ color: lang.code === i18n.language ? '#EE8267' : 'rgba(255,255,255,0.8)' }}>
                           {lang.label}
