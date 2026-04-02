@@ -26,6 +26,7 @@ function CandlestickChart({ symbol, interval, currentPrice }) {
   const candleSeriesRef = useRef(null);
   const volSeriesRef    = useRef(null);
   const lastCandleRef   = useRef(null);
+  const [showJump, setShowJump] = useState(false);
 
   useEffect(() => {
     if (!containerRef.current) return;
@@ -70,6 +71,14 @@ function CandlestickChart({ symbol, interval, currentPrice }) {
     chartRef.current        = chart;
     candleSeriesRef.current = candleSeries;
     volSeriesRef.current    = volSeries;
+
+    chart.timeScale().subscribeVisibleLogicalRangeChange((range) => {
+      if (!range || !candleSeriesRef.current) return;
+      try {
+        const barsInfo = candleSeriesRef.current.barsInLogicalRange(range);
+        setShowJump(barsInfo && barsInfo.barsBefore < -3);
+      } catch {}
+    });
 
     const ro = new ResizeObserver(() => {
       if (containerRef.current) chart.applyOptions({ width: containerRef.current.clientWidth });
@@ -127,7 +136,20 @@ function CandlestickChart({ symbol, interval, currentPrice }) {
     return () => clearInterval(t);
   }, [symbol, interval]);
 
-  return <div ref={containerRef} className="w-full h-full" />;
+  return (
+    <div className="relative w-full h-full">
+      <div ref={containerRef} className="w-full h-full" />
+      {showJump && (
+        <button
+          onClick={() => { chartRef.current?.timeScale().scrollToRealTime(); }}
+          className="absolute bottom-10 right-3 z-10 flex items-center gap-1 rounded-full px-3 py-1.5 text-xs font-bold transition-all active:scale-95"
+          style={{ background: '#EE8267', color: '#fff', boxShadow: '0 4px 14px rgba(238,130,103,0.4)' }}
+        >
+          ›› Latest
+        </button>
+      )}
+    </div>
+  );
 }
 
 // ── Open Position Card ───────────────────────────────────────────────────────

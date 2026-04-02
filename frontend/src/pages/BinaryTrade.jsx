@@ -12,6 +12,7 @@ function CandlestickChart({ symbol, interval, currentPrice }) {
   const candleSeriesRef = useRef(null);
   const volumeSeriesRef = useRef(null);
   const lastCandleRef   = useRef(null);
+  const [showJump, setShowJump] = useState(false);
 
   // Create chart on mount
   useEffect(() => {
@@ -81,6 +82,19 @@ function CandlestickChart({ symbol, interval, currentPrice }) {
     chartRef.current        = chart;
     candleSeriesRef.current = candleSeries;
     volumeSeriesRef.current = volumeSeries;
+
+    // Show jump button when user scrolls away from latest
+    chart.timeScale().subscribeVisibleLogicalRangeChange((range) => {
+      if (!range || !candleSeriesRef.current) return;
+      try {
+        const barsInfo = candleSeriesRef.current.barsInLogicalRange(range);
+        if (barsInfo && barsInfo.barsBefore < -3) {
+          setShowJump(true);
+        } else {
+          setShowJump(false);
+        }
+      } catch {}
+    });
 
     // Resize observer
     const ro = new ResizeObserver(() => {
@@ -186,7 +200,20 @@ function CandlestickChart({ symbol, interval, currentPrice }) {
     return () => clearInterval(timer);
   }, [symbol, interval]);
 
-  return <div ref={containerRef} className="w-full h-full" />;
+  return (
+    <div className="relative w-full h-full">
+      <div ref={containerRef} className="w-full h-full" />
+      {showJump && (
+        <button
+          onClick={() => { chartRef.current?.timeScale().scrollToRealTime(); }}
+          className="absolute bottom-10 right-3 z-10 flex items-center gap-1 rounded-full px-3 py-1.5 text-xs font-bold transition-all active:scale-95"
+          style={{ background: '#EE8267', color: '#fff', boxShadow: '0 4px 14px rgba(238,130,103,0.4)' }}
+        >
+          ›› Latest
+        </button>
+      )}
+    </div>
+  );
 }
 
 // ─── Countdown Ring ────────────────────────────────────────────────────────
