@@ -44,7 +44,17 @@ function CandlestickChart({ symbol, interval, currentPrice }) {
       },
       rightPriceScale: { borderColor: 'rgba(255,255,255,0.06)', textColor: '#848e9c' },
       timeScale: { borderColor: 'rgba(255,255,255,0.06)', textColor: '#848e9c', timeVisible: true },
-      handleScroll: true, handleScale: true,
+      handleScroll: {
+        mouseWheel: true,
+        pressedMouseMove: true,
+        horzTouchDrag: false,
+        vertTouchDrag: false,
+      },
+      handleScale: {
+        axisPressedMouseMove: true,
+        mouseWheel: true,
+        pinch: true,
+      },
     });
 
     const candleSeries = chart.addSeries(CandlestickSeries, {

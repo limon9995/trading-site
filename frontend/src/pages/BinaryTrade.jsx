@@ -43,8 +43,17 @@ function CandlestickChart({ symbol, interval, currentPrice }) {
         timeVisible: true,
         secondsVisible: interval === '1m',
       },
-      handleScroll: true,
-      handleScale: true,
+      handleScroll: {
+        mouseWheel: true,
+        pressedMouseMove: true,
+        horzTouchDrag: false,
+        vertTouchDrag: false,
+      },
+      handleScale: {
+        axisPressedMouseMove: true,
+        mouseWheel: true,
+        pinch: true,
+      },
     });
 
     // Candlestick series (lightweight-charts v5 API)
