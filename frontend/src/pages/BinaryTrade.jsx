@@ -46,7 +46,7 @@ function CandlestickChart({ symbol, interval, currentPrice }) {
       handleScroll: {
         mouseWheel: true,
         pressedMouseMove: true,
-        horzTouchDrag: false,
+        horzTouchDrag: true,
         vertTouchDrag: false,
       },
       handleScale: {
