@@ -4,6 +4,7 @@ import { createChart, CrosshairMode, LineStyle, CandlestickSeries, HistogramSeri
 import { binaryAPI, marketAPI } from '../services/api';
 import { useMarketPrices } from '../hooks/useMarketPrices';
 import { useAuth } from '../context/AuthContext';
+import { useTranslation } from 'react-i18next';
 
 // ─── Candlestick Chart Component ──────────────────────────────────────────
 function CandlestickChart({ symbol, interval, currentPrice }) {
@@ -532,6 +533,7 @@ const COINS = ['BTC', 'ETH', 'BNB', 'SOL', 'XRP', 'DOGE'];
 
 // ─── Main Page ─────────────────────────────────────────────────────────────
 export default function BinaryTrade() {
+  const { t }                 = useTranslation();
   const { user, refreshUser } = useAuth();
   const { prices }            = useMarketPrices(3000);
   const navigate              = useNavigate();
@@ -771,7 +773,7 @@ export default function BinaryTrade() {
         <div className="flex items-center justify-between px-4 py-3 border-b border-white/6">
           <div className="flex items-center gap-2">
             <span className="text-[#EE8267] text-base">⏱</span>
-            <span className="text-white font-bold text-base">Short Term Trade</span>
+            <span className="text-white font-bold text-base">{t('trade.shortTermTrade')}</span>
           </div>
           <span className="px-3 py-1 rounded-full text-xs font-bold"
             style={{ background: 'rgba(238,130,103,0.14)', color: '#EE8267', border: '1px solid rgba(238,130,103,0.28)' }}>
@@ -787,7 +789,7 @@ export default function BinaryTrade() {
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" className="w-4 h-4">
                 <path strokeLinecap="round" strokeLinejoin="round" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"/>
               </svg>
-              <span>Available Balance</span>
+              <span>{t('trade.availableBalance')}</span>
             </div>
             <span className="text-white font-bold text-sm">{balance.toFixed(2)} USDT</span>
           </div>
@@ -803,7 +805,7 @@ export default function BinaryTrade() {
 
           {/* Select Duration */}
           <div>
-            <p className="text-white/45 text-xs mb-2">Select Duration</p>
+            <p className="text-white/45 text-xs mb-2">{t('trade.selectDuration')}</p>
             <div className="flex gap-2 flex-wrap">
               {(settings.expiryTimes || [20, 30, 60, 90, 180]).map(t => (
                 <button key={t} onClick={() => setDuration(t)}
@@ -852,12 +854,12 @@ export default function BinaryTrade() {
             <button onClick={() => handlePlaceDirect('up')} disabled={placing || !currentPrice}
               className="py-4 rounded-[1.1rem] font-bold text-base transition-all active:scale-95 disabled:opacity-50 flex items-center justify-center gap-1.5"
               style={{ background: 'linear-gradient(135deg, #0ecb81 0%, #06a860 100%)', color: '#02160c' }}>
-              ↑ Up
+              ↑ {t('trade.up')}
             </button>
             <button onClick={() => handlePlaceDirect('down')} disabled={placing || !currentPrice}
               className="py-4 rounded-[1.1rem] font-bold text-base transition-all active:scale-95 disabled:opacity-50 flex items-center justify-center gap-1.5"
               style={{ background: 'linear-gradient(135deg, #7b1a28 0%, #5e1220 100%)', color: '#fff' }}>
-              ↓ Down
+              ↓ {t('trade.down')}
             </button>
           </div>
         </div>
@@ -868,8 +870,8 @@ export default function BinaryTrade() {
         style={{ background: 'linear-gradient(180deg, #07151a 0%, #0b1e24 100%)', border: '1px solid rgba(255,255,255,0.06)' }}>
         <div className="flex gap-2 px-4 pt-3 pb-2 border-b border-white/6">
           {[
-            { id: 'active', label: `Active${activeTrades.length ? ` (${activeTrades.length})` : ''}` },
-            { id: 'history', label: 'History' },
+            { id: 'active', label: `${t('trade.active')}${activeTrades.length ? ` (${activeTrades.length})` : ''}` },
+            { id: 'history', label: t('trade.history') },
           ].map(t => (
             <button key={t.id} onClick={() => setTradeView(t.id)}
               className="px-4 py-2 rounded-full text-sm font-semibold transition-all"
@@ -884,7 +886,7 @@ export default function BinaryTrade() {
             {activeTrades.length === 0 ? (
               <div className="py-10 text-center text-white/40">
                 <p className="text-3xl mb-2">📊</p>
-                <p className="text-sm">No active trades</p>
+                <p className="text-sm">{t('trade.noActiveTrades')}</p>
               </div>
             ) : (
               <div className="space-y-2">

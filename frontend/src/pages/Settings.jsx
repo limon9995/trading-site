@@ -3,6 +3,7 @@ import toast from 'react-hot-toast';
 import { useAuth } from '../context/AuthContext';
 import { useTheme } from '../context/ThemeContext';
 import { authAPI, walletAPI } from '../services/api';
+import { useTranslation } from 'react-i18next';
 
 const SETTINGS_PANEL =
   'rounded-[30px] border border-[#d9e6e7] bg-white shadow-[0_24px_80px_rgba(8,35,41,0.08)]';
@@ -10,6 +11,7 @@ const SETTINGS_INPUT =
   'input-field rounded-[22px] border-[#d7e4e5] bg-[#f7fbfb]';
 
 export default function Settings() {
+  const { t } = useTranslation();
   const { user, refreshUser } = useAuth();
   const { isDark, toggleTheme } = useTheme();
 
@@ -70,7 +72,7 @@ export default function Settings() {
   return (
     <div className="space-y-6 animate-fade-in max-w-3xl">
       <div className={`${SETTINGS_PANEL} p-6`}>
-        <h2 className="font-semibold text-text-primary mb-4">Profile Information</h2>
+        <h2 className="font-semibold text-text-primary mb-4">{t('settings.profileInfo')}</h2>
         <div className="flex items-center gap-4 mb-6">
           {/* Avatar */}
           <div className="w-16 h-16 rounded-full bg-brand-primary/20 flex items-center justify-center text-brand-primary font-black text-2xl flex-shrink-0">
@@ -163,7 +165,7 @@ export default function Settings() {
               copied ? 'border-green-trade text-green-trade' : ''
             }`}
           >
-            {copied ? '✓ Copied' : '📋 Copy'}
+            {copied ? `✓ ${t('settings.copied')}` : `📋 ${t('settings.copy')}`}
           </button>
         </div>
 
@@ -187,10 +189,10 @@ export default function Settings() {
 
       {/* ── Change Password ──────────────────────────────────────────── */}
       <div className={`${SETTINGS_PANEL} p-6`}>
-        <h2 className="font-semibold text-text-primary mb-4">Change Password</h2>
+        <h2 className="font-semibold text-text-primary mb-4">{t('settings.changePassword')}</h2>
         <form onSubmit={handlePwChange} className="space-y-4">
           <div>
-            <label className="text-sm text-text-secondary block mb-1.5">Current Password</label>
+            <label className="text-sm text-text-secondary block mb-1.5">{t('profile.currentPassword')}</label>
             <input
               type={showPasswords ? 'text' : 'password'}
               className={SETTINGS_INPUT}
@@ -201,7 +203,7 @@ export default function Settings() {
             />
           </div>
           <div>
-            <label className="text-sm text-text-secondary block mb-1.5">New Password</label>
+            <label className="text-sm text-text-secondary block mb-1.5">{t('profile.newPassword')}</label>
             <input
               type={showPasswords ? 'text' : 'password'}
               className={SETTINGS_INPUT}
@@ -212,7 +214,7 @@ export default function Settings() {
             />
           </div>
           <div>
-            <label className="text-sm text-text-secondary block mb-1.5">Confirm New Password</label>
+            <label className="text-sm text-text-secondary block mb-1.5">{t('profile.confirmPassword')}</label>
             <input
               type={showPasswords ? 'text' : 'password'}
               className={SETTINGS_INPUT}

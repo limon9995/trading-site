@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import toast from 'react-hot-toast';
 import { planAPI, walletAPI } from '../services/api';
 import { SkeletonCard } from '../components/SkeletonCard';
+import { useTranslation } from 'react-i18next';
 
 const PLAN_PANEL =
   'rounded-[30px] border border-[#d9e6e7] bg-white shadow-[0_24px_80px_rgba(8,35,41,0.08)]';
@@ -98,6 +99,7 @@ const DEFAULT_FEATURES = {
 
 // Confirmation modal
 function ConfirmModal({ plan, styles, onConfirm, onCancel, purchasing, usdtBalance }) {
+  const { t } = useTranslation();
   const hasEnough = usdtBalance >= plan.price;
 
   return (
@@ -113,7 +115,7 @@ function ConfirmModal({ plan, styles, onConfirm, onCancel, purchasing, usdtBalan
           >
             {styles.icon}
           </div>
-          <h3 className="text-xl font-bold text-text-primary">Confirm Purchase</h3>
+          <h3 className="text-xl font-bold text-text-primary">{t('plans.confirm')}</h3>
           <p className="text-sm text-text-secondary mt-1">
             Purchasing <span className="font-semibold" style={{ color: styles.ring }}>{plan.displayName}</span>
           </p>
@@ -129,15 +131,15 @@ function ConfirmModal({ plan, styles, onConfirm, onCancel, purchasing, usdtBalan
             <span className="text-text-primary">${plan.price.toLocaleString()} USDT</span>
           </div>
           <div className="flex justify-between">
-            <span className="text-text-muted">Daily Return</span>
+            <span className="text-text-muted">{t('plans.dailyReturn')}</span>
             <span className="text-green-trade">{plan.dailyReturn}%</span>
           </div>
           <div className="flex justify-between">
-            <span className="text-text-muted">Duration</span>
+            <span className="text-text-muted">{t('plans.duration')}</span>
             <span className="text-text-primary">{plan.duration} days</span>
           </div>
           <div className="flex justify-between">
-            <span className="text-text-muted">Max Return</span>
+            <span className="text-text-muted">{t('plans.maxReturn')}</span>
             <span className="text-green-trade">+{plan.maxReturn}%</span>
           </div>
           {plan.tradeBonus > 0 && (
@@ -165,7 +167,7 @@ function ConfirmModal({ plan, styles, onConfirm, onCancel, purchasing, usdtBalan
             onClick={onCancel}
             className="flex-1 rounded-full border border-[#d6e2e4] bg-white py-3 text-sm font-semibold text-[#506d72] transition-all hover:-translate-y-0.5"
           >
-            Cancel
+            {t('plans.cancel')}
           </button>
           <button
             onClick={onConfirm}
@@ -176,9 +178,9 @@ function ConfirmModal({ plan, styles, onConfirm, onCancel, purchasing, usdtBalan
             {purchasing ? (
               <>
                 <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                Processing...
+                {t('common.loading')}
               </>
-            ) : 'Confirm Purchase'}
+            ) : t('plans.confirm')}
           </button>
         </div>
       </div>
@@ -187,6 +189,7 @@ function ConfirmModal({ plan, styles, onConfirm, onCancel, purchasing, usdtBalan
 }
 
 export default function Plans() {
+  const { t } = useTranslation();
   const [plans, setPlans] = useState([]);
   const [loading, setLoading] = useState(true);
   const [myPlan, setMyPlan] = useState(null);
@@ -285,7 +288,7 @@ export default function Plans() {
 
       {/* Balance info */}
       <div className={`${PLAN_PANEL} flex items-center justify-between rounded-[28px] px-5 py-4`}>
-        <span className="text-sm text-text-secondary">Available USDT Balance</span>
+        <span className="text-sm text-text-secondary">{t('plans.balance')}</span>
         <span className="text-green-trade font-bold text-lg">
           ${usdtBalance.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
         </span>
@@ -346,11 +349,11 @@ export default function Plans() {
               <div className="grid grid-cols-2 gap-2 mb-4">
                 <div className="rounded-[20px] border border-[#dde8e9] bg-[#f7fbfb] p-3 text-center">
                   <p className="text-xl font-black" style={{ color: styles.ring }}>{plan.dailyReturn}%</p>
-                  <p className="text-xs text-text-muted mt-0.5">Daily Return</p>
+                  <p className="text-xs text-text-muted mt-0.5">{t('plans.dailyReturn')}</p>
                 </div>
                 <div className="rounded-[20px] border border-[#dde8e9] bg-[#f7fbfb] p-3 text-center">
                   <p className="text-xl font-black text-green-trade">+{plan.maxReturn}%</p>
-                  <p className="text-xs text-text-muted mt-0.5">Max Return</p>
+                  <p className="text-xs text-text-muted mt-0.5">{t('plans.maxReturn')}</p>
                 </div>
               </div>
 
@@ -411,7 +414,7 @@ export default function Plans() {
                       : '#9BA3A6',
                   }}
                 >
-                  {canAfford ? `Get ${plan.displayName}` : 'Insufficient Balance'}
+                  {canAfford ? `${t('plans.purchase')} ${plan.displayName}` : t('common.cancel')}
                 </button>
               )}
             </div>

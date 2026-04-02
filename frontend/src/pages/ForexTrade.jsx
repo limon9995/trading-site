@@ -4,6 +4,7 @@ import { useMarketPrices } from '../hooks/useMarketPrices';
 import { useAuth } from '../context/AuthContext';
 import { marketAPI } from '../services/api';
 import axios from 'axios';
+import { useTranslation } from 'react-i18next';
 
 const API = axios.create({ baseURL: '/api' });
 API.interceptors.request.use(c => {
@@ -226,6 +227,7 @@ const INTERVALS = [{ label: '1m', value: '1m' }, { label: '5m', value: '5m' }, {
 const COINS = ['BTC', 'ETH', 'BNB', 'SOL', 'XRP', 'DOGE', 'ADA', 'AVAX'];
 
 export default function ForexTrade() {
+  const { t }                 = useTranslation();
   const { user, refreshUser } = useAuth();
   const { prices }            = useMarketPrices(3000);
 
@@ -375,8 +377,8 @@ export default function ForexTrade() {
           <div className="mt-4 flex gap-2 border-b border-white/6 pb-3 text-sm">
             {[
               { id: 'chart', label: 'Chart' },
-              { id: 'positions', label: `Positions${positions.length ? ` (${positions.length})` : ''}` },
-              { id: 'history', label: 'History' },
+              { id: 'positions', label: `${t('trade.active')}${positions.length ? ` (${positions.length})` : ''}` },
+              { id: 'history', label: t('trade.history') },
             ].map(item => (
               <button
                 key={item.id}
@@ -504,7 +506,7 @@ export default function ForexTrade() {
               border: '1px solid rgba(14,203,129,0.4)',
               boxShadow: tradeType === 'buy' ? '0 4px 16px rgba(14,203,129,0.3)' : 'none',
             }}>
-            ▲ Buy / Long
+            ▲ {t('trade.up')} / Long
           </button>
           <button onClick={() => setTradeType('sell')}
             className="py-3.5 rounded-full text-sm font-bold transition-all active:scale-95 hover:-translate-y-0.5"
@@ -514,7 +516,7 @@ export default function ForexTrade() {
               border: '1px solid rgba(246,70,93,0.4)',
               boxShadow: tradeType === 'sell' ? '0 4px 16px rgba(246,70,93,0.3)' : 'none',
             }}>
-            ▼ Sell / Short
+            ▼ {t('trade.down')} / Short
           </button>
         </div>
 

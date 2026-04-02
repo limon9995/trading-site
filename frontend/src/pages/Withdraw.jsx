@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import toast from 'react-hot-toast';
 import { withdrawAPI } from '../services/api';
 import { useAuth } from '../context/AuthContext';
+import { useTranslation } from 'react-i18next';
 
 const COINS = [
   { symbol: 'USDT', name: 'Tether',   networks: ['TRC20', 'ERC20', 'BEP20'] },
@@ -32,6 +33,7 @@ const WITHDRAW_PANEL =
   'rounded-[30px] border border-[#d9e6e7] bg-white shadow-[0_24px_80px_rgba(8,35,41,0.08)]';
 
 export default function Withdraw() {
+  const { t } = useTranslation();
   const { user, refreshUser } = useAuth();
   const [tab, setTab] = useState('withdraw');
 
@@ -196,11 +198,11 @@ export default function Withdraw() {
       <div className="flex gap-2 rounded-[28px] border border-[#d9e5e6] bg-white p-1.5 shadow-[0_18px_50px_rgba(8,35,41,0.07)]">
         <button onClick={() => setTab('withdraw')}
           className={`flex-1 rounded-[22px] py-3 text-xs font-semibold uppercase tracking-[0.2em] transition-all ${tab === 'withdraw' ? 'bg-[#ee8267] text-white shadow-[0_12px_28px_rgba(238,130,103,0.22)]' : 'text-text-muted'}`}>
-          Withdraw
+          {t('withdraw.title')}
         </button>
         <button onClick={() => setTab('history')}
           className={`flex-1 rounded-[22px] py-3 text-xs font-semibold uppercase tracking-[0.2em] transition-all ${tab === 'history' ? 'bg-[#ee8267] text-white shadow-[0_12px_28px_rgba(238,130,103,0.22)]' : 'text-text-muted'}`}>
-          History
+          {t('withdraw.history')}
         </button>
       </div>
 
@@ -209,7 +211,7 @@ export default function Withdraw() {
         <form onSubmit={handleSendOtp} className="space-y-4">
           {/* Coin selector */}
           <div className={`${WITHDRAW_PANEL} space-y-3 p-5`}>
-            <p className="text-xs font-semibold text-text-muted uppercase tracking-wide">Select Coin</p>
+            <p className="text-xs font-semibold text-text-muted uppercase tracking-wide">{t('withdraw.selectCoin')}</p>
             <div className="grid grid-cols-4 gap-2">
               {COINS.map(c => {
                 const color = COIN_COLORS[c.symbol] || '#EE8267';
@@ -231,7 +233,7 @@ export default function Withdraw() {
 
           {/* Network selector */}
           <div className={`${WITHDRAW_PANEL} space-y-2 p-5`}>
-            <p className="text-xs font-semibold text-text-muted uppercase tracking-wide">Network</p>
+            <p className="text-xs font-semibold text-text-muted uppercase tracking-wide">{t('withdraw.network')}</p>
             <div className="flex gap-2 flex-wrap">
               {selectedCoin.networks.map(net => (
                 <button key={net} type="button" onClick={() => setSelectedNetwork(net)}
@@ -245,7 +247,7 @@ export default function Withdraw() {
 
           {/* Wallet address */}
           <div className={`${WITHDRAW_PANEL} space-y-2 p-5`}>
-            <p className="text-xs font-semibold text-text-muted uppercase tracking-wide">Wallet Address</p>
+            <p className="text-xs font-semibold text-text-muted uppercase tracking-wide">{t('withdraw.address')}</p>
             <textarea value={address} onChange={e => setAddress(e.target.value)}
               placeholder={`Enter ${selectedCoin.symbol} (${selectedNetwork}) address`} rows={2}
               className="w-full resize-none rounded-[22px] border border-[#d7e4e5] bg-[#f7fbfb] px-4 py-3 text-sm text-text-primary placeholder-text-muted outline-none focus:border-brand-primary/60" />
@@ -253,7 +255,7 @@ export default function Withdraw() {
 
           {/* Amount */}
           <div className={`${WITHDRAW_PANEL} space-y-3 p-5`}>
-            <p className="text-xs font-semibold text-text-muted uppercase tracking-wide">Amount (USDT)</p>
+            <p className="text-xs font-semibold text-text-muted uppercase tracking-wide">{t('withdraw.amount')}</p>
             <div className="relative">
               <input type="number" value={amount} onChange={e => setAmount(e.target.value)}
                 placeholder={`Min $${MIN_WITHDRAW}`}
@@ -265,15 +267,15 @@ export default function Withdraw() {
             {/* Fee breakdown */}
             <div className="space-y-1.5 pt-1 border-t border-light-border">
               <div className="flex justify-between text-xs">
-                <span className="text-text-muted">Withdrawal Amount</span>
+                <span className="text-text-muted">{t('withdraw.amount')}</span>
                 <span className="text-text-primary">${amt > 0 ? amt.toFixed(2) : '0.00'}</span>
               </div>
               <div className="flex justify-between text-xs">
-                <span className="text-text-muted">Network Fee (2%)</span>
+                <span className="text-text-muted">{t('withdraw.fee')}</span>
                 <span className="text-red-trade">-${fee.toFixed(2)}</span>
               </div>
               <div className="flex justify-between text-xs font-bold border-t border-light-border pt-1.5">
-                <span className="text-text-primary">You Receive</span>
+                <span className="text-text-primary">{t('withdraw.netAmount')}</span>
                 <span className="text-green-trade">${netAmount > 0 ? netAmount.toFixed(2) : '0.00'} {selectedCoin.symbol}</span>
               </div>
             </div>

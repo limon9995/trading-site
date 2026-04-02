@@ -5,6 +5,7 @@ import { walletAPI, tradeAPI } from '../services/api';
 import { useMarketPrices } from '../hooks/useMarketPrices';
 import AnimatedNumber from '../components/AnimatedNumber';
 import { useAuth } from '../context/AuthContext';
+import { useTranslation } from 'react-i18next';
 
 const SHORTCUTS = [
   { to: '/trade',       label: 'Trade',    color: '#EE8267', bg: '#EE826715',
@@ -30,6 +31,7 @@ const SHORTCUTS = [
 ];
 
 export default function Dashboard() {
+  const { t } = useTranslation();
   const { user } = useAuth();
   const [wallet, setWallet] = useState(null);
   const [loadingWallet, setLoadingWallet] = useState(true);
@@ -63,7 +65,7 @@ export default function Dashboard() {
 
         <div className="relative">
           <div className="flex items-center gap-2 mb-1">
-            <p className="text-white/70 text-[12px] uppercase tracking-[0.26em]">Total Balance</p>
+            <p className="text-white/70 text-[12px] uppercase tracking-[0.26em]">{t('dashboard.totalBalance')}</p>
             <button onClick={() => setBalanceVisible(v => !v)}
               className="text-white/50 hover:text-white transition-colors">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="w-4 h-4">
@@ -88,9 +90,9 @@ export default function Dashboard() {
 
           <div className="grid grid-cols-3 gap-3 mb-5">
             {[
-              ['Available', `$${balanceVisible ? usdtBalance.toFixed(2) : '••••'}`],
-              ['Open Trades', `${recentTrades.length}`],
-              ['Plan', user?.plan && user.plan !== 'none' ? user.plan.toUpperCase() : 'STANDARD'],
+              [t('dashboard.available'), `$${balanceVisible ? usdtBalance.toFixed(2) : '••••'}`],
+              [t('dashboard.openTrades'), `${recentTrades.length}`],
+              [t('dashboard.plan'), user?.plan && user.plan !== 'none' ? user.plan.toUpperCase() : 'STANDARD'],
             ].map(([label, value]) => (
               <div key={label} className="rounded-2xl px-3 py-3 bg-white/10 border border-white/10">
                 <p className="text-[11px] uppercase tracking-[0.18em] text-white/45">{label}</p>
@@ -104,12 +106,12 @@ export default function Dashboard() {
             <Link to="/deposit"
               className="flex-1 py-2.5 text-center text-sm font-bold rounded-full transition-all active:scale-95"
               style={{ background: '#EE8267', color: '#fff' }}>
-              + Add Funds
+              {t('dashboard.addFunds')}
             </Link>
             <Link to="/wallet"
               className="flex-1 py-2.5 text-center text-sm font-semibold rounded-full transition-all active:scale-95"
               style={{ background: 'rgba(255,255,255,0.15)', color: '#fff', border: '1px solid rgba(255,255,255,0.25)' }}>
-              My Wallet
+              {t('dashboard.myWallet')}
             </Link>
           </div>
         </div>
@@ -146,8 +148,8 @@ export default function Dashboard() {
       {/* ── Hot Markets — CEX.IO style ──────────────────────────────── */}
       <div className="rounded-[30px] overflow-hidden cex-surface">
         <div className="flex items-center justify-between px-4 py-3.5 border-b border-light-border">
-          <h3 className="font-bold text-text-primary text-sm">Hot Markets</h3>
-          <Link to="/trading" className="text-xs font-semibold" style={{ color: '#EE8267' }}>View All →</Link>
+          <h3 className="font-bold text-text-primary text-sm">{t('dashboard.hotMarkets')}</h3>
+          <Link to="/trading" className="text-xs font-semibold" style={{ color: '#EE8267' }}>{t('dashboard.viewAll')}</Link>
         </div>
 
         {/* Table header */}
@@ -201,8 +203,8 @@ export default function Dashboard() {
       {/* ── Recent Trades — CEX.IO style ────────────────────────────── */}
       <div className="rounded-[30px] overflow-hidden cex-surface">
         <div className="flex items-center justify-between px-4 py-3.5 border-b border-light-border">
-          <h3 className="font-bold text-text-primary text-sm">Recent Trades</h3>
-          <Link to="/transactions" className="text-xs font-semibold" style={{ color: '#EE8267' }}>View All →</Link>
+          <h3 className="font-bold text-text-primary text-sm">{t('dashboard.recentTrades')}</h3>
+          <Link to="/transactions" className="text-xs font-semibold" style={{ color: '#EE8267' }}>{t('dashboard.viewAll')}</Link>
         </div>
 
         {recentTrades.length === 0 ? (
@@ -212,9 +214,9 @@ export default function Dashboard() {
                 <path strokeLinecap="round" strokeLinejoin="round" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
               </svg>
             </div>
-            <p className="text-text-secondary text-sm font-medium">No trades yet</p>
-            <p className="text-text-muted text-xs mt-1 mb-4">Start trading to see your history</p>
-            <Link to="/trading" className="btn-primary inline-flex text-xs px-5 py-2.5">Start Trading</Link>
+            <p className="text-text-secondary text-sm font-medium">{t('dashboard.noTrades')}</p>
+            <p className="text-text-muted text-xs mt-1 mb-4">{t('dashboard.startTrading')}</p>
+            <Link to="/trading" className="btn-primary inline-flex text-xs px-5 py-2.5">{t('dashboard.startTrading')}</Link>
           </div>
         ) : (
           <div>

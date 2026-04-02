@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { settingsAPI } from '../services/api';
+import { useTranslation } from 'react-i18next';
 
 const PANEL = 'rounded-[30px] border border-[#d9e6e7] bg-white shadow-[0_24px_80px_rgba(8,35,41,0.08)]';
 
 export default function CustomerService() {
+  const { t } = useTranslation();
   const [settings, setSettings] = useState({ telegram_link: '', support_email: '', telegram_username: '' });
   const [loading, setLoading] = useState(true);
 
@@ -40,11 +42,11 @@ export default function CustomerService() {
                 ✈️
               </div>
               <div className="flex-1 min-w-0">
-                <p className="font-semibold text-text-primary">Telegram Support</p>
+                <p className="font-semibold text-text-primary">{t('support.telegram')}</p>
                 <p className="text-sm text-text-muted mt-0.5">
                   {tgUser ? `@${tgUser}` : 'Click to open Telegram'}
                 </p>
-                <p className="text-xs text-brand-primary mt-1">Tap to message us →</p>
+                <p className="text-xs text-brand-primary mt-1">{t('support.tapMessage')}</p>
               </div>
               <span className="text-text-muted text-xl">›</span>
             </a>
@@ -61,9 +63,9 @@ export default function CustomerService() {
                 📧
               </div>
               <div className="flex-1 min-w-0">
-                <p className="font-semibold text-text-primary">Email Support</p>
+                <p className="font-semibold text-text-primary">{t('support.email')}</p>
                 <p className="text-sm text-text-muted truncate mt-0.5">{email}</p>
-                <p className="text-xs text-green-trade mt-1">Tap to send email →</p>
+                <p className="text-xs text-green-trade mt-1">{t('support.tapEmail')}</p>
               </div>
               <span className="text-text-muted text-xl">›</span>
             </a>
@@ -71,7 +73,7 @@ export default function CustomerService() {
 
           {/* Info box */}
           <div className={`${PANEL} p-4 space-y-2`}>
-            <p className="text-sm font-semibold text-text-primary">📌 Response Times</p>
+            <p className="text-sm font-semibold text-text-primary">📌 {t('support.responseTimes')}</p>
             <div className="space-y-1.5 text-xs text-text-muted">
               <div className="flex justify-between">
                 <span>Telegram</span><span className="text-green-trade font-medium">Usually within 1 hour</span>

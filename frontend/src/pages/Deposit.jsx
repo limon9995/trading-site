@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import toast from 'react-hot-toast';
 import { QRCodeSVG } from 'qrcode.react';
 import { depositAPI } from '../services/api';
+import { useTranslation } from 'react-i18next';
 
 const COIN_ICONS = {
   USDT: '💵', BTC: '₿', ETH: 'Ξ', BNB: '🔶', TRX: '🔴', SOL: '◎',
@@ -17,6 +18,7 @@ const DEPOSIT_PANEL =
   'rounded-[32px] border border-[#d9e6e7] bg-white shadow-[0_24px_80px_rgba(8,35,41,0.08)]';
 
 export default function Deposit() {
+  const { t } = useTranslation();
   const [addresses, setAddresses] = useState({});  // { USDT: [{network, address, minDeposit, note}] }
   const [selectedCoin, setSelectedCoin] = useState('');
   const [selectedNetwork, setSelectedNetwork] = useState(null); // { network, address, minDeposit }
@@ -169,7 +171,7 @@ export default function Deposit() {
       <div className={`${DEPOSIT_PANEL} overflow-hidden`}>
         {/* Step 1: Select Coin */}
         <div className="border-b border-[#e3ecec] px-6 py-5">
-          <p className="mb-3 text-[11px] uppercase tracking-[0.24em] text-[#6c8185]">Step 1 — Select Coin</p>
+          <p className="mb-3 text-[11px] uppercase tracking-[0.24em] text-[#6c8185]">{t('deposit.selectCoin')}</p>
           <div className="flex flex-wrap gap-2">
             {coins.map((coin) => (
               <button
@@ -191,7 +193,7 @@ export default function Deposit() {
         {/* Step 2: Select Network */}
         {selectedCoin && addresses[selectedCoin]?.length > 0 && (
           <div className="border-b border-[#e3ecec] px-6 py-5">
-            <p className="mb-3 text-[11px] uppercase tracking-[0.24em] text-[#6c8185]">Step 2 — Select Network</p>
+            <p className="mb-3 text-[11px] uppercase tracking-[0.24em] text-[#6c8185]">{t('deposit.selectNetwork')}</p>
             <div className="flex flex-wrap gap-2">
               {addresses[selectedCoin].map((net) => (
                 <button
@@ -236,14 +238,14 @@ export default function Deposit() {
               <div className="flex-1 min-w-0 w-full">
                 <div className="space-y-3">
                   <div>
-                    <p className="text-xs text-text-muted mb-1">Deposit Address</p>
+                    <p className="text-xs text-text-muted mb-1">{t('deposit.address')}</p>
                     <div className="flex items-center gap-2 rounded-[22px] border border-[#d9e5e6] bg-[#f7fbfb] px-4 py-3">
                       <p className="text-sm text-text-primary font-mono break-all flex-1">{selectedNetwork.address}</p>
                       <button
                         onClick={handleCopyAddress}
                         className="flex-shrink-0 rounded-full bg-[#fff1ec] px-3 py-1.5 text-xs font-semibold text-brand-primary transition-colors hover:bg-[#ffe3da]"
                       >
-                        {copied ? '✓ Copied' : 'Copy'}
+                        {copied ? `✓ ${t('deposit.copied')}` : t('deposit.copy')}
                       </button>
                     </div>
                   </div>
@@ -346,7 +348,7 @@ export default function Deposit() {
               className="flex h-14 w-full items-center justify-center gap-2 rounded-full bg-[#ee8267] text-sm font-semibold text-white shadow-[0_18px_40px_rgba(238,130,103,0.28)] transition-all hover:-translate-y-0.5 hover:bg-[#e8775a] disabled:cursor-not-allowed disabled:opacity-50"
             >
               {submitting && <div className="w-4 h-4 border-2 border-light-border border-t-transparent rounded-full animate-spin" />}
-              {submitting ? 'Submitting...' : 'Submit for Review'}
+              {submitting ? t('common.loading') : t('deposit.submit')}
             </button>
           </div>
         )}
