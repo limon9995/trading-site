@@ -83,7 +83,7 @@ function CandlestickChart({ symbol, interval, currentPrice }) {
     let active = true;
     const load = async () => {
       try {
-        const { data } = await marketAPI.getCandles(symbol, interval, 200);
+        const { data } = await marketAPI.getCandles(symbol, interval, 1000);
         if (!active || !candleSeriesRef.current) return;
         const seen = new Set();
         const unique = data.filter(c => { if (seen.has(c.time)) return false; seen.add(c.time); return true; });
@@ -114,7 +114,7 @@ function CandlestickChart({ symbol, interval, currentPrice }) {
     const t = setInterval(async () => {
       if (!candleSeriesRef.current) return;
       try {
-        const { data } = await marketAPI.getCandles(symbol, interval, 200);
+        const { data } = await marketAPI.getCandles(symbol, interval, 1000);
         const seen = new Set();
         const unique = data.filter(c => { if (seen.has(c.time)) return false; seen.add(c.time); return true; });
         if (!candleSeriesRef.current) return;

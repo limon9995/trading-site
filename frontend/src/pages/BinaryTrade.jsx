@@ -106,7 +106,7 @@ function CandlestickChart({ symbol, interval, currentPrice }) {
 
     const load = async () => {
       try {
-        const { data } = await marketAPI.getCandles(symbol, interval, 200);
+        const { data } = await marketAPI.getCandles(symbol, interval, 1000);
         if (!active || !candleSeriesRef.current) return;
 
         // Remove duplicate times (Binance sometimes sends the same candle twice)
@@ -163,7 +163,7 @@ function CandlestickChart({ symbol, interval, currentPrice }) {
     const timer = setInterval(async () => {
       if (!candleSeriesRef.current) return;
       try {
-        const { data } = await marketAPI.getCandles(symbol, interval, 200);
+        const { data } = await marketAPI.getCandles(symbol, interval, 1000);
         const seen = new Set();
         const unique = data.filter(c => {
           if (seen.has(c.time)) return false;
