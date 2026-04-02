@@ -36,10 +36,10 @@ export default function NotificationFeed() {
   if (!visible) return null;
 
   return (
-    <div className="fixed bottom-4 left-4 z-50 space-y-2 max-w-xs pointer-events-none">
+    <div className="fixed top-[88px] right-3 z-50 space-y-2 max-w-[220px] pointer-events-none">
       <button
         onClick={() => setVisible(false)}
-        className="pointer-events-auto absolute -top-6 right-0 text-xs text-text-muted hover:text-text-secondary"
+        className="pointer-events-auto absolute -top-5 right-0 text-xs text-text-muted hover:text-text-secondary"
       >
         Hide
       </button>
