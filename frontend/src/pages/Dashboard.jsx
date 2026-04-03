@@ -174,9 +174,17 @@ export default function Dashboard() {
                 <Link key={coin.symbol} to={`/trading/${coin.symbol}`}
                   className="flex items-center gap-3 px-4 py-3.5 hover:bg-light-hover transition-colors border-t border-light-border">
                   {/* Icon */}
-                  <div className="w-9 h-9 rounded-full flex items-center justify-center font-bold text-sm flex-shrink-0 text-white"
-                    style={{ background: '#EE8267' }}>
-                    {coin.symbol[0]}
+                  <div className="w-9 h-9 rounded-full flex items-center justify-center flex-shrink-0 overflow-hidden bg-[#f0f1f3]">
+                    <img
+                      src={`https://cdn.jsdelivr.net/npm/cryptocurrency-icons@0.18.1/svg/color/${coin.symbol.toLowerCase()}.svg`}
+                      alt={coin.symbol}
+                      className="w-full h-full object-cover"
+                      onError={e => {
+                        e.target.style.display = 'none';
+                        e.target.parentNode.style.background = '#EE8267';
+                        e.target.parentNode.innerHTML = `<span style="color:#fff;font-weight:700;font-size:14px">${coin.symbol[0]}</span>`;
+                      }}
+                    />
                   </div>
                   {/* Name */}
                   <div className="flex-1 min-w-0">

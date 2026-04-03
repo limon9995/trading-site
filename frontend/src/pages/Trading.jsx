@@ -147,10 +147,18 @@ export default function Trading() {
               >
                 <div className="flex items-center gap-2.5 min-w-0">
                   <div
-                    className="w-9 h-9 rounded-full flex items-center justify-center text-sm font-bold flex-shrink-0"
+                    className="w-9 h-9 rounded-full flex items-center justify-center text-sm font-bold flex-shrink-0 overflow-hidden"
                     style={{ background: color + '22', border: `1px solid ${color}55`, color }}
                   >
-                    {coin.symbol[0]}
+                    <img
+                      src={`https://cdn.jsdelivr.net/npm/cryptocurrency-icons@0.18.1/svg/color/${coin.symbol.toLowerCase()}.svg`}
+                      alt={coin.symbol}
+                      className="w-full h-full object-cover"
+                      onError={e => {
+                        e.target.style.display = 'none';
+                        e.target.parentNode.innerHTML = `<span style="font-weight:700;font-size:14px">${coin.symbol[0]}</span>`;
+                      }}
+                    />
                   </div>
                   <div className="min-w-0">
                     <div className="flex items-center gap-1.5">

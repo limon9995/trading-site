@@ -194,19 +194,10 @@ export default function Layout() {
 
           {/* Center: Brand text + Search */}
           <div className="flex-1 mx-4 flex items-center gap-3">
-            {/* CEX.IO logo: icon + text */}
-            <div className="hidden xs:flex items-center gap-1.5 flex-shrink-0">
-              <svg viewBox="0 0 46 44" height="30" xmlns="http://www.w3.org/2000/svg">
-                <polygon fill="#0AE0D0" points="44.359,14.556 44.359,9.089 35.868,9.089 41.334,14.556"/>
-                <polygon fill="#0AE0D0" points="35.551,34.119 44.359,34.119 44.359,28.652 41.018,28.652"/>
-                <path fill="#0AE0D0" d="M34.198,28.652H22.625c-3.436,0-6.232-3.161-6.232-7.047c0-3.887,2.796-7.049,6.232-7.049h11.89l-5.467-5.467h-6.422c-6.451,0-11.699,5.615-11.699,12.516c0,6.9,5.248,12.514,11.699,12.514h6.181l-0.037-0.035L34.198,28.652z"/>
-                <path fill="#0AE0D0" d="M38.689,18.73l-15.78,0.141c-1.509,0.014-2.722,1.248-2.709,2.758c0.014,1.501,1.234,2.709,2.733,2.709c0.008,0,0.017,0,0.025,0l15.695-0.141l2.751-2.751L38.689,18.73z"/>
-                <path fill="#0AE0D0" d="M20.931,37.742c-8.029,0-14.561-7.24-14.561-16.137c0-8.898,6.531-16.138,14.561-16.138h23.884V0H20.931C9.888,0,0.903,9.692,0.903,21.605c0,11.913,8.984,21.604,20.028,21.604h23.884v-5.467H20.931z"/>
-              </svg>
-              <span className="leading-none" style={{ color: 'var(--cex-text)' }}>
-                <span className="text-[15px] font-semibold tracking-tight">CEX</span>
-                <span className="text-[15px] font-light opacity-50">.IO</span>
-              </span>
+            {/* CEX.IO text only */}
+            <div className="hidden xs:flex items-center flex-shrink-0 leading-none" style={{ color: 'var(--cex-text)' }}>
+              <span className="text-[17px] font-semibold tracking-tight">CEX</span>
+              <span className="text-[17px] font-light opacity-50">.IO</span>
             </div>
 
             {/* Search */}
