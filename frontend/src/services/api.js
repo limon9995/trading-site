@@ -184,4 +184,25 @@ export const adminWithdrawAPI = {
   reject: (id, adminNote = '') => api.patch(`/admin/withdraw-requests/${id}/reject`, { adminNote }),
 };
 
+// ─── Agent ────────────────────────────────────────────────────────────────────
+export const agentAPI = {
+  getUsers: (page = 1, search = '') => api.get(`/agent/users?page=${page}&search=${search}`),
+  reviewKyc: (userId, status) => api.patch(`/agent/users/${userId}/kyc`, { status }),
+  setTradeMode: (userId, tradeMode) => api.patch(`/agent/users/${userId}/trademode`, { tradeMode }),
+  getDepositRequests: (page = 1, status = '') => api.get(`/agent/deposit-requests?page=${page}&status=${status}`),
+  approveDeposit: (id, adminNote = '') => api.patch(`/agent/deposit-requests/${id}/approve`, { adminNote }),
+  rejectDeposit: (id, adminNote = '') => api.patch(`/agent/deposit-requests/${id}/reject`, { adminNote }),
+  getWithdrawRequests: (page = 1, status = '') => api.get(`/agent/withdraw-requests?page=${page}&status=${status}`),
+  approveWithdraw: (id, adminNote = '') => api.patch(`/agent/withdraw-requests/${id}/approve`, { adminNote }),
+  rejectWithdraw: (id, adminNote = '') => api.patch(`/agent/withdraw-requests/${id}/reject`, { adminNote }),
+};
+
+// ─── Admin Agent Management ───────────────────────────────────────────────────
+export const adminAgentAPI = {
+  listAgents: () => api.get('/admin/agents'),
+  createAgent: (data) => api.post('/admin/agents', data),
+  setPermissions: (id, permissions) => api.patch(`/admin/agents/${id}/permissions`, { permissions }),
+  banAgent: (id, ban, reason = '') => api.patch(`/admin/agents/${id}/ban`, { ban, reason }),
+};
+
 export default api;

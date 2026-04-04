@@ -34,6 +34,7 @@ app.use('/api/trade', require('./src/routes/trade'));
 app.use('/api/binary', require('./src/routes/binary'));
 app.use('/api/transactions', require('./src/routes/transactions'));
 app.use('/api/admin', require('./src/routes/admin'));
+app.use('/api/agent', require('./src/routes/agent'));
 app.use('/api/market', require('./src/routes/market'));
 app.use('/api/plans', require('./src/routes/plans'));
 app.use('/api/recharge', require('./src/routes/recharge'));

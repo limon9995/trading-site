@@ -34,9 +34,12 @@ export default function Login() {
     e.preventDefault();
     setLoading(true);
     try {
-      await login(form.email, form.password);
+      const data = await login(form.email, form.password);
       toast.success('Welcome back!');
-      navigate('/dashboard');
+      const role = data?.user?.role;
+      if (role === 'admin') navigate('/admin');
+      else if (role === 'agent') navigate('/agent');
+      else navigate('/dashboard');
     } catch (err) {
       toast.error(err.response?.data?.error || 'Login failed');
     } finally {

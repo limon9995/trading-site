@@ -24,8 +24,13 @@ const userSchema = new mongoose.Schema({
   },
   role: {
     type: String,
-    enum: ['user', 'admin'],
+    enum: ['user', 'admin', 'agent'],
     default: 'user',
+  },
+  agentPermissions: {
+    type: [String],
+    enum: ['kyc_approve', 'force_trade', 'manage_deposits', 'manage_withdrawals', 'view_users'],
+    default: [],
   },
   // Demo USDT balance
   demo_balance: {

@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import toast from 'react-hot-toast';
-import { adminAPI, adminDepositAPI, adminWithdrawAPI, settingsAPI, profileAPI, planPurchaseAPI, binaryAPI, marketAPI } from '../services/api';
+import { adminAPI, adminDepositAPI, adminWithdrawAPI, settingsAPI, profileAPI, planPurchaseAPI, binaryAPI, marketAPI, adminAgentAPI } from '../services/api';
 import { SkeletonCard, SkeletonTable } from '../components/SkeletonCard';
 import { useTheme } from '../context/ThemeContext';
 
@@ -67,6 +67,7 @@ const TAB_TONES = {
   withdrawals: { accent: '#b17a00', glow: 'rgba(177,122,0,0.16)' },
   plans: { accent: '#d4a017', glow: 'rgba(212,160,23,0.16)' },
   settings: { accent: '#8f6b10', glow: 'rgba(143,107,16,0.16)' },
+  agents: { accent: '#0ea5e9', glow: 'rgba(14,165,233,0.18)' },
 };
 
 export default function Admin() {
@@ -139,6 +140,16 @@ export default function Admin() {
   });
   const [binarySettingsSaving, setBinarySettingsSaving] = useState(false);
   const [binaryTrades, setBinaryTrades] = useState([]);
+
+  // Agent management state
+  const [agents, setAgents] = useState([]);
+  const [agentsLoading, setAgentsLoading] = useState(false);
+  const [agentForm, setAgentForm] = useState({ username: '', email: '', password: '', permissions: [] });
+  const [agentFormLoading, setAgentFormLoading] = useState(false);
+  const [agentPermModal, setAgentPermModal] = useState(null); // { agent }
+  const [agentPermModalPerms, setAgentPermModalPerms] = useState([]);
+  const [agentPermModalLoading, setAgentPermModalLoading] = useState(false);
+  const ALL_AGENT_PERMS = ['kyc_approve', 'force_trade', 'manage_deposits', 'manage_withdrawals', 'view_users'];
 
   const fetchStats = useCallback(async () => {
     try {
@@ -249,6 +260,15 @@ export default function Admin() {
     finally { setBinarySettingsSaving(false); }
   };
 
+  const fetchAgents = useCallback(async () => {
+    setAgentsLoading(true);
+    try {
+      const { data } = await adminAgentAPI.listAgents();
+      setAgents(data.agents || []);
+    } catch { toast.error('Failed to load agents'); }
+    finally { setAgentsLoading(false); }
+  }, []);
+
   useEffect(() => { fetchStats(); }, [fetchStats]);
 
   useEffect(() => {
@@ -264,7 +284,8 @@ export default function Admin() {
     if (activeTab === 'kyc') fetchKycUsers();
     if (activeTab === 'plans') fetchPlanPurchases();
     if (activeTab === 'binary') { fetchBinarySettings(); fetchBinaryTrades(); }
-  }, [activeTab, page, fetchUsers, fetchTrades, fetchDepositAddresses, fetchPlanPurchases]);
+    if (activeTab === 'agents') fetchAgents();
+  }, [activeTab, page, fetchUsers, fetchTrades, fetchDepositAddresses, fetchPlanPurchases, fetchAgents]);
 
   useEffect(() => {
     if (activeTab === 'deposit-req') fetchDepositRequests();
@@ -462,6 +483,7 @@ export default function Admin() {
     { key: 'withdrawals', label: '💸', fullLabel: 'Withdrawals', desc: 'Payout approvals and refunds' },
     { key: 'plans', label: '🚀', fullLabel: 'Plans', desc: 'Revenue and purchase history' },
     { key: 'settings', label: '⚙️', fullLabel: 'Settings', desc: 'Support and platform details' },
+    { key: 'agents', label: '🤝', fullLabel: 'Agents', desc: 'Create and manage agent accounts' },
   ];
 
   const tabCounts = {
@@ -475,6 +497,7 @@ export default function Admin() {
     withdrawals: withdrawRequests.filter((req) => req.status === 'pending').length || 0,
     plans: planPurchases.length || 0,
     settings: 3,
+    agents: agents.length || 0,
   };
 
   const adminVars = isDark ? {
@@ -1966,6 +1989,188 @@ export default function Admin() {
                 </button>
               </div>
             </div>
+          </div>
+        </div>
+      )}
+
+      {/* ═══ AGENTS TAB ═══════════════════════════════════════════════════════ */}
+      {activeTab === 'agents' && (
+        <div className="space-y-6">
+          <SectionHeader
+            eyebrow="Agent Management"
+            title="Agent Accounts"
+            body="Create agents with limited platform permissions. Each agent can only access the features you assign."
+          />
+
+          {/* Permission edit modal */}
+          {agentPermModal && (
+            <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
+              <div className={`w-full max-w-md ${ADMIN_PANEL} p-6 space-y-4`}>
+                <h3 className="text-lg font-semibold text-[var(--admin-title)]">Edit Permissions — {agentPermModal.username}</h3>
+                <div className="space-y-3">
+                  {ALL_AGENT_PERMS.map(p => (
+                    <label key={p} className="flex items-center gap-3 cursor-pointer">
+                      <input
+                        type="checkbox"
+                        checked={agentPermModalPerms.includes(p)}
+                        onChange={e => setAgentPermModalPerms(prev =>
+                          e.target.checked ? [...prev, p] : prev.filter(x => x !== p)
+                        )}
+                        className="h-4 w-4 rounded accent-[#0ea5e9]"
+                      />
+                      <span className="text-sm text-[var(--admin-title)] capitalize">{p.replace(/_/g, ' ')}</span>
+                    </label>
+                  ))}
+                </div>
+                <div className="flex gap-3 pt-2">
+                  <button className={ADMIN_BUTTON + ' flex-1'} onClick={() => setAgentPermModal(null)} disabled={agentPermModalLoading}>Cancel</button>
+                  <button
+                    disabled={agentPermModalLoading}
+                    onClick={async () => {
+                      setAgentPermModalLoading(true);
+                      try {
+                        await adminAgentAPI.setPermissions(agentPermModal._id, agentPermModalPerms);
+                        toast.success('Permissions updated');
+                        setAgentPermModal(null);
+                        fetchAgents();
+                      } catch (err) {
+                        toast.error(err?.response?.data?.error || 'Failed to update permissions');
+                      } finally { setAgentPermModalLoading(false); }
+                    }}
+                    className="flex-1 rounded-full py-2 text-sm font-semibold text-white bg-[#0ea5e9] hover:bg-[#0284c7] transition-all disabled:opacity-40"
+                  >{agentPermModalLoading ? 'Saving…' : 'Save'}</button>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Create agent form */}
+          <div className={ADMIN_PANEL + ' p-6'}>
+            <p className={ADMIN_FIELD_LABEL}>Create New Agent</p>
+            <div className="grid gap-4 sm:grid-cols-3 mb-4">
+              <div>
+                <label className={ADMIN_FIELD_LABEL}>Username</label>
+                <input className={ADMIN_INPUT + ' w-full'} placeholder="agent_username" value={agentForm.username}
+                  onChange={e => setAgentForm(f => ({ ...f, username: e.target.value }))} />
+              </div>
+              <div>
+                <label className={ADMIN_FIELD_LABEL}>Email</label>
+                <input className={ADMIN_INPUT + ' w-full'} type="email" placeholder="agent@example.com" value={agentForm.email}
+                  onChange={e => setAgentForm(f => ({ ...f, email: e.target.value }))} />
+              </div>
+              <div>
+                <label className={ADMIN_FIELD_LABEL}>Password</label>
+                <input className={ADMIN_INPUT + ' w-full'} type="password" placeholder="Min 6 chars" value={agentForm.password}
+                  onChange={e => setAgentForm(f => ({ ...f, password: e.target.value }))} />
+              </div>
+            </div>
+            <div className="mb-4">
+              <label className={ADMIN_FIELD_LABEL}>Initial Permissions</label>
+              <div className="flex flex-wrap gap-3">
+                {ALL_AGENT_PERMS.map(p => (
+                  <label key={p} className="flex items-center gap-2 cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={agentForm.permissions.includes(p)}
+                      onChange={e => setAgentForm(f => ({
+                        ...f,
+                        permissions: e.target.checked ? [...f.permissions, p] : f.permissions.filter(x => x !== p),
+                      }))}
+                      className="h-4 w-4 rounded accent-[#0ea5e9]"
+                    />
+                    <span className="text-sm text-[var(--admin-muted)] capitalize">{p.replace(/_/g, ' ')}</span>
+                  </label>
+                ))}
+              </div>
+            </div>
+            <button
+              disabled={agentFormLoading}
+              onClick={async () => {
+                if (!agentForm.username || !agentForm.email || !agentForm.password) {
+                  return toast.error('Username, email and password are required');
+                }
+                setAgentFormLoading(true);
+                try {
+                  await adminAgentAPI.createAgent(agentForm);
+                  toast.success('Agent created successfully');
+                  setAgentForm({ username: '', email: '', password: '', permissions: [] });
+                  fetchAgents();
+                } catch (err) {
+                  toast.error(err?.response?.data?.error || 'Failed to create agent');
+                } finally { setAgentFormLoading(false); }
+              }}
+              className="rounded-full bg-[#0ea5e9] px-6 py-2.5 text-sm font-semibold text-white shadow-[0_8px_24px_rgba(14,165,233,0.24)] hover:bg-[#0284c7] transition-all disabled:opacity-40"
+            >{agentFormLoading ? 'Creating…' : 'Create Agent'}</button>
+          </div>
+
+          {/* Agents list */}
+          <div className={ADMIN_PANEL + ' p-6'}>
+            <p className={ADMIN_FIELD_LABEL}>All Agents ({agents.length})</p>
+            {agentsLoading ? (
+              <p className="text-sm text-[var(--admin-muted)]">Loading…</p>
+            ) : (
+              <div className="overflow-x-auto">
+                <table className="w-full text-sm">
+                  <thead>
+                    <tr className="border-b border-[var(--admin-border)]">
+                      {['Username', 'Email', 'Permissions', 'Status', 'Created', 'Actions'].map(h => (
+                        <th key={h} className="pb-3 pr-4 text-left text-[11px] font-semibold uppercase tracking-[0.18em] text-[var(--admin-muted)]">{h}</th>
+                      ))}
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {agents.map(ag => (
+                      <tr key={ag._id} className="border-b border-[var(--admin-border)]/40">
+                        <td className="py-3 pr-4 font-medium text-[var(--admin-title)]">{ag.username}</td>
+                        <td className="py-3 pr-4 text-[var(--admin-muted)]">{ag.email}</td>
+                        <td className="py-3 pr-4">
+                          <div className="flex flex-wrap gap-1">
+                            {(ag.agentPermissions || []).length === 0
+                              ? <span className="text-[11px] text-[var(--admin-muted)]">None</span>
+                              : ag.agentPermissions.map(p => (
+                                <span key={p} className="inline-flex rounded-full bg-[#0ea5e9]/12 px-2 py-0.5 text-[10px] font-semibold text-[#0ea5e9] capitalize">
+                                  {p.replace(/_/g, ' ')}
+                                </span>
+                              ))
+                            }
+                          </div>
+                        </td>
+                        <td className="py-3 pr-4">
+                          {ag.isBanned
+                            ? <span className="rounded-full bg-red-500/10 px-2.5 py-0.5 text-[11px] font-semibold text-red-400">Banned</span>
+                            : <span className="rounded-full bg-green-500/10 px-2.5 py-0.5 text-[11px] font-semibold text-green-400">Active</span>
+                          }
+                        </td>
+                        <td className="py-3 pr-4 text-[var(--admin-muted)]">{new Date(ag.createdAt).toLocaleDateString()}</td>
+                        <td className="py-3 pr-4">
+                          <div className="flex gap-2">
+                            <button
+                              className={ADMIN_BUTTON}
+                              onClick={() => { setAgentPermModal(ag); setAgentPermModalPerms(ag.agentPermissions || []); }}
+                            >Permissions</button>
+                            <button
+                              className={ADMIN_BUTTON}
+                              onClick={async () => {
+                                try {
+                                  await adminAgentAPI.banAgent(ag._id, !ag.isBanned, ag.isBanned ? '' : 'Banned by admin');
+                                  toast.success(ag.isBanned ? 'Agent unbanned' : 'Agent banned');
+                                  fetchAgents();
+                                } catch (err) {
+                                  toast.error(err?.response?.data?.error || 'Failed');
+                                }
+                              }}
+                            >{ag.isBanned ? 'Unban' : 'Ban'}</button>
+                          </div>
+                        </td>
+                      </tr>
+                    ))}
+                    {agents.length === 0 && (
+                      <tr><td colSpan={6} className="py-8 text-center text-sm text-[var(--admin-muted)]">No agents created yet.</td></tr>
+                    )}
+                  </tbody>
+                </table>
+              </div>
+            )}
           </div>
         </div>
       )}

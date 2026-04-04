@@ -25,6 +25,8 @@ const Withdraw = lazy(() => import('./pages/Withdraw'));
 const ForgotPassword = lazy(() => import('./pages/ForgotPassword'));
 const Layout = lazy(() => import('./components/Layout'));
 const AdminShell = lazy(() => import('./components/AdminShell'));
+const AgentShell = lazy(() => import('./components/AgentShell'));
+const Agent = lazy(() => import('./pages/Agent'));
 
 // Error Boundary — catches render crashes and shows the error on screen
 class ErrorBoundary extends React.Component {
@@ -88,6 +90,14 @@ const AdminRoute = ({ children }) => {
   return children;
 };
 
+const AgentRoute = ({ children }) => {
+  const { user, loading } = useAuth();
+  if (loading) return <FullScreenLoader label="Loading agent access..." />;
+  if (!user) return <Navigate to="/login" replace />;
+  if (user.role !== 'agent') return <Navigate to="/dashboard" replace />;
+  return children;
+};
+
 const PublicRoute = ({ children }) => {
   const { user, loading } = useAuth();
   if (loading) return <FullScreenLoader label="Preparing authentication..." />;
@@ -136,6 +146,18 @@ const AppRoutes = () => (
             </AdminShell>
           </RouteContent>
         </AdminRoute>
+      }
+    />
+    <Route
+      path="/agent"
+      element={
+        <AgentRoute>
+          <RouteContent label="Loading agent panel...">
+            <AgentShell>
+              <Agent />
+            </AgentShell>
+          </RouteContent>
+        </AgentRoute>
       }
     />
     <Route path="*" element={<Navigate to="/" replace />} />

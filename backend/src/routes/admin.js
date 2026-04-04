@@ -23,6 +23,12 @@ const {
   approveWithdrawRequest,
   rejectWithdrawRequest,
 } = require('../controllers/adminController');
+const {
+  listAgents,
+  createAgent,
+  updateAgentPermissions,
+  banAgent,
+} = require('../controllers/agentController');
 const adminAuth = require('../middleware/adminAuth');
 
 const router = express.Router();
@@ -63,5 +69,11 @@ router.patch('/withdraw-requests/:id/reject', rejectWithdrawRequest);
 
 // Plan purchases
 router.get('/plan-purchases', getPlanPurchases);
+
+// Agent management (admin only)
+router.get('/agents', listAgents);
+router.post('/agents', createAgent);
+router.patch('/agents/:id/permissions', updateAgentPermissions);
+router.patch('/agents/:id/ban', banAgent);
 
 module.exports = router;
