@@ -3,15 +3,15 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useTheme } from '../context/ThemeContext';
 
-function AdminBrand() {
+function AdminBrand({ isDark }) {
   return (
     <div className="flex items-center gap-3">
       <div className="flex h-12 w-12 items-center justify-center rounded-[18px] bg-[linear-gradient(135deg,#f0b90b_0%,#d79d00_100%)] text-lg font-black text-[#241807] shadow-[0_12px_30px_rgba(240,185,11,0.28)]">
         A
       </div>
       <div>
-        <p className="text-[11px] font-semibold uppercase tracking-[0.28em] text-[#9b771c]">Admin Console</p>
-        <h1 className="text-xl font-semibold tracking-[-0.03em] text-[#241807]">CEXBR Operations</h1>
+        <p className="text-[11px] font-semibold uppercase tracking-[0.28em]" style={{ color: isDark ? '#f0b90b' : '#9b771c' }}>Admin Console</p>
+        <h1 className="text-xl font-semibold tracking-[-0.03em]" style={{ color: isDark ? '#fff8e5' : '#241807' }}>CEXBR Operations</h1>
       </div>
     </div>
   );
@@ -44,7 +44,7 @@ export default function AdminShell({ children }) {
         }}
       >
         <div className="mx-auto flex max-w-7xl flex-col gap-4 px-4 py-4 md:flex-row md:items-center md:justify-between md:px-6">
-          <AdminBrand />
+          <AdminBrand isDark={isDark} />
 
           <div className="flex flex-wrap items-center gap-3">
             <button

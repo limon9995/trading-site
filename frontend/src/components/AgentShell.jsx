@@ -3,15 +3,15 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useTheme } from '../context/ThemeContext';
 
-function AgentBrand() {
+function AgentBrand({ isDark }) {
   return (
     <div className="flex items-center gap-3">
       <div className="flex h-12 w-12 items-center justify-center rounded-[18px] bg-[linear-gradient(135deg,#0ea5e9_0%,#0369a1_100%)] text-lg font-black text-white shadow-[0_12px_30px_rgba(14,165,233,0.28)]">
         AG
       </div>
       <div>
-        <p className="text-[11px] font-semibold uppercase tracking-[0.28em] text-[#0ea5e9]">Agent Console</p>
-        <h1 className="text-xl font-semibold tracking-[-0.03em]" style={{ color: 'inherit' }}>CEXBR Agent</h1>
+        <p className="text-[11px] font-semibold uppercase tracking-[0.28em]" style={{ color: isDark ? '#38bdf8' : '#0284c7' }}>Agent Console</p>
+        <h1 className="text-xl font-semibold tracking-[-0.03em]" style={{ color: isDark ? '#f0f9ff' : '#0c4a6e' }}>CEXBR Agent</h1>
       </div>
     </div>
   );
@@ -44,7 +44,7 @@ export default function AgentShell({ children }) {
         }}
       >
         <div className="mx-auto flex max-w-7xl flex-col gap-4 px-4 py-4 md:flex-row md:items-center md:justify-between md:px-6">
-          <AgentBrand />
+          <AgentBrand isDark={isDark} />
 
           <div className="flex flex-wrap items-center gap-3">
             <button
