@@ -348,6 +348,11 @@ export default function Layout() {
                 Admin
               </button>
             )}
+            {user?.role === 'agent' && (
+              <button onClick={() => navigate('/agent')} className="text-xs font-bold px-3 py-2 rounded-full text-white shadow-sm" style={{ background: 'linear-gradient(135deg, #0ea5e9 0%, #0369a1 100%)' }}>
+                Agent Panel
+              </button>
+            )}
           </div>
         </div>
       </header>
@@ -431,6 +436,23 @@ export default function Layout() {
                       <DrawerSvgIcon paths={DRAWER_ICON_PATHS['/admin'] || [[]]} color="#EE8267" />
                     </span>
                     {t('layout.admin')}
+                  </>
+                </NavLink>
+              )}
+              {user?.role === 'agent' && (
+                <NavLink to="/agent" onClick={() => setDrawerOpen(false)}
+                  className={({ isActive }) =>
+                    `flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all ${
+                      isActive ? 'bg-sky-500/10 text-sky-400' : 'text-text-secondary hover:bg-light-hover hover:text-sky-400'
+                    }`
+                  }
+                >
+                  <>
+                    <span className="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0"
+                      style={{ background: '#0ea5e915', border: '1px solid #0ea5e930' }}>
+                      <DrawerSvgIcon paths={DRAWER_ICON_PATHS['/admin'] || [[]]} color="#0ea5e9" />
+                    </span>
+                    Agent Panel
                   </>
                 </NavLink>
               )}
