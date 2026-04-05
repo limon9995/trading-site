@@ -51,7 +51,10 @@ export default function Dashboard() {
 
   const totalBalance = wallet?.totalBalance || 0;
   const usdtBalance = wallet?.usdtBalance || 0;
-  const marketList = Object.values(prices || {}).filter(c => c?.price != null).slice(0, 10);
+  const marketList = Object.entries(prices || {})
+    .filter(([, c]) => c?.price != null)
+    .map(([key, c]) => ({ ...c, symbol: c.symbol || key }))
+    .slice(0, 10);
 
   return (
     <div className="space-y-5 animate-fade-in">
@@ -224,7 +227,7 @@ export default function Dashboard() {
             </div>
             <p className="text-text-secondary text-sm font-medium">{t('dashboard.noTrades')}</p>
             <p className="text-text-muted text-xs mt-1 mb-4">{t('dashboard.startTrading')}</p>
-            <Link to="/trading" className="btn-primary inline-flex text-xs px-5 py-2.5">{t('dashboard.startTrading')}</Link>
+            <Link to="/trade" className="btn-primary inline-flex text-xs px-5 py-2.5">{t('dashboard.startTrading')}</Link>
           </div>
         ) : (
           <div>
