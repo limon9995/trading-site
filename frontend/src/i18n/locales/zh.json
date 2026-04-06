@@ -15,5 +15,5 @@
   "transactions": { "title": "交易历史", "deposits": "充值记录", "withdrawals": "提现记录", "noDeposits": "暂无充值记录", "noWithdrawals": "暂无提现记录" },
   "layout": { "dashboard": "仪表板", "profile": "个人资料 & KYC", "deposit": "充值", "transfer": "转账", "withdraw": "提现", "wallet": "钱包", "plans": "投资计划", "markets": "市场", "newCoins": "新币", "transactions": "交易记录", "support": "客户服务", "recovery": "账号恢复", "settings": "设置", "admin": "管理面板", "logout": "退出登录" },
   "newCoins": { "title": "新币与即将上线", "subtitle": "发现最新上线和即将推出的代币。", "newListing": "新上线", "upcoming": "即将推出", "recentlyListed": "最近在我们平台上线的币种（实时价格）", "comingSoon": "即将在我们平台推出的币种" },
-  "kyc": { "selectDocType": "选择证件类型", "documentType": "证件类型", "docUploadInfo": "请上传清晰、无遮挡的政府颁发身份证件照片。所有证件必须有效且未过期。", "clearPhotoNote": "请上传清晰、光线充足的照片。模糊或黑暗的图像将被拒绝。", "docType": { "passport": "护照", "national_id": "身份证（NID）", "driving_license": "驾驶证" } }
+  "kyc": { "selectDocType": "选择证件类型", "documentType": "证件类型", "frontSide": "正面", "backSide": "背面", "docUploadInfo": "请上传清晰、无遮挡的政府颁发身份证件照片。所有证件必须有效且未过期。", "clearPhotoNote": "请上传清晰、光线充足的照片。模糊或黑暗的图像将被拒绝。", "docType": { "passport": "护照", "national_id": "身份证（NID）", "driving_license": "驾驶证" } }
 }

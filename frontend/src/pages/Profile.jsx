@@ -4,115 +4,6 @@ import { useTranslation } from 'react-i18next';
 import { useAuth } from '../context/AuthContext';
 import { authAPI, profileAPI } from '../services/api';
 
-const COUNTRIES = [
-  'Afghanistan','Albania','Algeria','Argentina','Australia','Austria','Azerbaijan',
-  'Bahrain','Bangladesh','Belgium','Bolivia','Brazil','Cambodia','Canada','Chile',
-  'China','Colombia','Croatia','Czech Republic','Denmark','Ecuador','Egypt',
-  'Estonia','Ethiopia','Finland','France','Germany','Ghana','Greece','Guatemala',
-  'Hong Kong','Hungary','India','Indonesia','Iran','Iraq','Ireland','Israel',
-  'Italy','Japan','Jordan','Kazakhstan','Kenya','Kuwait','Latvia','Lebanon',
-  'Lithuania','Malaysia','Mexico','Morocco','Myanmar','Nepal','Netherlands',
-  'New Zealand','Nigeria','Norway','Oman','Pakistan','Panama','Peru','Philippines',
-  'Poland','Portugal','Qatar','Romania','Russia','Saudi Arabia','Singapore',
-  'South Africa','South Korea','Spain','Sri Lanka','Sweden','Switzerland',
-  'Taiwan','Thailand','Turkey','UAE','Uganda','Ukraine','United Kingdom',
-  'United States','Uzbekistan','Venezuela','Vietnam','Yemen','Zimbabwe',
-];
-
-const DIAL_CODES = [
-  { code: '+1',   flag: '🇺🇸', name: 'US/CA' },
-  { code: '+7',   flag: '🇷🇺', name: 'Russia' },
-  { code: '+20',  flag: '🇪🇬', name: 'Egypt' },
-  { code: '+27',  flag: '🇿🇦', name: 'South Africa' },
-  { code: '+30',  flag: '🇬🇷', name: 'Greece' },
-  { code: '+31',  flag: '🇳🇱', name: 'Netherlands' },
-  { code: '+32',  flag: '🇧🇪', name: 'Belgium' },
-  { code: '+33',  flag: '🇫🇷', name: 'France' },
-  { code: '+34',  flag: '🇪🇸', name: 'Spain' },
-  { code: '+36',  flag: '🇭🇺', name: 'Hungary' },
-  { code: '+39',  flag: '🇮🇹', name: 'Italy' },
-  { code: '+40',  flag: '🇷🇴', name: 'Romania' },
-  { code: '+41',  flag: '🇨🇭', name: 'Switzerland' },
-  { code: '+43',  flag: '🇦🇹', name: 'Austria' },
-  { code: '+44',  flag: '🇬🇧', name: 'UK' },
-  { code: '+45',  flag: '🇩🇰', name: 'Denmark' },
-  { code: '+46',  flag: '🇸🇪', name: 'Sweden' },
-  { code: '+47',  flag: '🇳🇴', name: 'Norway' },
-  { code: '+48',  flag: '🇵🇱', name: 'Poland' },
-  { code: '+49',  flag: '🇩🇪', name: 'Germany' },
-  { code: '+51',  flag: '🇵🇪', name: 'Peru' },
-  { code: '+52',  flag: '🇲🇽', name: 'Mexico' },
-  { code: '+54',  flag: '🇦🇷', name: 'Argentina' },
-  { code: '+55',  flag: '🇧🇷', name: 'Brazil' },
-  { code: '+56',  flag: '🇨🇱', name: 'Chile' },
-  { code: '+57',  flag: '🇨🇴', name: 'Colombia' },
-  { code: '+58',  flag: '🇻🇪', name: 'Venezuela' },
-  { code: '+60',  flag: '🇲🇾', name: 'Malaysia' },
-  { code: '+61',  flag: '🇦🇺', name: 'Australia' },
-  { code: '+62',  flag: '🇮🇩', name: 'Indonesia' },
-  { code: '+63',  flag: '🇵🇭', name: 'Philippines' },
-  { code: '+64',  flag: '🇳🇿', name: 'New Zealand' },
-  { code: '+65',  flag: '🇸🇬', name: 'Singapore' },
-  { code: '+66',  flag: '🇹🇭', name: 'Thailand' },
-  { code: '+81',  flag: '🇯🇵', name: 'Japan' },
-  { code: '+82',  flag: '🇰🇷', name: 'South Korea' },
-  { code: '+84',  flag: '🇻🇳', name: 'Vietnam' },
-  { code: '+86',  flag: '🇨🇳', name: 'China' },
-  { code: '+880', flag: '🇧🇩', name: 'Bangladesh' },
-  { code: '+886', flag: '🇹🇼', name: 'Taiwan' },
-  { code: '+90',  flag: '🇹🇷', name: 'Turkey' },
-  { code: '+91',  flag: '🇮🇳', name: 'India' },
-  { code: '+92',  flag: '🇵🇰', name: 'Pakistan' },
-  { code: '+93',  flag: '🇦🇫', name: 'Afghanistan' },
-  { code: '+94',  flag: '🇱🇰', name: 'Sri Lanka' },
-  { code: '+95',  flag: '🇲🇲', name: 'Myanmar' },
-  { code: '+98',  flag: '🇮🇷', name: 'Iran' },
-  { code: '+212', flag: '🇲🇦', name: 'Morocco' },
-  { code: '+213', flag: '🇩🇿', name: 'Algeria' },
-  { code: '+216', flag: '🇹🇳', name: 'Tunisia' },
-  { code: '+218', flag: '🇱🇾', name: 'Libya' },
-  { code: '+220', flag: '🇬🇲', name: 'Gambia' },
-  { code: '+221', flag: '🇸🇳', name: 'Senegal' },
-  { code: '+233', flag: '🇬🇭', name: 'Ghana' },
-  { code: '+234', flag: '🇳🇬', name: 'Nigeria' },
-  { code: '+251', flag: '🇪🇹', name: 'Ethiopia' },
-  { code: '+254', flag: '🇰🇪', name: 'Kenya' },
-  { code: '+256', flag: '🇺🇬', name: 'Uganda' },
-  { code: '+263', flag: '🇿🇼', name: 'Zimbabwe' },
-  { code: '+351', flag: '🇵🇹', name: 'Portugal' },
-  { code: '+352', flag: '🇱🇺', name: 'Luxembourg' },
-  { code: '+353', flag: '🇮🇪', name: 'Ireland' },
-  { code: '+358', flag: '🇫🇮', name: 'Finland' },
-  { code: '+380', flag: '🇺🇦', name: 'Ukraine' },
-  { code: '+386', flag: '🇸🇮', name: 'Slovenia' },
-  { code: '+385', flag: '🇭🇷', name: 'Croatia' },
-  { code: '+420', flag: '🇨🇿', name: 'Czech Rep.' },
-  { code: '+421', flag: '🇸🇰', name: 'Slovakia' },
-  { code: '+502', flag: '🇬🇹', name: 'Guatemala' },
-  { code: '+507', flag: '🇵🇦', name: 'Panama' },
-  { code: '+593', flag: '🇪🇨', name: 'Ecuador' },
-  { code: '+598', flag: '🇺🇾', name: 'Uruguay' },
-  { code: '+60',  flag: '🇲🇾', name: 'Malaysia' },
-  { code: '+7',   flag: '🇰🇿', name: 'Kazakhstan' },
-  { code: '+855', flag: '🇰🇭', name: 'Cambodia' },
-  { code: '+856', flag: '🇱🇦', name: 'Laos' },
-  { code: '+960', flag: '🇲🇻', name: 'Maldives' },
-  { code: '+962', flag: '🇯🇴', name: 'Jordan' },
-  { code: '+963', flag: '🇸🇾', name: 'Syria' },
-  { code: '+964', flag: '🇮🇶', name: 'Iraq' },
-  { code: '+965', flag: '🇰🇼', name: 'Kuwait' },
-  { code: '+966', flag: '🇸🇦', name: 'Saudi Arabia' },
-  { code: '+967', flag: '🇾🇪', name: 'Yemen' },
-  { code: '+968', flag: '🇴🇲', name: 'Oman' },
-  { code: '+971', flag: '🇦🇪', name: 'UAE' },
-  { code: '+972', flag: '🇮🇱', name: 'Israel' },
-  { code: '+973', flag: '🇧🇭', name: 'Bahrain' },
-  { code: '+974', flag: '🇶🇦', name: 'Qatar' },
-  { code: '+977', flag: '🇳🇵', name: 'Nepal' },
-  { code: '+992', flag: '🇹🇯', name: 'Tajikistan' },
-  { code: '+994', flag: '🇦🇿', name: 'Azerbaijan' },
-  { code: '+998', flag: '🇺🇿', name: 'Uzbekistan' },
-];
 
 const DOC_TYPES = [
   { value: 'passport' },
@@ -156,20 +47,6 @@ function KycStatusBanner({ status }) {
   );
 }
 
-function StepBadge({ step, label, active, done }) {
-  return (
-    <div className="flex flex-col items-center gap-1">
-      <div className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold transition-all ${
-        done  ? 'bg-[#0ECB81] text-white' :
-        active ? 'bg-[#ee8267] text-white shadow-[0_4px_14px_rgba(238,130,103,0.4)]' :
-        'bg-[#f0f4f5] text-text-muted'
-      }`}>
-        {done ? '✓' : step}
-      </div>
-      <span className={`text-[9px] font-semibold uppercase tracking-wide ${active ? 'text-[#ee8267]' : 'text-text-muted'}`}>{label}</span>
-    </div>
-  );
-}
 
 function UploadBox({ label, icon, preview, onChange, disabled }) {
   const ref = useRef();
@@ -206,41 +83,14 @@ function UploadBox({ label, icon, preview, onChange, disabled }) {
 export default function Profile() {
   const { t } = useTranslation();
   const { user, refreshUser } = useAuth();
-  const [tab, setTab]   = useState('kyc');
-  const [step, setStep] = useState(1);
+  const [tab, setTab] = useState('kyc');
   const [saving, setSaving] = useState(false);
 
-  // Parse existing mobile: try to detect dial code
-  const detectDialCode = (mobile) => {
-    if (!mobile) return { dialCode: '+1', number: '' };
-    for (const d of DIAL_CODES.sort((a, b) => b.code.length - a.code.length)) {
-      if (mobile.startsWith(d.code)) {
-        return { dialCode: d.code, number: mobile.slice(d.code.length).trim() };
-      }
-    }
-    return { dialCode: '+1', number: mobile };
-  };
-
-  const { dialCode: initDial, number: initNumber } = detectDialCode(user?.mobile || '');
-
-  const [dialCode, setDialCode] = useState(initDial);
-  const [phoneNumber, setPhoneNumber] = useState(initNumber);
-
-  const [form, setForm] = useState({
-    firstName: user?.firstName || '',
-    lastName:  user?.lastName  || '',
-    address:   user?.address   || '',
-    city:      user?.city      || '',
-    zipCode:   user?.zipCode   || '',
-    state:     user?.state     || '',
-    country:   user?.country   || '',
-    kycDocType:  user?.kycDocType  || '',
-  });
+  const [kycDocType, setKycDocType] = useState(user?.kycDocType || '');
 
   const [docPreviews, setDocPreviews] = useState({
     kycDocFront: user?.kycDocFront || null,
     kycDocBack:  user?.kycDocBack  || null,
-    kycDocSelfie:user?.kycDocSelfie|| null,
   });
 
   const [pwForm, setPwForm] = useState({ currentPassword: '', newPassword: '', confirmPassword: '' });
@@ -252,8 +102,6 @@ export default function Profile() {
   const isPending  = kycStatus === 'pending';
   const isDisabled = isVerified || isPending;
 
-  const handleChange = (e) => setForm(f => ({ ...f, [e.target.name]: e.target.value }));
-
   const handleFileChange = (field) => (e) => {
     const file = e.target.files?.[0];
     if (!file) return;
@@ -263,36 +111,19 @@ export default function Profile() {
     reader.readAsDataURL(file);
   };
 
-  const handleNextStep = () => {
-    if (step === 1) {
-      if (!form.firstName.trim() || !form.lastName.trim()) return toast.error('First and last name are required');
-      if (!phoneNumber.trim()) return toast.error('Phone number is required');
-    }
-    if (step === 2) {
-      if (!form.address.trim() || !form.city.trim() || !form.country) return toast.error('Address, city and country are required');
-    }
-    if (step === 3) {
-      if (!form.kycDocType) return toast.error('Please select a document type');
-      if (!docPreviews.kycDocFront) return toast.error('Front side of document is required');
-      if (!docPreviews.kycDocSelfie) return toast.error('Selfie with document is required');
-    }
-    setStep(s => s + 1);
-  };
-
   const handleSaveKyc = async () => {
+    if (!kycDocType) return toast.error(t('kyc.selectDocType'));
+    if (!docPreviews.kycDocFront) return toast.error('Front side of document is required');
+    if (!docPreviews.kycDocBack) return toast.error('Back side of document is required');
     setSaving(true);
     try {
-      const mobile = `${dialCode}${phoneNumber.trim()}`;
       await profileAPI.update({
-        ...form,
-        mobile,
-        kycDocFront:  docPreviews.kycDocFront  || '',
-        kycDocBack:   docPreviews.kycDocBack   || '',
-        kycDocSelfie: docPreviews.kycDocSelfie || '',
+        kycDocType,
+        kycDocFront: docPreviews.kycDocFront || '',
+        kycDocBack:  docPreviews.kycDocBack  || '',
       });
       await refreshUser();
       toast.success('KYC submitted! Under review.');
-      setStep(1);
     } catch (err) {
       toast.error(err.response?.data?.error || 'Failed to submit KYC');
     } finally {
@@ -316,7 +147,6 @@ export default function Profile() {
     }
   };
 
-  const docTypeLabel = form.kycDocType ? t(`kyc.docType.${form.kycDocType}`) : '—';
 
   return (
     <div className="space-y-4 animate-fade-in pb-4">
@@ -365,298 +195,75 @@ export default function Profile() {
 
       {/* ── KYC Tab ── */}
       {tab === 'kyc' && (
-        <div className="rounded-[30px] border border-[#d9e6e7] bg-white shadow-[0_24px_80px_rgba(8,35,41,0.08)] overflow-hidden">
+        <div className="rounded-[30px] border border-[#d9e6e7] bg-white shadow-[0_24px_80px_rgba(8,35,41,0.08)] p-5 space-y-4">
 
           {/* Status banner */}
-          {kycStatus !== 'unverified' && (
-            <div className="px-5 pt-5">
-              <KycStatusBanner status={kycStatus} />
-            </div>
-          )}
+          {kycStatus !== 'unverified' && <KycStatusBanner status={kycStatus} />}
 
           {/* Unverified intro */}
           {kycStatus === 'unverified' && (
-            <div className="px-5 pt-5">
-              <div className="rounded-[20px] p-4 flex items-start gap-3" style={{ background: 'rgba(10,224,208,0.06)', border: '1px solid rgba(10,224,208,0.2)' }}>
-                <div className="w-10 h-10 rounded-full flex items-center justify-center text-xl flex-shrink-0" style={{ background: 'rgba(10,224,208,0.12)' }}>
-                  🛡️
-                </div>
-                <div>
-                  <p className="text-sm font-bold text-text-primary">Identity Verification Required</p>
-                  <p className="text-xs text-text-muted mt-0.5 leading-relaxed">Complete KYC to unlock higher limits and full trading features. Verification typically takes 1–2 business days.</p>
-                </div>
+            <div className="rounded-[20px] p-4 flex items-start gap-3" style={{ background: 'rgba(10,224,208,0.06)', border: '1px solid rgba(10,224,208,0.2)' }}>
+              <div className="w-10 h-10 rounded-full flex items-center justify-center text-xl flex-shrink-0" style={{ background: 'rgba(10,224,208,0.12)' }}>🛡️</div>
+              <div>
+                <p className="text-sm font-bold text-text-primary">Identity Verification Required</p>
+                <p className="text-xs text-text-muted mt-0.5 leading-relaxed">Upload your document photos to complete KYC. Verification typically takes 1–2 business days.</p>
               </div>
             </div>
           )}
 
-          {/* Step indicator — 4 steps */}
-          {!isDisabled && (
-            <div className="px-5 pt-5">
-              <div className="flex items-center gap-0">
-                <StepBadge step={1} label="Personal" active={step === 1} done={step > 1} />
-                <div className={`flex-1 h-0.5 mx-1.5 rounded-full transition-all ${step > 1 ? 'bg-[#0ECB81]' : 'bg-[#e5eef0]'}`} />
-                <StepBadge step={2} label="Address"  active={step === 2} done={step > 2} />
-                <div className={`flex-1 h-0.5 mx-1.5 rounded-full transition-all ${step > 2 ? 'bg-[#0ECB81]' : 'bg-[#e5eef0]'}`} />
-                <StepBadge step={3} label="Document" active={step === 3} done={step > 3} />
-                <div className={`flex-1 h-0.5 mx-1.5 rounded-full transition-all ${step > 3 ? 'bg-[#0ECB81]' : 'bg-[#e5eef0]'}`} />
-                <StepBadge step={4} label="Review"   active={step === 4} done={false} />
-              </div>
-            </div>
-          )}
-
-          <div className="p-5 space-y-4">
-
-            {/* ── Step 1: Personal Info ── */}
-            {(step === 1 || isDisabled) && (
-              <>
-                <p className="text-[11px] font-bold uppercase tracking-widest text-text-muted flex items-center gap-2">
-                  <span className="w-5 h-5 rounded-full bg-[#ee8267] text-white flex items-center justify-center text-[9px]">1</span>
-                  Personal Information
-                </p>
-
-                <div className="grid grid-cols-2 gap-3">
-                  <InputField label="First Name" icon="👤">
-                    <input name="firstName" value={form.firstName} onChange={handleChange}
-                      className={PROFILE_INPUT} placeholder="John" disabled={isDisabled} />
-                  </InputField>
-                  <InputField label="Last Name" icon="👤">
-                    <input name="lastName" value={form.lastName} onChange={handleChange}
-                      className={PROFILE_INPUT} placeholder="Smith" disabled={isDisabled} />
-                  </InputField>
-                </div>
-
-                {/* Phone with dial code */}
-                <InputField label="Phone Number" icon="📱">
-                  <div className="flex gap-2">
-                    <select
-                      value={dialCode}
-                      onChange={e => setDialCode(e.target.value)}
-                      disabled={isDisabled}
-                      className="rounded-[16px] border border-[#d7e4e5] bg-[#f7fbfb] px-2 py-3 text-sm text-text-primary outline-none transition-all focus:border-[#0AE0D0] focus:ring-2 focus:ring-[#0AE0D0]/10 disabled:opacity-50 flex-shrink-0"
-                      style={{ maxWidth: 110 }}
-                    >
-                      {DIAL_CODES.map((d, i) => (
-                        <option key={`${d.code}-${i}`} value={d.code}>
-                          {d.flag} {d.code}
-                        </option>
-                      ))}
-                    </select>
-                    <input
-                      value={phoneNumber}
-                      onChange={e => setPhoneNumber(e.target.value)}
-                      className={PROFILE_INPUT}
-                      placeholder="712 345 6789"
-                      type="tel"
-                      disabled={isDisabled}
-                    />
-                  </div>
-                </InputField>
-
-                {/* Nationality */}
-                <InputField label="Nationality / Country" icon="🌍">
-                  <select name="country" value={form.country} onChange={handleChange}
-                    className={PROFILE_INPUT} disabled={isDisabled}>
-                    <option value="">Select your country</option>
-                    {COUNTRIES.map(c => <option key={c} value={c}>{c}</option>)}
-                  </select>
-                </InputField>
-
-                {!isDisabled && (
-                  <button onClick={handleNextStep}
-                    className="w-full py-3.5 rounded-[18px] text-sm font-bold text-white transition-all active:scale-95"
-                    style={{ background: 'linear-gradient(135deg,#ee8267,#f4927e)', boxShadow: '0 12px 32px rgba(238,130,103,0.3)' }}>
-                    Continue →
-                  </button>
-                )}
-              </>
-            )}
-
-            {/* ── Step 2: Address ── */}
-            {(step === 2 || isDisabled) && (
-              <>
-                {isDisabled && <hr className="border-[#e5eef0]" />}
-                <p className="text-[11px] font-bold uppercase tracking-widest text-text-muted flex items-center gap-2">
-                  <span className="w-5 h-5 rounded-full bg-[#185B64] text-white flex items-center justify-center text-[9px]">2</span>
-                  Residential Address
-                </p>
-
-                <InputField label="Street Address" icon="🏠">
-                  <input name="address" value={form.address} onChange={handleChange}
-                    className={PROFILE_INPUT} placeholder="123 Main Street, Apt 4B" disabled={isDisabled} />
-                </InputField>
-
-                <div className="grid grid-cols-2 gap-3">
-                  <InputField label="City" icon="🏙️">
-                    <input name="city" value={form.city} onChange={handleChange}
-                      className={PROFILE_INPUT} placeholder="New York" disabled={isDisabled} />
-                  </InputField>
-                  <InputField label="ZIP / Postal Code" icon="📮">
-                    <input name="zipCode" value={form.zipCode} onChange={handleChange}
-                      className={PROFILE_INPUT} placeholder="10001" disabled={isDisabled} />
-                  </InputField>
-                </div>
-
-                <InputField label="State / Province / Region" icon="🗺️">
-                  <input name="state" value={form.state} onChange={handleChange}
-                    className={PROFILE_INPUT} placeholder="New York" disabled={isDisabled} />
-                </InputField>
-
-                {!isDisabled && (
-                  <div className="flex gap-3">
-                    <button onClick={() => setStep(1)}
-                      className="flex-1 py-3.5 rounded-[18px] text-sm font-bold text-text-secondary border border-[#d7e4e5] bg-[#f7fbfb] transition-all active:scale-95">
-                      ← Back
-                    </button>
-                    <button onClick={handleNextStep}
-                      className="flex-1 py-3.5 rounded-[18px] text-sm font-bold text-white transition-all active:scale-95"
-                      style={{ background: 'linear-gradient(135deg,#ee8267,#f4927e)' }}>
-                      Continue →
-                    </button>
-                  </div>
-                )}
-              </>
-            )}
-
-            {/* ── Step 3: Document Upload ── */}
-            {(step === 3 || isDisabled) && (
-              <>
-                {isDisabled && <hr className="border-[#e5eef0]" />}
-                <p className="text-[11px] font-bold uppercase tracking-widest text-text-muted flex items-center gap-2">
-                  <span className="w-5 h-5 rounded-full bg-[#0AE0D0] text-white flex items-center justify-center text-[9px]">3</span>
-                  Identity Document
-                </p>
-
-                {/* Info notice */}
-                <div className="rounded-[14px] px-4 py-3 flex items-start gap-2.5 text-xs text-text-muted" style={{ background: 'rgba(10,224,208,0.06)', border: '1px solid rgba(10,224,208,0.15)' }}>
-                  <span className="text-base flex-shrink-0 mt-0.5">ℹ️</span>
-                  <span>{t('kyc.docUploadInfo')}</span>
-                </div>
-                {/* Clear photo warning */}
-                <div className="rounded-[14px] px-4 py-3 flex items-start gap-2.5 text-xs font-semibold" style={{ background: 'rgba(238,130,103,0.08)', border: '1px solid rgba(238,130,103,0.25)', color: '#c45a38' }}>
-                  <span className="text-base flex-shrink-0 mt-0.5">📸</span>
-                  <span>{t('kyc.clearPhotoNote')}</span>
-                </div>
-
-                <InputField label="Document Type" icon="🪪">
-                  <select name="kycDocType" value={form.kycDocType} onChange={handleChange}
-                    className={PROFILE_INPUT} disabled={isDisabled}>
-                    <option value="">{t('kyc.selectDocType')}</option>
-                    {DOC_TYPES.map(d => <option key={d.value} value={d.value}>{t(`kyc.docType.${d.value}`)}</option>)}
-                  </select>
-                </InputField>
-
-                <div className="grid grid-cols-2 gap-3">
-                  <UploadBox
-                    label="Front Side"
-                    icon="🖼️"
-                    preview={docPreviews.kycDocFront}
-                    onChange={handleFileChange('kycDocFront')}
-                    disabled={isDisabled}
-                  />
-                  <UploadBox
-                    label="Back Side"
-                    icon="🖼️"
-                    preview={docPreviews.kycDocBack}
-                    onChange={handleFileChange('kycDocBack')}
-                    disabled={isDisabled}
-                  />
-                </div>
-
-                <UploadBox
-                  label="Selfie Holding Document"
-                  icon="🤳"
-                  preview={docPreviews.kycDocSelfie}
-                  onChange={handleFileChange('kycDocSelfie')}
-                  disabled={isDisabled}
-                />
-
-                {!isDisabled && (
-                  <div className="flex gap-3">
-                    <button onClick={() => setStep(2)}
-                      className="flex-1 py-3.5 rounded-[18px] text-sm font-bold text-text-secondary border border-[#d7e4e5] bg-[#f7fbfb] transition-all active:scale-95">
-                      ← Back
-                    </button>
-                    <button onClick={handleNextStep}
-                      className="flex-1 py-3.5 rounded-[18px] text-sm font-bold text-white transition-all active:scale-95"
-                      style={{ background: 'linear-gradient(135deg,#ee8267,#f4927e)' }}>
-                      Continue →
-                    </button>
-                  </div>
-                )}
-              </>
-            )}
-
-            {/* ── Step 4: Review & Submit ── */}
-            {step === 4 && !isDisabled && (
-              <>
-                <p className="text-[11px] font-bold uppercase tracking-widest text-text-muted flex items-center gap-2">
-                  <span className="w-5 h-5 rounded-full bg-[#0ECB81] text-white flex items-center justify-center text-[9px]">4</span>
-                  Review & Submit
-                </p>
-
-                {/* Summary card */}
-                <div className="rounded-[20px] p-4 space-y-3" style={{ background: '#f7fbfb', border: '1px solid #d9e6e7' }}>
-                  <p className="text-xs font-bold text-text-primary uppercase tracking-wider">Personal</p>
-                  <div className="grid grid-cols-2 gap-2 text-xs">
-                    <div><span className="text-text-muted">First Name</span><p className="font-semibold text-text-primary mt-0.5">{form.firstName || '—'}</p></div>
-                    <div><span className="text-text-muted">Last Name</span><p className="font-semibold text-text-primary mt-0.5">{form.lastName || '—'}</p></div>
-                    <div className="col-span-2"><span className="text-text-muted">Phone</span><p className="font-semibold text-text-primary mt-0.5">{dialCode} {phoneNumber || '—'}</p></div>
-                    <div className="col-span-2"><span className="text-text-muted">Nationality</span><p className="font-semibold text-text-primary mt-0.5">{form.country || '—'}</p></div>
-                  </div>
-                  <hr className="border-[#d9e6e7]" />
-                  <p className="text-xs font-bold text-text-primary uppercase tracking-wider">Address</p>
-                  <div className="grid grid-cols-2 gap-2 text-xs">
-                    <div className="col-span-2"><span className="text-text-muted">Street</span><p className="font-semibold text-text-primary mt-0.5">{form.address || '—'}</p></div>
-                    <div><span className="text-text-muted">City</span><p className="font-semibold text-text-primary mt-0.5">{form.city || '—'}</p></div>
-                    <div><span className="text-text-muted">ZIP</span><p className="font-semibold text-text-primary mt-0.5">{form.zipCode || '—'}</p></div>
-                    <div className="col-span-2"><span className="text-text-muted">State / Region</span><p className="font-semibold text-text-primary mt-0.5">{form.state || '—'}</p></div>
-                  </div>
-                  <hr className="border-[#d9e6e7]" />
-                  <p className="text-xs font-bold text-text-primary uppercase tracking-wider">Documents</p>
-                  <div className="text-xs space-y-1">
-                    <div><span className="text-text-muted">{t('kyc.documentType')}</span><p className="font-semibold text-text-primary mt-0.5">{docTypeLabel}</p></div>
-                    <div className="flex gap-2 mt-2">
-                      {docPreviews.kycDocFront && (
-                        <div className="flex-1 rounded-[10px] overflow-hidden" style={{ maxHeight: 70 }}>
-                          <img src={docPreviews.kycDocFront} className="w-full h-full object-cover" alt="Front" />
-                        </div>
-                      )}
-                      {docPreviews.kycDocBack && (
-                        <div className="flex-1 rounded-[10px] overflow-hidden" style={{ maxHeight: 70 }}>
-                          <img src={docPreviews.kycDocBack} className="w-full h-full object-cover" alt="Back" />
-                        </div>
-                      )}
-                      {docPreviews.kycDocSelfie && (
-                        <div className="flex-1 rounded-[10px] overflow-hidden" style={{ maxHeight: 70 }}>
-                          <img src={docPreviews.kycDocSelfie} className="w-full h-full object-cover" alt="Selfie" />
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                </div>
-
-                {/* Consent notice */}
-                <div className="rounded-[16px] px-4 py-3 flex items-start gap-2.5 text-xs text-text-muted" style={{ background: 'rgba(10,224,208,0.06)', border: '1px solid rgba(10,224,208,0.15)' }}>
-                  <span className="text-base flex-shrink-0 mt-0.5">ℹ️</span>
-                  <span>By submitting, you confirm that all information is accurate and truthful, and you consent to identity verification in accordance with international compliance standards.</span>
-                </div>
-
-                <div className="flex gap-3">
-                  <button onClick={() => setStep(3)}
-                    className="flex-1 py-3.5 rounded-[18px] text-sm font-bold text-text-secondary border border-[#d7e4e5] bg-[#f7fbfb] transition-all active:scale-95">
-                    ← Back
-                  </button>
-                  <button onClick={handleSaveKyc} disabled={saving}
-                    className="flex-1 py-3.5 rounded-[18px] text-sm font-bold text-white flex items-center justify-center gap-2 transition-all active:scale-95"
-                    style={{ background: 'linear-gradient(135deg,#ee8267,#f4927e)', boxShadow: '0 12px 32px rgba(238,130,103,0.3)' }}>
-                    {saving && <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />}
-                    {saving ? 'Submitting...' : '🚀 Submit KYC'}
-                  </button>
-                </div>
-              </>
-            )}
-
+          {/* Info notice */}
+          <div className="rounded-[14px] px-4 py-3 flex items-start gap-2.5 text-xs text-text-muted" style={{ background: 'rgba(10,224,208,0.06)', border: '1px solid rgba(10,224,208,0.15)' }}>
+            <span className="text-base flex-shrink-0 mt-0.5">ℹ️</span>
+            <span>{t('kyc.docUploadInfo')}</span>
           </div>
+
+          {/* Clear photo warning */}
+          <div className="rounded-[14px] px-4 py-3 flex items-start gap-2.5 text-xs font-semibold" style={{ background: 'rgba(238,130,103,0.08)', border: '1px solid rgba(238,130,103,0.25)', color: '#c45a38' }}>
+            <span className="text-base flex-shrink-0 mt-0.5">📸</span>
+            <span>{t('kyc.clearPhotoNote')}</span>
+          </div>
+
+          {/* Document type */}
+          <InputField label={t('kyc.documentType')} icon="🪪">
+            <select
+              value={kycDocType}
+              onChange={e => setKycDocType(e.target.value)}
+              className={PROFILE_INPUT}
+              disabled={isDisabled}
+            >
+              <option value="">{t('kyc.selectDocType')}</option>
+              {DOC_TYPES.map(d => <option key={d.value} value={d.value}>{t(`kyc.docType.${d.value}`)}</option>)}
+            </select>
+          </InputField>
+
+          {/* Front & Back upload */}
+          <div className="grid grid-cols-2 gap-3">
+            <UploadBox
+              label={t('kyc.frontSide')}
+              icon="🖼️"
+              preview={docPreviews.kycDocFront}
+              onChange={handleFileChange('kycDocFront')}
+              disabled={isDisabled}
+            />
+            <UploadBox
+              label={t('kyc.backSide')}
+              icon="🖼️"
+              preview={docPreviews.kycDocBack}
+              onChange={handleFileChange('kycDocBack')}
+              disabled={isDisabled}
+            />
+          </div>
+
+          {/* Submit */}
+          {!isDisabled && (
+            <button onClick={handleSaveKyc} disabled={saving}
+              className="w-full py-3.5 rounded-[18px] text-sm font-bold text-white flex items-center justify-center gap-2 transition-all active:scale-95"
+              style={{ background: 'linear-gradient(135deg,#ee8267,#f4927e)', boxShadow: '0 12px 32px rgba(238,130,103,0.3)' }}>
+              {saving && <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />}
+              {saving ? 'Submitting...' : '🚀 Submit KYC'}
+            </button>
+          )}
+
         </div>
       )}
 
