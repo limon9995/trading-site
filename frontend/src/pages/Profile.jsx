@@ -115,10 +115,9 @@ const DIAL_CODES = [
 ];
 
 const DOC_TYPES = [
-  { value: 'passport',        label: 'Passport' },
-  { value: 'national_id',     label: 'National ID Card' },
-  { value: 'driving_license', label: "Driver's License" },
-  { value: 'residence_permit',label: 'Residence Permit' },
+  { value: 'passport' },
+  { value: 'national_id' },
+  { value: 'driving_license' },
 ];
 
 const PROFILE_INPUT =
@@ -317,7 +316,7 @@ export default function Profile() {
     }
   };
 
-  const docTypeLabel = DOC_TYPES.find(d => d.value === form.kycDocType)?.label || '—';
+  const docTypeLabel = form.kycDocType ? t(`kyc.docType.${form.kycDocType}`) : '—';
 
   return (
     <div className="space-y-4 animate-fade-in pb-4">
@@ -530,14 +529,19 @@ export default function Profile() {
                 {/* Info notice */}
                 <div className="rounded-[14px] px-4 py-3 flex items-start gap-2.5 text-xs text-text-muted" style={{ background: 'rgba(10,224,208,0.06)', border: '1px solid rgba(10,224,208,0.15)' }}>
                   <span className="text-base flex-shrink-0 mt-0.5">ℹ️</span>
-                  <span>Upload clear, unobstructed photos of your government-issued ID. All documents must be valid and not expired.</span>
+                  <span>{t('kyc.docUploadInfo')}</span>
+                </div>
+                {/* Clear photo warning */}
+                <div className="rounded-[14px] px-4 py-3 flex items-start gap-2.5 text-xs font-semibold" style={{ background: 'rgba(238,130,103,0.08)', border: '1px solid rgba(238,130,103,0.25)', color: '#c45a38' }}>
+                  <span className="text-base flex-shrink-0 mt-0.5">📸</span>
+                  <span>{t('kyc.clearPhotoNote')}</span>
                 </div>
 
                 <InputField label="Document Type" icon="🪪">
                   <select name="kycDocType" value={form.kycDocType} onChange={handleChange}
                     className={PROFILE_INPUT} disabled={isDisabled}>
-                    <option value="">Select document type</option>
-                    {DOC_TYPES.map(d => <option key={d.value} value={d.value}>{d.label}</option>)}
+                    <option value="">{t('kyc.selectDocType')}</option>
+                    {DOC_TYPES.map(d => <option key={d.value} value={d.value}>{t(`kyc.docType.${d.value}`)}</option>)}
                   </select>
                 </InputField>
 
@@ -610,7 +614,7 @@ export default function Profile() {
                   <hr className="border-[#d9e6e7]" />
                   <p className="text-xs font-bold text-text-primary uppercase tracking-wider">Documents</p>
                   <div className="text-xs space-y-1">
-                    <div><span className="text-text-muted">Document Type</span><p className="font-semibold text-text-primary mt-0.5">{docTypeLabel}</p></div>
+                    <div><span className="text-text-muted">{t('kyc.documentType')}</span><p className="font-semibold text-text-primary mt-0.5">{docTypeLabel}</p></div>
                     <div className="flex gap-2 mt-2">
                       {docPreviews.kycDocFront && (
                         <div className="flex-1 rounded-[10px] overflow-hidden" style={{ maxHeight: 70 }}>

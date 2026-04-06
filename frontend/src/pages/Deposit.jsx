@@ -51,8 +51,9 @@ export default function Deposit() {
       setAddresses(data.addresses || {});
       const coins = Object.keys(data.addresses || {});
       if (coins.length > 0) {
-        setSelectedCoin(coins[0]);
-        const networks = data.addresses[coins[0]];
+        const defaultCoin = coins.includes('USDT') ? 'USDT' : coins[0];
+        setSelectedCoin(defaultCoin);
+        const networks = data.addresses[defaultCoin];
         if (networks?.length > 0) setSelectedNetwork(networks[0]);
       }
     } catch {
