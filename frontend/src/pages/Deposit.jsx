@@ -227,19 +227,21 @@ export default function Deposit() {
             <div className="flex flex-col sm:flex-row items-center gap-6">
               {/* QR Code */}
               <div
-                className="flex-shrink-0 rounded-[26px] p-4 shadow-inner"
+                className="flex-shrink-0 rounded-[26px] p-3"
                 style={{
-                  background: isDark ? '#0f2028' : '#f7fbfb',
-                  border: `1px solid ${isDark ? '#1e3d47' : '#e0ebec'}`,
+                  background: isDark ? '#1a2e33' : '#f7fbfb',
+                  border: `1px solid ${isDark ? '#2a4449' : '#e0ebec'}`,
                 }}
               >
-                <QRCodeSVG
-                  value={selectedNetwork.address}
-                  size={140}
-                  bgColor={isDark ? '#0f2028' : '#ffffff'}
-                  fgColor={isDark ? '#ffffff' : '#0d2127'}
-                  level="M"
-                />
+                <div className="rounded-[18px] bg-white p-3">
+                  <QRCodeSVG
+                    value={selectedNetwork.address}
+                    size={136}
+                    bgColor="#ffffff"
+                    fgColor="#000000"
+                    level="M"
+                  />
+                </div>
               </div>
 
               {/* Address info */}
