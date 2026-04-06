@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import toast from 'react-hot-toast';
+import { QRCodeSVG } from 'qrcode.react';
 import { adminAPI, adminDepositAPI, adminWithdrawAPI, settingsAPI, profileAPI, planPurchaseAPI, binaryAPI, marketAPI, adminAgentAPI } from '../services/api';
 import { SkeletonCard, SkeletonTable } from '../components/SkeletonCard';
 import { useTheme } from '../context/ThemeContext';
@@ -15,9 +16,12 @@ const SECTION_CARD =
 const ADMIN_FIELD_LABEL =
   'mb-2 block text-[11px] font-semibold uppercase tracking-[0.22em] text-[var(--admin-label)]';
 const ADDRESS_PRESETS = [
-  { coin: 'USDT', network: 'TRC20', minDeposit: 10, note: 'Send only USDT via TRC20.' },
-  { coin: 'USDT', network: 'BEP20', minDeposit: 10, note: 'Send only USDT via BEP20.' },
-  { coin: 'BTC', network: 'BTC', minDeposit: 0.0001, note: 'Send only BTC on the Bitcoin network.' },
+  { coin: 'USDT', network: 'TRC20',   minDeposit: 10,     note: 'Send only USDT via TRC20 network.' },
+  { coin: 'USDT', network: 'ERC-20',  minDeposit: 10,     note: 'Send only USDT via ERC-20 network.' },
+  { coin: 'BNB',  network: 'BEP-20',  minDeposit: 10,     note: 'Send only BNB via BEP-20 network.' },
+  { coin: 'BTC',  network: 'Bitcoin', minDeposit: 10,     note: 'Send only BTC on the Bitcoin network.' },
+  { coin: 'ETH',  network: 'ERC-20',  minDeposit: 10,     note: 'Send only ETH via ERC-20 network.' },
+  { coin: 'SOL',  network: 'Solana',  minDeposit: 10,     note: 'Send only SOL on the Solana network.' },
 ];
 
 function SectionHeader({ eyebrow, title, body, actions = null }) {
@@ -1529,13 +1533,27 @@ export default function Admin() {
                 <div className="md:col-span-2">
                   <label className={ADMIN_FIELD_LABEL}>Wallet Address</label>
                   <p className="mb-2 text-xs text-text-muted">Paste the full receiving address exactly as users should copy it.</p>
-                  <textarea
-                    rows="3"
-                    className={`${ADMIN_INPUT} min-h-[110px] resize-y font-mono text-sm leading-6 text-[#0d2127] placeholder:text-[#b8c9cc]`}
-                    value={addrForm.address}
-                    onChange={(e) => setAddrForm(f => ({ ...f, address: e.target.value }))}
-                    placeholder="Paste wallet address here..."
-                  />
+                  <div className="flex gap-3 items-start">
+                    <textarea
+                      rows="3"
+                      className={`${ADMIN_INPUT} min-h-[110px] resize-y font-mono text-sm leading-6 text-[#0d2127] placeholder:text-[#b8c9cc] flex-1`}
+                      value={addrForm.address}
+                      onChange={(e) => setAddrForm(f => ({ ...f, address: e.target.value }))}
+                      placeholder="Paste wallet address here..."
+                    />
+                    {addrForm.address && (
+                      <div className="flex-shrink-0 rounded-[20px] border border-[#e0eaeb] bg-white p-3 shadow-sm">
+                        <QRCodeSVG
+                          value={addrForm.address}
+                          size={84}
+                          bgColor="#ffffff"
+                          fgColor="#0d2127"
+                          level="M"
+                        />
+                        <p className="mt-2 text-center text-[10px] text-text-muted">QR Preview</p>
+                      </div>
+                    )}
+                  </div>
                 </div>
                 <div>
                   <label className={ADMIN_FIELD_LABEL}>Minimum Deposit</label>
@@ -1633,7 +1651,18 @@ export default function Admin() {
             ) : (
               <div className="divide-y divide-light-border/50">
                 {depositAddresses.map((addr) => (
-                  <div key={addr._id} className="grid gap-4 px-5 py-5 lg:grid-cols-[1.1fr_0.9fr_220px] lg:items-start">
+                  <div key={addr._id} className="grid gap-4 px-5 py-5 lg:grid-cols-[auto_1fr_0.8fr_180px] lg:items-start">
+                    {/* QR Code */}
+                    <div className="flex-shrink-0 rounded-[20px] border border-[#e0eaeb] bg-white p-3 shadow-sm">
+                      <QRCodeSVG
+                        value={addr.address}
+                        size={90}
+                        bgColor="#ffffff"
+                        fgColor="#0d2127"
+                        level="M"
+                      />
+                    </div>
+
                     <div className="min-w-0">
                       <div className="flex items-center gap-2 flex-wrap">
                         <span className="rounded-full bg-[#0d2127] px-3 py-1 text-xs font-bold uppercase tracking-[0.2em] text-white">
