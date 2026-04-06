@@ -103,21 +103,21 @@ export default function Trading() {
         )}
       </div>
 
-      <div className="flex gap-2">
+      <div className="mt-3 flex items-center gap-2">
         {['All', 'Gainers', 'Losers'].map(f => (
           <button
             key={f}
             onClick={() => setFilter(f)}
             className={`rounded-full px-4 py-2 text-xs font-semibold transition-all ${
               filter === f
-                ? 'bg-[#ee8267] text-white shadow-[0_12px_28px_rgba(238,130,103,0.22)]'
+                ? 'bg-[#ee8267] text-white shadow-[0_8px_20px_rgba(238,130,103,0.28)]'
                 : 'border border-[#d7e4e5] bg-[#f7fbfb] text-[#5a7377] hover:-translate-y-0.5'
             }`}
           >
             {f}
           </button>
         ))}
-        <div className="ml-auto text-xs text-text-muted self-center">{coins.length} coins</div>
+        <div className="ml-auto text-xs text-text-muted">{coins.length} coins</div>
       </div>
 
       <div className="mt-5 grid grid-cols-[1fr_auto_auto] gap-2 border-b border-light-border/40 px-3 py-2 text-[10px] font-medium uppercase tracking-[0.22em] text-[#789094]">
