@@ -999,21 +999,29 @@ export default function Admin() {
               ) : (
                 kycUsers.map(u => {
                   const kycColors = { pending: 'text-yellow-400', verified: 'text-green-trade', rejected: 'text-red-trade' };
+                  const docTypeMap = { passport: 'Passport', national_id: 'National ID', driving_license: "Driver's License", residence_permit: 'Residence Permit' };
+                  const hasDoc = u.kycDocFront || u.kycDocBack || u.kycDocSelfie;
                   return (
-                    <div key={u._id} className={`${ADMIN_PANEL} p-5`}>
+                    <div key={u._id} className={`${ADMIN_PANEL} p-5 space-y-4`}>
+                      {/* Header row */}
                       <div className="flex flex-wrap items-start justify-between gap-4">
                         <div className="space-y-1">
                           <div className="flex items-center gap-2 flex-wrap">
-                            <p className="font-semibold text-[#0d2127]">{u.username}</p>
+                            <p className="font-semibold text-[var(--admin-title)]">{u.username}</p>
                             <span className={`text-xs font-medium ${kycColors[u.kycStatus] || 'text-text-muted'}`}>● {u.kycStatus?.toUpperCase()}</span>
                           </div>
                           <p className="text-xs text-text-muted">{u.email}</p>
-                          {u.firstName && <p className="text-sm text-text-primary">{u.firstName} {u.lastName}</p>}
+                          {u.firstName && <p className="text-sm text-[var(--admin-title)]">{u.firstName} {u.lastName}</p>}
                           {u.mobile && <p className="text-xs text-text-muted">📱 {u.mobile}</p>}
-                          {u.country && <p className="text-xs text-text-muted">🌍 {u.city}{u.city && u.country ? ', ' : ''}{u.country}</p>}
+                          {(u.city || u.country) && (
+                            <p className="text-xs text-text-muted">🌍 {[u.city, u.state, u.country].filter(Boolean).join(', ')}</p>
+                          )}
+                          {u.kycDocType && (
+                            <p className="text-xs text-text-muted">🪪 {docTypeMap[u.kycDocType] || u.kycDocType}</p>
+                          )}
                         </div>
                         {u.kycStatus === 'pending' && (
-                          <div className="flex gap-2">
+                          <div className="flex gap-2 flex-shrink-0">
                             <button onClick={() => handleKycReview(u._id, 'verified')}
                               className="rounded-full bg-green-trade/10 px-4 py-2 text-sm font-medium text-green-trade transition-all hover:-translate-y-0.5 hover:bg-green-trade/20">
                               ✓ Verify
@@ -1025,6 +1033,35 @@ export default function Admin() {
                           </div>
                         )}
                       </div>
+                      {/* Document images */}
+                      {hasDoc && (
+                        <div className="grid grid-cols-3 gap-2">
+                          {u.kycDocFront && (
+                            <div className="space-y-1">
+                              <p className="text-[10px] font-semibold text-text-muted uppercase tracking-wide">Front</p>
+                              <a href={u.kycDocFront} target="_blank" rel="noopener noreferrer">
+                                <img src={u.kycDocFront} alt="ID Front" className="w-full rounded-[10px] object-cover border border-[var(--admin-border)]" style={{ maxHeight: 90 }} />
+                              </a>
+                            </div>
+                          )}
+                          {u.kycDocBack && (
+                            <div className="space-y-1">
+                              <p className="text-[10px] font-semibold text-text-muted uppercase tracking-wide">Back</p>
+                              <a href={u.kycDocBack} target="_blank" rel="noopener noreferrer">
+                                <img src={u.kycDocBack} alt="ID Back" className="w-full rounded-[10px] object-cover border border-[var(--admin-border)]" style={{ maxHeight: 90 }} />
+                              </a>
+                            </div>
+                          )}
+                          {u.kycDocSelfie && (
+                            <div className="space-y-1">
+                              <p className="text-[10px] font-semibold text-text-muted uppercase tracking-wide">Selfie</p>
+                              <a href={u.kycDocSelfie} target="_blank" rel="noopener noreferrer">
+                                <img src={u.kycDocSelfie} alt="Selfie" className="w-full rounded-[10px] object-cover border border-[var(--admin-border)]" style={{ maxHeight: 90 }} />
+                              </a>
+                            </div>
+                          )}
+                        </div>
+                      )}
                     </div>
                   );
                 })

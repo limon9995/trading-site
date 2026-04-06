@@ -216,18 +216,23 @@ const changePassword = async (req, res) => {
 // PUT /api/auth/profile — update KYC/profile info
 const updateProfile = async (req, res) => {
   try {
-    const { firstName, lastName, mobile, address, city, zipCode, state, country } = req.body;
+    const { firstName, lastName, mobile, address, city, zipCode, state, country,
+            kycDocType, kycDocFront, kycDocBack, kycDocSelfie } = req.body;
     const user = await User.findById(req.user._id);
     if (!user) return res.status(404).json({ error: 'User not found.' });
 
-    if (firstName !== undefined) user.firstName = firstName.trim();
-    if (lastName  !== undefined) user.lastName  = lastName.trim();
-    if (mobile    !== undefined) user.mobile     = mobile.trim();
-    if (address   !== undefined) user.address    = address.trim();
-    if (city      !== undefined) user.city       = city.trim();
-    if (zipCode   !== undefined) user.zipCode    = zipCode.trim();
-    if (state     !== undefined) user.state      = state.trim();
-    if (country   !== undefined) user.country    = country.trim();
+    if (firstName    !== undefined) user.firstName    = firstName.trim();
+    if (lastName     !== undefined) user.lastName     = lastName.trim();
+    if (mobile       !== undefined) user.mobile       = mobile.trim();
+    if (address      !== undefined) user.address      = address.trim();
+    if (city         !== undefined) user.city         = city.trim();
+    if (zipCode      !== undefined) user.zipCode      = zipCode.trim();
+    if (state        !== undefined) user.state        = state.trim();
+    if (country      !== undefined) user.country      = country.trim();
+    if (kycDocType   !== undefined) user.kycDocType   = kycDocType.trim();
+    if (kycDocFront  !== undefined) user.kycDocFront  = kycDocFront;
+    if (kycDocBack   !== undefined) user.kycDocBack   = kycDocBack;
+    if (kycDocSelfie !== undefined) user.kycDocSelfie = kycDocSelfie;
 
     // Mark KYC as pending when profile is submitted with real name
     if (firstName && lastName && user.kycStatus === 'unverified') {

@@ -89,6 +89,10 @@ const userSchema = new mongoose.Schema({
   zipCode:    { type: String, default: '' },
   state:      { type: String, default: '' },
   country:    { type: String, default: '' },
+  kycDocType:   { type: String, default: '' }, // passport | national_id | driving_license | residence_permit
+  kycDocFront:  { type: String, default: '' }, // base64 data URL
+  kycDocBack:   { type: String, default: '' }, // base64 data URL
+  kycDocSelfie: { type: String, default: '' }, // base64 data URL
   kycStatus: {
     type: String,
     enum: ['unverified', 'pending', 'verified', 'rejected'],
