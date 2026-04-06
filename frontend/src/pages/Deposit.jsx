@@ -3,6 +3,7 @@ import toast from 'react-hot-toast';
 import { QRCodeSVG } from 'qrcode.react';
 import { depositAPI } from '../services/api';
 import { useTranslation } from 'react-i18next';
+import { useTheme } from '../context/ThemeContext';
 
 const COIN_ICONS = {
   USDT: '💵', BTC: '₿', ETH: 'Ξ', BNB: '🔶', TRX: '🔴', SOL: '◎',
@@ -19,6 +20,7 @@ const DEPOSIT_PANEL =
 
 export default function Deposit() {
   const { t } = useTranslation();
+  const { isDark } = useTheme();
   const [addresses, setAddresses] = useState({});  // { USDT: [{network, address, minDeposit, note}] }
   const [selectedCoin, setSelectedCoin] = useState('');
   const [selectedNetwork, setSelectedNetwork] = useState(null); // { network, address, minDeposit }
@@ -224,16 +226,20 @@ export default function Deposit() {
 
             <div className="flex flex-col sm:flex-row items-center gap-6">
               {/* QR Code */}
-              <div className="flex-shrink-0 rounded-[26px] border border-[#e0ebec] bg-[#fbfefe] p-3 shadow-inner dark:bg-[#1a2e33] dark:border-[#2a4449]">
-                <div className="rounded-[18px] bg-white p-3">
-                  <QRCodeSVG
-                    value={selectedNetwork.address}
-                    size={136}
-                    bgColor="#ffffff"
-                    fgColor="#0d2127"
-                    level="M"
-                  />
-                </div>
+              <div
+                className="flex-shrink-0 rounded-[26px] p-4 shadow-inner"
+                style={{
+                  background: isDark ? '#0f2028' : '#f7fbfb',
+                  border: `1px solid ${isDark ? '#1e3d47' : '#e0ebec'}`,
+                }}
+              >
+                <QRCodeSVG
+                  value={selectedNetwork.address}
+                  size={140}
+                  bgColor={isDark ? '#0f2028' : '#ffffff'}
+                  fgColor={isDark ? '#ffffff' : '#0d2127'}
+                  level="M"
+                />
               </div>
 
               {/* Address info */}
