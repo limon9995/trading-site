@@ -3,7 +3,7 @@ import React from 'react';
 const STATS = [
   { value: '5M+',    label: 'Registered Users',   color: '#EE8267' },
   { value: '180+',   label: 'Countries Supported', color: '#0ECB81' },
-  { value: '$2B+',   label: 'Trading Volume',      color: '#185B64' },
+  { value: '$2B+',   label: 'Trading Volume',      color: '#38bdf8' },
   { value: '99.9%',  label: 'Platform Uptime',     color: '#a855f7' },
 ];
 
@@ -119,7 +119,7 @@ export default function AboutUs() {
               <div key={s.label} className="rounded-[16px] p-3.5"
                 style={{ background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.1)' }}>
                 <p className="text-xl font-extrabold" style={{ color: s.color }}>{s.value}</p>
-                <p className="text-white/50 text-xs mt-0.5">{s.label}</p>
+                <p className="text-white/70 text-xs mt-0.5">{s.label}</p>
               </div>
             ))}
           </div>
