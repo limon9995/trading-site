@@ -5,6 +5,14 @@ import App from './App.jsx';
 import './index.css';
 import './i18n/i18n.js';
 
+// Auto-reload once when a chunk fails to load after a new deployment
+window.addEventListener('vite:preloadError', () => {
+  if (!sessionStorage.getItem('chunk_reload')) {
+    sessionStorage.setItem('chunk_reload', '1');
+    window.location.reload();
+  }
+});
+
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
     <App />
