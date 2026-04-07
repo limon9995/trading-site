@@ -218,13 +218,16 @@ export default function Withdraw() {
                 const active = selectedCoin.symbol === c.symbol;
                 return (
                   <button key={c.symbol} type="button" onClick={() => handleCoinChange(c.symbol)}
-                    className={`flex flex-col items-center gap-1 rounded-[20px] p-3 transition-all ${active ? 'opacity-100 shadow-[0_12px_28px_rgba(8,35,41,0.06)]' : 'opacity-60 hover:-translate-y-0.5 hover:opacity-90'}`}
-                    style={{ background: active ? color + '20' : '#f7fbfb', border: active ? `1px solid ${color}60` : '1px solid #dde8e9' }}>
+                    className={`flex flex-col items-center gap-1 rounded-[20px] p-3 transition-all ${active ? 'opacity-100 shadow-[0_8px_20px_rgba(8,35,41,0.10)]' : 'opacity-55 hover:-translate-y-0.5 hover:opacity-85'}`}
+                    style={{
+                      background: active ? color : '#f7fbfb',
+                      border: active ? `1.5px solid ${color}` : '1px solid #dde8e9',
+                    }}>
                     <div className="w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold"
-                      style={{ background: color + '25', color }}>
+                      style={{ background: active ? 'rgba(255,255,255,0.25)' : color + '22', color: active ? '#fff' : color }}>
                       {c.symbol[0]}
                     </div>
-                    <span className="text-[10px] font-semibold text-text-primary">{c.symbol}</span>
+                    <span className={`text-[10px] font-semibold ${active ? 'text-white' : 'text-text-primary'}`}>{c.symbol}</span>
                   </button>
                 );
               })}
@@ -237,7 +240,8 @@ export default function Withdraw() {
             <div className="flex gap-2 flex-wrap">
               {selectedCoin.networks.map(net => (
                 <button key={net} type="button" onClick={() => setSelectedNetwork(net)}
-                  className={`rounded-full px-4 py-2.5 text-xs font-semibold transition-all ${selectedNetwork === net ? 'bg-[#ee8267] text-white shadow-[0_12px_28px_rgba(238,130,103,0.2)]' : 'border border-[#d9e5e6] bg-[#f7fbfb] text-text-secondary'}`}>
+                  className={`rounded-full px-4 py-2.5 text-xs font-semibold transition-all ${selectedNetwork === net ? 'text-white shadow-[0_8px_20px_rgba(24,91,100,0.30)]' : 'border border-[#d9e5e6] bg-[#f7fbfb] text-text-secondary hover:border-[#185B64]/40'}`}
+                  style={selectedNetwork === net ? { background: 'linear-gradient(135deg, #185B64, #0E2026)' } : {}}>
                   {net}
                 </button>
               ))}
@@ -282,7 +286,8 @@ export default function Withdraw() {
           </div>
 
           <button type="submit" disabled={sending || amt < MIN_WITHDRAW || amt > balance || !address.trim()}
-            className="h-14 w-full rounded-full bg-[#ee8267] text-sm font-semibold text-white shadow-[0_18px_40px_rgba(238,130,103,0.28)] transition-all hover:-translate-y-0.5 hover:bg-[#e8775a] disabled:opacity-40">
+            className="h-14 w-full rounded-full text-sm font-semibold text-white shadow-[0_18px_40px_rgba(24,91,100,0.35)] transition-all hover:-translate-y-0.5 disabled:opacity-40"
+            style={{ background: 'linear-gradient(135deg, #185B64, #0E2026)' }}>
             {sending ? (
               <span className="flex items-center justify-center gap-2">
                 <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
@@ -321,8 +326,8 @@ export default function Withdraw() {
                   onKeyDown={e => handleOtpKeyDown(i, e)}
                   className="w-11 h-14 text-center text-xl font-bold text-text-primary rounded-xl outline-none transition-all"
                   style={{
-                    background: digit ? '#EE826725' : '#f2f3f5',
-                    border: digit ? '2px solid #EE8267' : '2px solid #E8EAED',
+                    background: digit ? '#185B6418' : '#f2f3f5',
+                    border: digit ? '2px solid #185B64' : '2px solid #E8EAED',
                   }}
                 />
               ))}
@@ -330,7 +335,8 @@ export default function Withdraw() {
 
             {/* Verify button */}
             <button onClick={handleVerifyOtp} disabled={verifying || otp.join('').length !== 6}
-              className="h-14 w-full rounded-full bg-[#ee8267] text-sm font-semibold text-white shadow-[0_18px_40px_rgba(238,130,103,0.28)] transition-all hover:-translate-y-0.5 hover:bg-[#e8775a] disabled:opacity-40">
+              className="h-14 w-full rounded-full text-sm font-semibold text-white shadow-[0_18px_40px_rgba(24,91,100,0.35)] transition-all hover:-translate-y-0.5 disabled:opacity-40"
+              style={{ background: 'linear-gradient(135deg, #185B64, #0E2026)' }}>
               {verifying ? (
                 <span className="flex items-center justify-center gap-2">
                   <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
