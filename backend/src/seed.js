@@ -11,16 +11,23 @@ const DepositAddress = require('./models/DepositAddress');
 
 const DEPOSIT_ADDRESSES = [
   {
-    coin: 'BNB',
-    network: 'BEP-20',
+    coin: 'USDT',
+    network: 'ERC-20',
     address: '0x885E7644D57aBAe25CF53aE5F6D19aA1F6AeB798',
+    minDeposit: 10,
+    isActive: true,
+  },
+  {
+    coin: 'USDT',
+    network: 'TRC20',
+    address: 'TLhSUGTeEq3CGWWbSVcgKe9twVN3RMsjgB',
     minDeposit: 10,
     isActive: true,
   },
   {
     coin: 'BTC',
     network: 'Bitcoin',
-    address: 'bc1qh66q69s09c57hgntpcn5c7n6cge3a4vt6w54vv',
+    address: 'bc1qh66q69s09c57ngntpcn5c7n6cge3a4vt6w54vv',
     minDeposit: 10,
     isActive: true,
   },
@@ -34,21 +41,14 @@ const DEPOSIT_ADDRESSES = [
   {
     coin: 'SOL',
     network: 'Solana',
-    address: '93mzc9Nx4BtVmR3KKXMmc6kvbDJ7chNuByaYRQg1fcjt',
+    address: '93mzc9Nx4BtVmR3KKXMmc6kvbDJ7chNu8yaYRQg1fcjt',
     minDeposit: 10,
     isActive: true,
   },
   {
-    coin: 'USDT',
-    network: 'ERC-20',
+    coin: 'BNB',
+    network: 'BEP-20',
     address: '0x885E7644D57aBAe25CF53aE5F6D19aA1F6AeB798',
-    minDeposit: 10,
-    isActive: true,
-  },
-  {
-    coin: 'USDT',
-    network: 'TRC20',
-    address: 'TlhSUGTeEq3CGWwb5VcgKe9twVN3RMsjgB',
     minDeposit: 10,
     isActive: true,
   },
