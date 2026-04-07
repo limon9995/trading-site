@@ -191,8 +191,8 @@ export default function Dashboard() {
                   </div>
                   {/* Name */}
                   <div className="flex-1 min-w-0">
-                    <p className="font-semibold text-text-primary text-sm">{coin.symbol}<span className="text-text-muted font-normal">/USDT</span></p>
-                    <p className="text-xs text-text-muted capitalize truncate">{coin.coinId?.replace(/-/g, ' ')}</p>
+                    <p className="font-semibold text-text-primary text-sm"><span className="text-text-muted font-normal">/USDT</span></p>
+                    <p className="text-xs text-text-muted capitalize truncate">{coin.coinId?.replace(/-/g, ' ') || coin.symbol}</p>
                   </div>
                   {/* Price + change */}
                   <div className="text-right">
