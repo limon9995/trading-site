@@ -101,7 +101,10 @@ const AgentRoute = ({ children }) => {
 const PublicRoute = ({ children }) => {
   const { user, loading } = useAuth();
   if (loading) return <FullScreenLoader label="Preparing authentication..." />;
-  return user ? <Navigate to="/dashboard" replace /> : children;
+  if (!user) return children;
+  if (user.role === 'admin') return <Navigate to="/admin" replace />;
+  if (user.role === 'agent') return <Navigate to="/agent" replace />;
+  return <Navigate to="/dashboard" replace />;
 };
 
 const RouteContent = ({ children, label = 'Loading page...' }) => (
