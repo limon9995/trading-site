@@ -264,10 +264,16 @@ export default function Withdraw() {
               <input type="number" value={amount} onChange={e => setAmount(e.target.value)}
                 placeholder={`Min $${MIN_WITHDRAW}`}
                 className="input-field rounded-[22px] border-[#d7e4e5] bg-[#f7fbfb] pr-16"
-                step="any" min={MIN_WITHDRAW} />
+                step="any" />
               <button type="button" onClick={() => setAmount(Math.max(0, balance).toFixed(2))}
                 className="absolute right-3 top-1/2 -translate-y-1/2 text-xs font-bold text-brand-primary">MAX</button>
             </div>
+            {amt > 0 && amt < MIN_WITHDRAW && (
+              <p className="text-xs text-red-trade font-medium">Minimum withdrawal is ${MIN_WITHDRAW}</p>
+            )}
+            {amt > balance && (
+              <p className="text-xs text-red-trade font-medium">Insufficient balance (available: ${balance.toFixed(2)})</p>
+            )}
             {/* Fee breakdown */}
             <div className="space-y-1.5 pt-1 border-t border-light-border">
               <div className="flex justify-between text-xs">
@@ -286,14 +292,18 @@ export default function Withdraw() {
           </div>
 
           <button type="submit" disabled={sending || amt < MIN_WITHDRAW || amt > balance || !address.trim()}
-            className="h-14 w-full rounded-full text-sm font-semibold text-white shadow-[0_18px_40px_rgba(24,91,100,0.35)] transition-all hover:-translate-y-0.5 disabled:opacity-40"
+            className="h-14 w-full rounded-full text-sm font-semibold text-white shadow-[0_18px_40px_rgba(24,91,100,0.35)] transition-all hover:-translate-y-0.5 disabled:opacity-50 disabled:cursor-not-allowed"
             style={{ background: 'linear-gradient(135deg, #185B64, #0E2026)' }}>
             {sending ? (
               <span className="flex items-center justify-center gap-2">
                 <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
                 Sending OTP...
               </span>
-            ) : `Send OTP & Continue`}
+            ) : !address.trim() ? 'Enter Wallet Address'
+              : amt <= 0 ? `Enter Amount (Min $${MIN_WITHDRAW})`
+              : amt < MIN_WITHDRAW ? `Minimum $${MIN_WITHDRAW} Required`
+              : amt > balance ? 'Insufficient Balance'
+              : 'Send OTP & Continue'}
           </button>
           <p className="text-center text-[10px] text-text-muted/50">An OTP will be sent to your registered email</p>
         </form>
