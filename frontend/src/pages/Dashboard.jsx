@@ -150,17 +150,17 @@ export default function Dashboard() {
 
       {/* ── Hot Markets — CEX.IO style ──────────────────────────────── */}
       <div className="rounded-[30px] overflow-hidden cex-surface">
-        <div className="flex items-center justify-between px-4 py-3.5 border-b border-light-border">
-          <h3 className="font-bold text-text-primary text-sm">{t('dashboard.hotMarkets')}</h3>
+        <div className="flex items-center justify-between px-4 py-3.5 border-b border-light-border dark:border-white/8">
+          <h3 className="font-bold text-text-primary dark:text-white text-sm">{t('dashboard.hotMarkets')}</h3>
           <Link to="/trading" className="text-xs font-semibold" style={{ color: '#EE8267' }}>{t('dashboard.viewAll')}</Link>
         </div>
 
         {/* Table header */}
         <div className="flex items-center justify-between px-4 py-2">
-          <span className="text-xs text-text-muted font-medium">Name</span>
+          <span className="text-xs text-text-muted dark:text-white/40 font-medium">Name</span>
           <div className="flex items-center gap-6">
-            <span className="text-xs text-text-muted font-medium">Price</span>
-            <span className="text-xs text-text-muted font-medium w-16 text-right">24h Change</span>
+            <span className="text-xs text-text-muted dark:text-white/40 font-medium">Price</span>
+            <span className="text-xs text-text-muted dark:text-white/40 font-medium w-16 text-right">24h Change</span>
           </div>
         </div>
 
@@ -175,9 +175,9 @@ export default function Dashboard() {
               ))
             : marketList.map((coin) => (
                 <Link key={coin.symbol} to={`/trading/${coin.symbol}`}
-                  className="flex items-center gap-3 px-4 py-3.5 hover:bg-light-hover transition-colors border-t border-light-border">
+                  className="flex items-center gap-3 px-4 py-3.5 hover:bg-light-hover dark:hover:bg-white/5 transition-colors border-t border-light-border dark:border-white/8">
                   {/* Icon */}
-                  <div className="w-9 h-9 rounded-full flex items-center justify-center flex-shrink-0 overflow-hidden bg-[#f0f1f3]">
+                  <div className="w-9 h-9 rounded-full flex items-center justify-center flex-shrink-0 overflow-hidden bg-[#f0f1f3] dark:bg-white/10">
                     <img
                       src={`https://cdn.jsdelivr.net/npm/cryptocurrency-icons@0.18.1/svg/color/${coin.symbol.toLowerCase()}.svg`}
                       alt={coin.symbol}
@@ -191,12 +191,12 @@ export default function Dashboard() {
                   </div>
                   {/* Name */}
                   <div className="flex-1 min-w-0">
-                    <p className="font-semibold text-text-primary text-sm">{coin.symbol}<span className="text-text-muted font-normal">/USDT</span></p>
-                    <p className="text-xs text-text-muted capitalize truncate">{coin.coinId?.replace(/-/g, ' ')}</p>
+                    <p className="font-semibold text-text-primary dark:text-white text-sm">{coin.symbol}<span className="text-text-muted dark:text-white/50 font-normal">/USDT</span></p>
+                    <p className="text-xs text-text-muted dark:text-white/40 capitalize truncate">{coin.coinId?.replace(/-/g, ' ')}</p>
                   </div>
                   {/* Price + change */}
                   <div className="text-right">
-                    <p className="text-sm font-semibold text-text-primary">
+                    <p className="text-sm font-semibold text-text-primary dark:text-white">
                       ${coin.price < 1
                         ? coin.price.toFixed(4)
                         : coin.price.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
