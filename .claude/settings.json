@@ -17,7 +17,10 @@
       "Bash(timeout 10 node -e \":*)",
       "Bash(timeout 15 node -e \":*)",
       "WebFetch(domain:cexhd.co)",
-      "Bash(npm run:*)"
+      "Bash(npm run:*)",
+      "Read(//home/md-limon-hossain/SAAS/kafi\\\\ web/frontend/src/context/**)",
+      "Bash(node src/createAccounts.js)",
+      "Bash(xargs '-I{}' sh -c 'file=\"{}\"; python3 -c \":*)"
     ]
   }
 }

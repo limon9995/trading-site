@@ -22,6 +22,7 @@ const Transfer = lazy(() => import('./pages/Transfer'));
 const Recovery = lazy(() => import('./pages/Recovery'));
 const NewCoins = lazy(() => import('./pages/NewCoins'));
 const Withdraw = lazy(() => import('./pages/Withdraw'));
+const AboutUs = lazy(() => import('./pages/AboutUs'));
 const ForgotPassword = lazy(() => import('./pages/ForgotPassword'));
 const Layout = lazy(() => import('./components/Layout'));
 const AdminShell = lazy(() => import('./components/AdminShell'));
@@ -138,6 +139,7 @@ const AppRoutes = () => (
       <Route path="/recovery" element={<RouteContent label="Loading recovery..."><Recovery /></RouteContent>} />
       <Route path="/new-coins" element={<RouteContent label="Loading new coins..."><NewCoins /></RouteContent>} />
       <Route path="/withdraw" element={<RouteContent label="Loading withdrawals..."><Withdraw /></RouteContent>} />
+      <Route path="/about" element={<RouteContent label="Loading about..."><AboutUs /></RouteContent>} />
     </Route>
     <Route
       path="/admin"
