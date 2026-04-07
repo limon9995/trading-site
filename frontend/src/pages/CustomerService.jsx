@@ -16,9 +16,9 @@ export default function CustomerService() {
       .finally(() => setLoading(false));
   }, []);
 
-  const telegram = settings.telegram_link || '';
-  const email    = settings.support_email || '';
-  const tgUser   = settings.telegram_username || '';
+  const telegram = settings.telegram_link || 'https://t.me/cexsupport2067';
+  const email    = settings.support_email || 'cexsupporthelp@gmail.com';
+  const tgUser   = settings.telegram_username || 'cexsupport2067';
 
   return (
     <div className="space-y-4 animate-fade-in">
