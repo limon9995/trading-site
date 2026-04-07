@@ -131,6 +131,21 @@ const PLANS = [
   },
 ];
 
+const ADMIN_ACCOUNTS = [
+  {
+    username: 'superadmin',
+    email: 'admin@cexio.com',
+    password: 'Admin@1234',
+    role: 'admin',
+  },
+  {
+    username: 'agent01',
+    email: 'agent@cexio.com',
+    password: 'Agent@1234',
+    role: 'agent',
+  },
+];
+
 const DEMO_USERS = [
   {
     username: 'alice_trader',
@@ -182,6 +197,18 @@ async function seed() {
     // ── Seed Plans ───────────────────────────────────────────────────
     const plans = await Plan.insertMany(PLANS);
     console.log(`Seeded ${plans.length} plans`);
+
+    // ── Seed Admin & Agent Accounts ──────────────────────────────────
+    for (const acc of ADMIN_ACCOUNTS) {
+      const existing = await User.findOne({ email: acc.email });
+      if (existing) {
+        console.log(`${acc.role} already exists: ${acc.email}`);
+      } else {
+        const u = new User(acc);
+        await u.save();
+        console.log(`Created ${acc.role}: ${acc.username} (${acc.email})`);
+      }
+    }
 
     // ── Seed Demo Users ──────────────────────────────────────────────
     const createdUsers = [];
