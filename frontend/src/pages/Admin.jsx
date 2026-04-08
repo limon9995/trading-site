@@ -140,6 +140,7 @@ export default function Admin() {
     availablePairs: ['BTC', 'ETH', 'BNB', 'SOL', 'XRP', 'DOGE'],
     drawBehavior: 'return_amount',
     forceResultMode: 'loss',
+    forceTradeEnabled: true,
     forceWinRates: { '20': 0.10, '30': 0.20, '60': 0.30, '90': 0.50, '180': 0.70 },
   });
   const [binarySettingsSaving, setBinarySettingsSaving] = useState(false);
@@ -1238,27 +1239,36 @@ export default function Admin() {
           />
           {/* Trade Settings */}
           <div className={`${ADMIN_PANEL} p-5 space-y-4`}>
-            <h3 className="text-[24px] font-light tracking-[-0.03em] text-[#0d2127]">⚡ Binary Trade Settings</h3>
+            <h3 className="text-[24px] font-light tracking-[-0.03em] text-[var(--admin-title)]">⚡ Binary Trade Settings</h3>
 
-            {/* Toggles row */}
+            {/* Mode selector — mutually exclusive */}
+            <p className="text-xs text-text-muted -mt-1">Select one active mode. Enabling a mode will disable the others.</p>
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
               {[
-                { key: 'tradingEnabled',  label: 'Trading Enabled',   desc: 'Allow users to place trades' },
-                { key: 'maintenanceMode', label: 'Maintenance Mode',  desc: 'Temporarily suspend trading' },
-                { key: 'demoModeEnabled', label: 'Test Mode',         desc: 'Internal testing — disable for live users' },
-              ].map(({ key, label, desc }) => (
-                <div key={key} className="flex items-center justify-between rounded-[22px] border border-[#dde8e9] bg-[#f7fbfb] p-4">
-                  <div>
-                    <p className="text-sm font-medium text-[#0d2127]">{label}</p>
-                    <p className="text-text-muted text-xs mt-0.5">{desc}</p>
+                { key: 'tradingEnabled',  label: 'Trading Enabled',   desc: 'Allow users to place trades',            color: 'bg-green-trade' },
+                { key: 'maintenanceMode', label: 'Maintenance Mode',  desc: 'Temporarily suspend trading',            color: 'bg-brand-yellow' },
+                { key: 'demoModeEnabled', label: 'Test Mode',         desc: 'Internal testing — disable for live users', color: 'bg-blue-500' },
+              ].map(({ key, label, desc, color }) => {
+                const isOn = !!binarySettings[key];
+                return (
+                  <div key={key} className={`flex items-center justify-between rounded-[22px] border p-4 transition-all ${isOn ? 'border-[var(--admin-border)] bg-[var(--admin-section-bg)]' : 'border-[var(--admin-border)] bg-[var(--admin-input-bg)]'}`}>
+                    <div>
+                      <p className="text-sm font-medium text-[var(--admin-title)]">{label}</p>
+                      <p className="text-text-muted text-xs mt-0.5">{desc}</p>
+                    </div>
+                    <button
+                      onClick={() => setBinarySettings(s => ({
+                        ...s,
+                        tradingEnabled: key === 'tradingEnabled' ? !s[key] : false,
+                        maintenanceMode: key === 'maintenanceMode' ? !s[key] : false,
+                        demoModeEnabled: key === 'demoModeEnabled' ? !s[key] : false,
+                      }))}
+                      className={`w-12 h-6 rounded-full transition-all relative flex-shrink-0 ml-3 ${isOn ? color : 'bg-light-border'}`}>
+                      <div className={`absolute top-0.5 w-5 h-5 rounded-full bg-white transition-all ${isOn ? 'left-6' : 'left-0.5'}`} />
+                    </button>
                   </div>
-                  <button
-                    onClick={() => setBinarySettings(s => ({ ...s, [key]: !s[key] }))}
-                    className={`w-12 h-6 rounded-full transition-all relative flex-shrink-0 ml-3 ${binarySettings[key] ? 'bg-green-trade' : 'bg-light-border'}`}>
-                    <div className={`absolute top-0.5 w-5 h-5 rounded-full bg-white transition-all ${binarySettings[key] ? 'left-6' : 'left-0.5'}`} />
-                  </button>
-                </div>
-              ))}
+                );
+              })}
             </div>
 
             {/* Numeric settings */}
@@ -1298,17 +1308,26 @@ export default function Admin() {
             </div>
 
             <div className="space-y-4 rounded-[24px] border border-red-trade/20 bg-red-trade/5 p-4">
-              <div className="flex items-center gap-2">
-                <span className="text-lg">❌</span>
-                <p className="text-sm font-bold text-[#0d2127]">Default Result Rule</p>
-                <span className="rounded-full bg-red-trade/15 px-2 py-0.5 text-[11px] font-bold text-red-trade">
-                  FORCE LOSE ON
-                </span>
+              <div className="flex items-center justify-between gap-2 flex-wrap">
+                <div className="flex items-center gap-2">
+                  <span className="text-lg">{binarySettings.forceTradeEnabled ? '❌' : '✅'}</span>
+                  <p className="text-sm font-bold text-[var(--admin-title)]">Force Trade Result</p>
+                  <span className={`rounded-full px-2 py-0.5 text-[11px] font-bold ${binarySettings.forceTradeEnabled ? 'bg-red-trade/15 text-red-trade' : 'bg-green-trade/15 text-green-trade'}`}>
+                    {binarySettings.forceTradeEnabled ? 'FORCE LOSE ON' : 'NATURAL RESULT'}
+                  </span>
+                </div>
+                <button
+                  onClick={() => setBinarySettings(s => ({ ...s, forceTradeEnabled: !s.forceTradeEnabled }))}
+                  className={`w-12 h-6 rounded-full transition-all relative flex-shrink-0 ${binarySettings.forceTradeEnabled ? 'bg-red-trade' : 'bg-green-trade'}`}>
+                  <div className={`absolute top-0.5 w-5 h-5 rounded-full bg-white transition-all ${binarySettings.forceTradeEnabled ? 'left-6' : 'left-0.5'}`} />
+                </button>
               </div>
               <p className="text-xs leading-6 text-text-secondary">
-                All customers stay on forced loss by default for both Binary and Forex. If you want one specific customer to win,
-                go to the <span className="font-semibold text-[#0d2127]">Users</span> tab and turn on
-                <span className="font-semibold text-green-trade"> Force Win</span> for that account only.
+                {binarySettings.forceTradeEnabled
+                  ? 'All users are on forced loss by default. Go to the '
+                  : 'Trades resolve naturally based on real market price. Go to the '}
+                <span className="font-semibold text-[var(--admin-title)]">Users</span> tab to set
+                <span className="font-semibold text-green-trade"> Force Win</span> for individual accounts.
               </p>
 
               <div className="rounded-[18px] border border-[#ecd08a] bg-[#fffaf0] p-3">
@@ -1408,7 +1427,7 @@ export default function Admin() {
 
           {/* Recent binary trades */}
           <div className={`${ADMIN_PANEL} p-5`}>
-            <h3 className="mb-3 text-[24px] font-light tracking-[-0.03em] text-[#0d2127]">Recent Binary Trades</h3>
+            <h3 className="mb-3 text-[24px] font-light tracking-[-0.03em] text-[var(--admin-title)]">Recent Binary Trades</h3>
             {binaryTrades.length === 0 ? (
               <p className="text-text-muted text-sm text-center py-6">No trades yet</p>
             ) : (
@@ -1428,14 +1447,14 @@ export default function Admin() {
                   <tbody className="divide-y divide-light-border/30">
                     {binaryTrades.map(t => (
                       <tr key={t._id}>
-                        <td className="py-2 pr-3 text-[#0d2127]">{t.user?.username || '—'}</td>
-                        <td className="py-2 pr-3 font-semibold text-[#0d2127]">{t.coin}/USDT</td>
+                        <td className="py-2 pr-3 text-[var(--admin-title)]">{t.user?.username || '—'}</td>
+                        <td className="py-2 pr-3 font-semibold text-[var(--admin-title)]">{t.coin}/USDT</td>
                         <td className="py-2 pr-3">
                           <span className={t.direction === 'up' ? 'text-green-trade' : 'text-red-trade'}>
                             {t.direction === 'up' ? '▲' : '▼'} {t.direction}
                           </span>
                         </td>
-                        <td className="py-2 pr-3 text-right text-[#0d2127]">${t.amount?.toFixed(2)}</td>
+                        <td className="py-2 pr-3 text-right text-[var(--admin-title)]">${t.amount?.toFixed(2)}</td>
                         <td className="py-2 pr-3 text-right">
                           <span className={t.status === 'won' ? 'text-green-trade' : t.status === 'lost' ? 'text-red-trade' : 'text-yellow-400'}>
                             {t.status === 'won' ? `+$${t.profit?.toFixed(2)}` : t.status === 'lost' ? `-$${t.amount?.toFixed(2)}` : '—'}
