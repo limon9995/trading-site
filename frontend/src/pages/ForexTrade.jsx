@@ -256,7 +256,7 @@ export default function ForexTrade() {
     { label: '24h Volume', value: coinData?.volume24h ? `${(coinData.volume24h / 1e6).toFixed(2)}M` : '---' },
   ];
 
-  useEffect(() => { loadPositions(); loadHistory(); }, []);
+  useEffect(() => { loadPositions(); loadHistory(); if (refreshUser) refreshUser(); }, []);
 
   const loadPositions = async () => {
     try { const { data } = await forexAPI.getOpen(); setPositions(data.trades || []); } catch {}

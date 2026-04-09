@@ -565,6 +565,7 @@ export default function BinaryTrade() {
     }).catch(() => {});
     loadActiveTrades();
     loadHistory();
+    if (refreshUser) refreshUser();
   }, []);
 
   const loadActiveTrades = async () => {
