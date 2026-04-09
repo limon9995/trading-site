@@ -155,7 +155,7 @@ export default function Admin() {
   const [agentPermModal, setAgentPermModal] = useState(null); // { agent }
   const [agentPermModalPerms, setAgentPermModalPerms] = useState([]);
   const [agentPermModalLoading, setAgentPermModalLoading] = useState(false);
-  const ALL_AGENT_PERMS = ['kyc_approve', 'force_trade', 'manage_deposits', 'manage_withdrawals', 'view_users', 'manage_balance'];
+  const ALL_AGENT_PERMS = ['kyc_approve', 'force_trade', 'manage_deposits', 'manage_withdrawals', 'view_users', 'manage_balance', 'ban_user'];
 
   const fetchStats = useCallback(async () => {
     try {

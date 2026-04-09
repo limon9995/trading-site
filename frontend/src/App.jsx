@@ -17,6 +17,7 @@ const Deposit = lazy(() => import('./pages/Deposit'));
 const Profile = lazy(() => import('./pages/Profile'));
 const CustomerService = lazy(() => import('./pages/CustomerService'));
 const BinaryTrade = lazy(() => import('./pages/BinaryTrade'));
+const ForexTrade = lazy(() => import('./pages/ForexTrade'));
 const TradePage = lazy(() => import('./pages/TradePage'));
 const Transfer = lazy(() => import('./pages/Transfer'));
 const Recovery = lazy(() => import('./pages/Recovery'));
@@ -131,6 +132,7 @@ const AppRoutes = () => (
       <Route path="/settings" element={<RouteContent label="Loading settings..."><Settings /></RouteContent>} />
       <Route path="/deposit" element={<RouteContent label="Loading deposits..."><Deposit /></RouteContent>} />
       <Route path="/binary" element={<RouteContent label="Loading binary trading..."><BinaryTrade /></RouteContent>} />
+      <Route path="/forex"  element={<RouteContent label="Loading forex trading..."><ForexTrade /></RouteContent>} />
       <Route path="/trade"  element={<RouteContent label="Loading trading desk..."><TradePage /></RouteContent>} />
       <Route path="/profile" element={<RouteContent label="Loading profile..."><Profile /></RouteContent>} />
       <Route path="/support" element={<RouteContent label="Loading support..."><CustomerService /></RouteContent>} />

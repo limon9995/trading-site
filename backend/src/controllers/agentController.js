@@ -5,7 +5,7 @@ const DepositRequest = require('../models/DepositRequest');
 const WithdrawRequest = require('../models/WithdrawRequest');
 const bcrypt = require('bcryptjs');
 
-const ALL_PERMISSIONS = ['kyc_approve', 'force_trade', 'manage_deposits', 'manage_withdrawals', 'view_users', 'manage_balance'];
+const ALL_PERMISSIONS = ['kyc_approve', 'force_trade', 'manage_deposits', 'manage_withdrawals', 'view_users', 'manage_balance', 'ban_user'];
 
 // ─── Agent-callable: User list ────────────────────────────────────────────────
 
@@ -367,6 +367,25 @@ const updateAgentPermissions = async (req, res) => {
   }
 };
 
+// PATCH /api/agent/users/:id/ban — agent ban/unban a user
+const banUser = async (req, res) => {
+  try {
+    const { ban, reason } = req.body;
+    const user = await User.findById(req.params.id);
+    if (!user) return res.status(404).json({ error: 'User not found.' });
+    if (user.role !== 'user') return res.status(400).json({ error: 'Can only ban regular users.' });
+
+    user.isBanned  = !!ban;
+    user.banReason = ban ? (reason || 'Banned by agent') : '';
+    user.bannedAt  = ban ? new Date() : null;
+    await user.save();
+
+    res.json({ message: ban ? 'User banned.' : 'User unbanned.', isBanned: user.isBanned });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+};
+
 // PATCH /api/admin/agents/:id/ban
 const banAgent = async (req, res) => {
   try {
@@ -387,7 +406,7 @@ const banAgent = async (req, res) => {
 
 module.exports = {
   // Agent-callable
-  getUsers, reviewKyc, setTradeMode, modifyBalance,
+  getUsers, reviewKyc, setTradeMode, modifyBalance, banUser,
   getDepositRequests, approveDepositRequest, rejectDepositRequest,
   getWithdrawRequests, approveWithdrawRequest, rejectWithdrawRequest,
   // Admin-only

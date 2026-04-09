@@ -6,6 +6,7 @@ const {
   reviewKyc,
   setTradeMode,
   modifyBalance,
+  banUser,
   getDepositRequests,
   approveDepositRequest,
   rejectDepositRequest,
@@ -30,6 +31,9 @@ router.patch('/users/:id/trademode', requirePermission('force_trade'), setTradeM
 
 // Balance edit
 router.patch('/users/:id/balance', requirePermission('manage_balance'), modifyBalance);
+
+// Ban / Unban user
+router.patch('/users/:id/ban', requirePermission('ban_user'), banUser);
 
 // Deposits
 router.get('/deposit-requests', requirePermission('manage_deposits'), getDepositRequests);

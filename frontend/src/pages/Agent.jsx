@@ -18,6 +18,7 @@ const ALL_AGENT_TABS = [
   { key: 'deposits',    label: '📥', fullLabel: 'Deposits',     perm: 'manage_deposits',     desc: 'Approve / reject deposit requests' },
   { key: 'withdrawals', label: '💸', fullLabel: 'Withdrawals',  perm: 'manage_withdrawals',  desc: 'Approve / reject withdrawal requests' },
   { key: 'balance',     label: '💰', fullLabel: 'Balance',      perm: 'manage_balance',      desc: 'Credit or debit user balance' },
+  { key: 'ban',         label: '🚫', fullLabel: 'Ban Users',    perm: 'ban_user',            desc: 'Ban or unban user accounts' },
 ];
 
 const TAB_TONES = {
@@ -27,6 +28,7 @@ const TAB_TONES = {
   deposits:    { accent: '#0284c7', glow: 'rgba(2,132,199,0.18)' },
   withdrawals: { accent: '#0369a1', glow: 'rgba(3,105,161,0.18)' },
   balance:     { accent: '#f59e0b', glow: 'rgba(245,158,11,0.18)' },
+  ban:         { accent: '#ef4444', glow: 'rgba(239,68,68,0.18)' },
 };
 
 function KycBadge({ status }) {
@@ -142,6 +144,14 @@ export default function Agent() {
   const [withdrawModal, setWithdrawModal] = useState(null);
   const [withdrawModalLoading, setWithdrawModalLoading] = useState(false);
 
+  // Ban state
+  const [banUsers, setBanUsers]               = useState([]);
+  const [banUsersLoading, setBanUsersLoading] = useState(false);
+  const [banSearch, setBanSearch]             = useState('');
+  const [banPage, setBanPage]                 = useState(1);
+  const [banPagination, setBanPagination]     = useState({});
+  const [banLoading, setBanLoading]           = useState({});
+
   // Balance state
   const [balanceUsers, setBalanceUsers]         = useState([]);
   const [balanceUsersLoading, setBalanceUsersLoading] = useState(false);
@@ -194,6 +204,16 @@ export default function Agent() {
     finally { setWithdrawalsLoading(false); }
   }, [withdrawPage, withdrawFilter]);
 
+  const fetchBanUsers = useCallback(async () => {
+    setBanUsersLoading(true);
+    try {
+      const { data } = await agentAPI.getUsers(banPage, banSearch);
+      setBanUsers(data.users || []);
+      setBanPagination(data.pagination || {});
+    } catch { toast.error('Failed to load users'); }
+    finally { setBanUsersLoading(false); }
+  }, [banPage, banSearch]);
+
   const fetchBalanceUsers = useCallback(async () => {
     setBalanceUsersLoading(true);
     try {
@@ -211,7 +231,8 @@ export default function Agent() {
     if (activeTab === 'deposits')    fetchDeposits();
     if (activeTab === 'withdrawals') fetchWithdrawals();
     if (activeTab === 'balance')     fetchBalanceUsers();
-  }, [activeTab, fetchUsers, fetchKycUsers, fetchDeposits, fetchWithdrawals, fetchBalanceUsers]);
+    if (activeTab === 'ban')         fetchBanUsers();
+  }, [activeTab, fetchUsers, fetchKycUsers, fetchDeposits, fetchWithdrawals, fetchBalanceUsers, fetchBanUsers]);
 
   // ─── Handlers ─────────────────────────────────────────────────────────────
 
@@ -272,6 +293,19 @@ export default function Agent() {
       toast.error(err?.response?.data?.error || 'Failed to review withdrawal');
     } finally {
       setWithdrawModalLoading(false);
+    }
+  };
+
+  const handleBanUser = async (userId, ban) => {
+    setBanLoading(prev => ({ ...prev, [userId]: true }));
+    try {
+      await agentAPI.banUser(userId, ban);
+      toast.success(ban ? 'User banned.' : 'User unbanned.');
+      fetchBanUsers();
+    } catch (err) {
+      toast.error(err?.response?.data?.error || 'Failed to update ban status');
+    } finally {
+      setBanLoading(prev => ({ ...prev, [userId]: false }));
     }
   };
 
@@ -832,6 +866,85 @@ export default function Agent() {
                 <button className={BTN} disabled={balancePage <= 1} onClick={() => setBalancePage(p => p - 1)}>← Prev</button>
                 <span className="text-sm text-[var(--ag-muted)]">Page {balancePage} / {balancePagination.pages}</span>
                 <button className={BTN} disabled={balancePage >= balancePagination.pages} onClick={() => setBalancePage(p => p + 1)}>Next →</button>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* ═══ BAN TAB ══════════════════════════════════════════════════════════ */}
+      {activeTab === 'ban' && (
+        <div className="space-y-4">
+          <div className={`${SECTION} p-5`}>
+            <h3 className="text-[22px] font-light text-[var(--ag-title)]">Ban Users</h3>
+            <p className="mt-1 text-sm text-[var(--ag-muted)]">Ban or unban user accounts.</p>
+          </div>
+          <div className={`${SECTION} p-5 space-y-4`}>
+            <div>
+              <label className={LABEL}>Search</label>
+              <input
+                className={INPUT}
+                placeholder="Search by username or email…"
+                value={banSearch}
+                onChange={e => { setBanSearch(e.target.value); setBanPage(1); }}
+              />
+            </div>
+            {banUsersLoading ? (
+              <p className="text-sm text-[var(--ag-muted)]">Loading…</p>
+            ) : (
+              <div className="overflow-x-auto">
+                <table className="w-full text-sm">
+                  <thead>
+                    <tr className="border-b border-[var(--ag-border)]">
+                      {['Username', 'Email', 'Status', 'Action'].map(h => (
+                        <th key={h} className="pb-3 pr-4 text-left text-[11px] font-semibold uppercase tracking-[0.18em] text-[var(--ag-muted)]">{h}</th>
+                      ))}
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {banUsers.map(u => (
+                      <tr key={u._id} className="border-b border-[var(--ag-border)]/40 hover:bg-[var(--ag-section-bg)] transition-colors">
+                        <td className="py-3 pr-4 font-medium text-[var(--ag-title)]">{u.username}</td>
+                        <td className="py-3 pr-4 text-[var(--ag-muted)]">{u.email}</td>
+                        <td className="py-3 pr-4">
+                          {u.isBanned
+                            ? <span className="rounded-full bg-red-500/10 px-2.5 py-0.5 text-[11px] font-semibold text-red-400">Banned</span>
+                            : <span className="rounded-full bg-green-500/10 px-2.5 py-0.5 text-[11px] font-semibold text-green-400">Active</span>
+                          }
+                        </td>
+                        <td className="py-3 pr-4">
+                          {u.isBanned ? (
+                            <button
+                              disabled={banLoading[u._id]}
+                              onClick={() => handleBanUser(u._id, false)}
+                              className="rounded-full bg-green-500/10 border border-green-500/30 px-3 py-1.5 text-[11px] font-semibold text-green-400 hover:bg-green-500/20 transition-all disabled:opacity-40"
+                            >
+                              {banLoading[u._id] ? '…' : 'Unban'}
+                            </button>
+                          ) : (
+                            <button
+                              disabled={banLoading[u._id]}
+                              onClick={() => handleBanUser(u._id, true)}
+                              className="rounded-full bg-red-500/10 border border-red-500/30 px-3 py-1.5 text-[11px] font-semibold text-red-400 hover:bg-red-500/20 transition-all disabled:opacity-40"
+                            >
+                              {banLoading[u._id] ? '…' : 'Ban'}
+                            </button>
+                          )}
+                        </td>
+                      </tr>
+                    ))}
+                    {banUsers.length === 0 && (
+                      <tr><td colSpan={4} className="py-8 text-center text-sm text-[var(--ag-muted)]">No users found.</td></tr>
+                    )}
+                  </tbody>
+                </table>
+              </div>
+            )}
+            {banPagination.pages > 1 && (
+              <div className="mt-4 flex items-center gap-3">
+                <button className={BTN} disabled={banPage <= 1} onClick={() => setBanPage(p => p - 1)}>← Prev</button>
+                <span className="text-sm text-[var(--ag-muted)]">Page {banPage} / {banPagination.pages}</span>
+                <button className={BTN} disabled={banPage >= banPagination.pages} onClick={() => setBanPage(p => p + 1)}>Next →</button>
               </div>
             )}
           </div>

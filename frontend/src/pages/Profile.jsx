@@ -68,7 +68,7 @@ function UploadBox({ label, icon, preview, onChange, disabled }) {
           <div className="flex flex-col items-center gap-1 py-4 px-2 text-center">
             <span className="text-2xl" style={{ opacity: 0.6 }}>📎</span>
             <span className="text-[10px] font-semibold text-text-secondary">Tap to upload</span>
-            <span className="text-[9px] text-text-muted">JPG, PNG — max 5MB</span>
+            <span className="text-[9px] text-text-muted">JPG, PNG — max 20MB</span>
           </div>
         )}
         {preview && (
@@ -105,9 +105,26 @@ export default function Profile() {
   const handleFileChange = (field) => (e) => {
     const file = e.target.files?.[0];
     if (!file) return;
-    if (file.size > 5 * 1024 * 1024) return toast.error('File too large. Max 5MB.');
+    if (file.size > 20 * 1024 * 1024) return toast.error('File too large. Max 20MB.');
     const reader = new FileReader();
-    reader.onload = (ev) => setDocPreviews(p => ({ ...p, [field]: ev.target.result }));
+    reader.onload = (ev) => {
+      const img = new Image();
+      img.onload = () => {
+        const MAX = 1600;
+        let { width, height } = img;
+        if (width > MAX || height > MAX) {
+          if (width > height) { height = Math.round(height * MAX / width); width = MAX; }
+          else { width = Math.round(width * MAX / height); height = MAX; }
+        }
+        const canvas = document.createElement('canvas');
+        canvas.width  = width;
+        canvas.height = height;
+        canvas.getContext('2d').drawImage(img, 0, 0, width, height);
+        const compressed = canvas.toDataURL('image/jpeg', 0.82);
+        setDocPreviews(p => ({ ...p, [field]: compressed }));
+      };
+      img.src = ev.target.result;
+    };
     reader.readAsDataURL(file);
   };
 

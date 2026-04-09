@@ -197,6 +197,15 @@ export const agentAPI = {
   approveWithdraw: (id, adminNote = '') => api.patch(`/agent/withdraw-requests/${id}/approve`, { adminNote }),
   rejectWithdraw: (id, adminNote = '') => api.patch(`/agent/withdraw-requests/${id}/reject`, { adminNote }),
   modifyBalance: (userId, amount, reason) => api.patch(`/agent/users/${userId}/balance`, { amount, reason }),
+  banUser: (userId, ban, reason = '') => api.patch(`/agent/users/${userId}/ban`, { ban, reason }),
+};
+
+// ─── Forex ────────────────────────────────────────────────────────────────────
+export const forexAPI = {
+  open:    (data) => api.post('/forex/open', data),
+  close:   (id)   => api.post(`/forex/close/${id}`),
+  getOpen: ()     => api.get('/forex/open'),
+  history: ()     => api.get('/forex/history'),
 };
 
 // ─── Admin Agent Management ───────────────────────────────────────────────────

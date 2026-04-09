@@ -2,23 +2,8 @@ import { useState, useEffect, useRef } from 'react';
 import { createChart, CrosshairMode, LineStyle, CandlestickSeries, HistogramSeries } from 'lightweight-charts';
 import { useMarketPrices } from '../hooks/useMarketPrices';
 import { useAuth } from '../context/AuthContext';
-import { marketAPI } from '../services/api';
-import axios from 'axios';
+import { marketAPI, forexAPI } from '../services/api';
 import { useTranslation } from 'react-i18next';
-
-const API = axios.create({ baseURL: '/api' });
-API.interceptors.request.use(c => {
-  const t = localStorage.getItem('token');
-  if (t) c.headers.Authorization = `Bearer ${t}`;
-  return c;
-});
-
-const forexAPI = {
-  open:    (d) => API.post('/forex/open', d),
-  close:   (id) => API.post(`/forex/close/${id}`),
-  getOpen: ()  => API.get('/forex/open'),
-  history: ()  => API.get('/forex/history'),
-};
 
 // ── Candlestick Chart ────────────────────────────────────────────────────────
 function CandlestickChart({ symbol, interval, currentPrice }) {
