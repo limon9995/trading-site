@@ -234,7 +234,12 @@ const updateProfile = async (req, res) => {
     if (kycDocBack   !== undefined) user.kycDocBack   = kycDocBack;
     if (kycDocSelfie !== undefined) user.kycDocSelfie = kycDocSelfie;
 
-    // Mark KYC as pending when profile is submitted with real name
+    // Mark KYC as pending when docs are submitted
+    if (kycDocFront && kycDocBack && user.kycStatus === 'unverified') {
+      user.kycStatus = 'pending';
+      user.kycSubmittedAt = new Date();
+    }
+    // Also mark pending when name is provided (fallback)
     if (firstName && lastName && user.kycStatus === 'unverified') {
       user.kycStatus = 'pending';
       user.kycSubmittedAt = new Date();

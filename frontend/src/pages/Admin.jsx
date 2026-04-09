@@ -828,8 +828,25 @@ export default function Admin() {
                             </div>
                           </div>
                         </td>
-                        <td className="px-5 py-4 text-right font-medium text-text-primary">
-                          ${u.demo_balance.toFixed(2)}
+                        <td className="px-5 py-4 text-right">
+                          <div className="flex items-center justify-end gap-2">
+                            <span className="font-medium text-text-primary">${u.demo_balance.toFixed(2)}</span>
+                            <button
+                              onClick={async () => {
+                                setBalanceModal({ user: u });
+                                setBalanceCoin('USDT');
+                                setBalanceCoinAmount('');
+                                setBalanceReason('');
+                                try {
+                                  const { data } = await marketAPI.getPrices();
+                                  setCoinPrices(data.prices || data || {});
+                                } catch {}
+                              }}
+                              title="Edit balance"
+                              className="w-6 h-6 rounded-full flex items-center justify-center bg-[#f0b90b]/20 text-[#9b7008] hover:bg-[#f0b90b]/35 transition-colors flex-shrink-0"
+                              style={{ fontSize: 12 }}
+                            >✏️</button>
+                          </div>
                         </td>
                         <td className="px-5 py-4 text-center">
                           <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${

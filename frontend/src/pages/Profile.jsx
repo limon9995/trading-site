@@ -12,12 +12,12 @@ const DOC_TYPES = [
 ];
 
 const PROFILE_INPUT =
-  'w-full rounded-[16px] border border-[#d7e4e5] bg-[#f7fbfb] px-4 py-3 text-sm text-text-primary outline-none transition-all focus:border-[#0AE0D0] focus:ring-2 focus:ring-[#0AE0D0]/10 disabled:opacity-50';
+  'w-full rounded-[16px] border border-[#b0c8cc] bg-[#f0f8f9] px-4 py-3 text-sm text-text-primary outline-none transition-all focus:border-[#0AE0D0] focus:ring-2 focus:ring-[#0AE0D0]/20 disabled:opacity-50';
 
 function InputField({ label, icon, children }) {
   return (
     <div>
-      <label className="text-xs font-semibold text-text-muted mb-2 block flex items-center gap-1.5">
+      <label className="text-xs font-semibold text-text-secondary mb-2 block flex items-center gap-1.5">
         <span className="text-[13px]">{icon}</span>
         {label}
       </label>
@@ -52,23 +52,23 @@ function UploadBox({ label, icon, preview, onChange, disabled }) {
   const ref = useRef();
   return (
     <div>
-      <p className="text-xs font-semibold text-text-muted mb-1.5 flex items-center gap-1.5">
+      <p className="text-xs font-semibold text-text-secondary mb-1.5 flex items-center gap-1.5">
         <span>{icon}</span>{label}
       </p>
       <div
         onClick={() => !disabled && ref.current?.click()}
         className={`relative rounded-[16px] border-2 border-dashed flex flex-col items-center justify-center overflow-hidden transition-all ${
           disabled ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer hover:border-[#0AE0D0]'
-        } ${preview ? 'border-[#0ECB81]' : 'border-[#d7e4e5]'}`}
-        style={{ minHeight: 90, background: preview ? '#f0faf6' : '#f7fbfb' }}
+        } ${preview ? 'border-[#0ECB81]' : 'border-[#8ab5bc]'}`}
+        style={{ minHeight: 90, background: preview ? '#e8f7f1' : '#edf5f6' }}
       >
         {preview ? (
           <img src={preview} alt={label} className="w-full h-full object-cover" style={{ maxHeight: 120 }} />
         ) : (
           <div className="flex flex-col items-center gap-1 py-4 px-2 text-center">
-            <span className="text-2xl opacity-40">📎</span>
-            <span className="text-[10px] text-text-muted">Tap to upload</span>
-            <span className="text-[9px] text-text-muted opacity-70">JPG, PNG — max 5MB</span>
+            <span className="text-2xl" style={{ opacity: 0.6 }}>📎</span>
+            <span className="text-[10px] font-semibold text-text-secondary">Tap to upload</span>
+            <span className="text-[9px] text-text-muted">JPG, PNG — max 5MB</span>
           </div>
         )}
         {preview && (
@@ -212,13 +212,13 @@ export default function Profile() {
           )}
 
           {/* Info notice */}
-          <div className="rounded-[14px] px-4 py-3 flex items-start gap-2.5 text-xs text-text-muted" style={{ background: 'rgba(10,224,208,0.06)', border: '1px solid rgba(10,224,208,0.15)' }}>
+          <div className="rounded-[14px] px-4 py-3 flex items-start gap-2.5 text-xs text-text-secondary" style={{ background: 'rgba(10,224,208,0.1)', border: '1px solid rgba(10,224,208,0.3)' }}>
             <span className="text-base flex-shrink-0 mt-0.5">ℹ️</span>
             <span>{t('kyc.docUploadInfo')}</span>
           </div>
 
           {/* Clear photo warning */}
-          <div className="rounded-[14px] px-4 py-3 flex items-start gap-2.5 text-xs font-semibold" style={{ background: 'rgba(238,130,103,0.08)', border: '1px solid rgba(238,130,103,0.25)', color: '#c45a38' }}>
+          <div className="rounded-[14px] px-4 py-3 flex items-start gap-2.5 text-xs font-semibold" style={{ background: 'rgba(238,130,103,0.12)', border: '1px solid rgba(238,130,103,0.4)', color: '#b94a2a' }}>
             <span className="text-base flex-shrink-0 mt-0.5">📸</span>
             <span>{t('kyc.clearPhotoNote')}</span>
           </div>
@@ -284,7 +284,7 @@ export default function Profile() {
             { key: 'con',  field: 'confirmPassword',  label: 'Confirm Password', placeholder: 'Repeat new password' },
           ].map(({ key, field, label, placeholder }) => (
             <div key={key}>
-              <label className="text-xs font-semibold text-text-muted mb-2 block">{label}</label>
+              <label className="text-xs font-semibold text-text-secondary mb-2 block">{label}</label>
               <div className="relative">
                 <input
                   type={showPw[key] ? 'text' : 'password'}

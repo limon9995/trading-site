@@ -287,6 +287,7 @@ export default function Agent() {
       setBalanceAmount('');
       setBalanceReason('');
       fetchBalanceUsers();
+      fetchUsers();
     } catch (err) {
       toast.error(err?.response?.data?.error || 'Failed to modify balance');
     } finally {
@@ -438,7 +439,18 @@ export default function Agent() {
                         <td className="py-3 pr-4 font-medium text-[var(--ag-title)]">{u.username}</td>
                         <td className="py-3 pr-4 text-[var(--ag-muted)]">{u.email}</td>
                         <td className="py-3 pr-4"><KycBadge status={u.kycStatus} /></td>
-                        <td className="py-3 pr-4 font-mono text-[var(--ag-title)]">${(u.demo_balance || 0).toFixed(2)}</td>
+                        <td className="py-3 pr-4">
+                          <div className="flex items-center gap-2">
+                            <span className="font-mono text-[var(--ag-title)]">${(u.demo_balance || 0).toFixed(2)}</span>
+                            {perms.includes('manage_balance') && (
+                              <button
+                                title="Edit balance"
+                                className="rounded-full bg-amber-500/15 border border-amber-500/30 px-2 py-0.5 text-[10px] font-semibold text-amber-400 hover:bg-amber-500/25 transition-all"
+                                onClick={() => { setBalanceModal(u); setBalanceAmount(''); setBalanceReason(''); }}
+                              >✏️ Edit</button>
+                            )}
+                          </div>
+                        </td>
                         <td className="py-3 pr-4">
                           {u.isBanned
                             ? <span className="rounded-full bg-red-500/10 px-2.5 py-0.5 text-[11px] font-semibold text-red-400">Banned</span>
