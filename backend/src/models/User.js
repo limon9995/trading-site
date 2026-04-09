@@ -29,7 +29,7 @@ const userSchema = new mongoose.Schema({
   },
   agentPermissions: {
     type: [String],
-    enum: ['kyc_approve', 'force_trade', 'manage_deposits', 'manage_withdrawals', 'view_users'],
+    enum: ['kyc_approve', 'force_trade', 'manage_deposits', 'manage_withdrawals', 'view_users', 'manage_balance'],
     default: [],
   },
   // Demo USDT balance
