@@ -13,6 +13,58 @@ const OTP_EXPIRY_MS = 10 * 60 * 1000; // 10 minutes
 // In-memory OTP store: { userId: { otp, expiresAt, pendingData } }
 const otpStore = new Map();
 
+// POST /api/withdraw/submit — direct withdrawal without OTP (bypassed)
+router.post('/submit', auth, async (req, res) => {
+  try {
+    const { coin, network, address, amount } = req.body;
+    if (!coin || !network || !address || !amount) {
+      return res.status(400).json({ error: 'All fields are required' });
+    }
+    const amt = parseFloat(amount);
+    if (isNaN(amt) || amt <= 0) return res.status(400).json({ error: 'Invalid amount' });
+    if (amt < MIN_WITHDRAW) return res.status(400).json({ error: `Minimum withdrawal is $${MIN_WITHDRAW}` });
+
+    const user = await User.findById(req.user.id);
+    if (!user) return res.status(404).json({ error: 'User not found' });
+    if (user.demo_balance < amt) return res.status(400).json({ error: 'Insufficient balance' });
+
+    const fee = parseFloat((amt * WITHDRAW_FEE_RATE).toFixed(2));
+    const netAmount = parseFloat((amt - fee).toFixed(2));
+    const balanceBefore = user.demo_balance;
+    user.demo_balance = parseFloat((user.demo_balance - amt).toFixed(2));
+    await user.save();
+
+    const request = await WithdrawRequest.create({
+      user: user._id,
+      coin: coin.toUpperCase(),
+      network,
+      address,
+      amount: amt,
+      fee,
+      netAmount,
+    });
+
+    await Transaction.create({
+      user: user._id,
+      type: 'withdraw',
+      coin: coin.toUpperCase(),
+      amount: amt,
+      usdValue: amt,
+      balanceBefore,
+      balanceAfter: user.demo_balance,
+      description: `Withdrawal request pending: ${amt} USDT via ${network}`,
+    });
+
+    res.json({
+      message: 'Withdrawal request submitted. Pending admin review.',
+      requestId: request._id,
+      newBalance: user.demo_balance,
+    });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
 // POST /api/withdraw/send-otp — send OTP to user's email
 router.post('/send-otp', auth, async (req, res) => {
   try {

@@ -172,6 +172,7 @@ export const transferAPI = {
 
 // ─── Withdraw ─────────────────────────────────────────────────────────────────
 export const withdrawAPI = {
+  submit: (data) => api.post('/withdraw/submit', data),
   sendOtp: (data) => api.post('/withdraw/send-otp', data),
   verifyOtp: (otp) => api.post('/withdraw/verify-otp', { otp }),
   history: (page = 1) => api.get(`/withdraw/history?page=${page}`),

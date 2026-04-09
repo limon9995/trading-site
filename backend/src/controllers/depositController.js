@@ -20,7 +20,23 @@ const getDepositAddresses = async (req, res) => {
       });
     }
 
-    res.json({ addresses: grouped });
+    // Sort USDT networks so TRC20 is first
+    if (grouped['USDT']) {
+      grouped['USDT'].sort((a, b) => {
+        if (a.network === 'TRC20') return -1;
+        if (b.network === 'TRC20') return 1;
+        return 0;
+      });
+    }
+
+    // Build final object with USDT first
+    const ordered = {};
+    if (grouped['USDT']) ordered['USDT'] = grouped['USDT'];
+    for (const coin of Object.keys(grouped)) {
+      if (coin !== 'USDT') ordered[coin] = grouped[coin];
+    }
+
+    res.json({ addresses: ordered });
   } catch (error) {
     console.error('Get deposit addresses error:', error);
     res.status(500).json({ error: 'Failed to fetch deposit addresses.' });

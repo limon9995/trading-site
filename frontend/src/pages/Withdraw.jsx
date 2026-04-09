@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import toast from 'react-hot-toast';
 import { withdrawAPI } from '../services/api';
 import { useAuth } from '../context/AuthContext';
@@ -42,16 +42,7 @@ export default function Withdraw() {
   const [selectedNetwork, setSelectedNetwork] = useState(COINS[0].networks[0]);
   const [address, setAddress] = useState('');
   const [amount, setAmount] = useState('');
-  const [sending, setSending] = useState(false);
-
-  // OTP state
-  const [otpStep, setOtpStep] = useState(false); // show OTP modal
-  const [otpEmail, setOtpEmail] = useState('');
-  const [otp, setOtp] = useState(['', '', '', '', '', '']);
-  const [verifying, setVerifying] = useState(false);
-  const [resendTimer, setResendTimer] = useState(0);
-  const otpRefs = useRef([]);
-  const timerRef = useRef(null);
+  const [submitting, setSubmitting] = useState(false);
 
   // History state
   const [history, setHistory] = useState([]);
@@ -63,14 +54,6 @@ export default function Withdraw() {
   const amt = parseFloat(amount) || 0;
   const fee = parseFloat((amt * WITHDRAW_FEE_RATE).toFixed(2));
   const netAmount = Math.max(0, parseFloat((amt - fee).toFixed(2)));
-
-  // Countdown timer for resend
-  useEffect(() => {
-    if (resendTimer > 0) {
-      timerRef.current = setTimeout(() => setResendTimer(t => t - 1), 1000);
-    }
-    return () => clearTimeout(timerRef.current);
-  }, [resendTimer]);
 
   const handleCoinChange = (symbol) => {
     const coin = COINS.find(c => c.symbol === symbol);
@@ -92,94 +75,29 @@ export default function Withdraw() {
     if (tab === 'history') fetchHistory();
   }, [tab, histPage]);
 
-  // Step 1: Send OTP
-  const handleSendOtp = async (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     if (!address.trim()) return toast.error('Enter wallet address');
     if (amt < MIN_WITHDRAW) return toast.error(`Minimum withdrawal is $${MIN_WITHDRAW}`);
     if (amt > balance) return toast.error('Insufficient balance');
 
-    setSending(true);
+    setSubmitting(true);
     try {
-      const { data } = await withdrawAPI.sendOtp({
+      const { data } = await withdrawAPI.submit({
         coin: selectedCoin.symbol,
         network: selectedNetwork,
         address: address.trim(),
         amount: amt,
       });
-      setOtpEmail(data.email);
-      setOtp(['', '', '', '', '', '']);
-      setOtpStep(true);
-      setResendTimer(60);
       toast.success(data.message);
-      setTimeout(() => otpRefs.current[0]?.focus(), 100);
-    } catch (err) {
-      toast.error(err.response?.data?.error || 'Failed to send OTP');
-    } finally { setSending(false); }
-  };
-
-  // OTP input handling
-  const handleOtpChange = (index, value) => {
-    if (!/^\d*$/.test(value)) return;
-    const newOtp = [...otp];
-    newOtp[index] = value.slice(-1);
-    setOtp(newOtp);
-    if (value && index < 5) otpRefs.current[index + 1]?.focus();
-  };
-
-  const handleOtpKeyDown = (index, e) => {
-    if (e.key === 'Backspace' && !otp[index] && index > 0) {
-      otpRefs.current[index - 1]?.focus();
-    }
-  };
-
-  const handleOtpPaste = (e) => {
-    e.preventDefault();
-    const pasted = e.clipboardData.getData('text').replace(/\D/g, '').slice(0, 6);
-    const newOtp = [...otp];
-    pasted.split('').forEach((char, i) => { newOtp[i] = char; });
-    setOtp(newOtp);
-    otpRefs.current[Math.min(pasted.length, 5)]?.focus();
-  };
-
-  // Step 2: Verify OTP and submit
-  const handleVerifyOtp = async () => {
-    const otpValue = otp.join('');
-    if (otpValue.length !== 6) return toast.error('Enter the 6-digit OTP');
-    setVerifying(true);
-    try {
-      const { data } = await withdrawAPI.verifyOtp(otpValue);
-      toast.success(data.message);
-      setOtpStep(false);
-      setOtp(['', '', '', '', '', '']);
       setAmount('');
       setAddress('');
       if (refreshUser) refreshUser();
       setTab('history');
       setHistPage(1);
     } catch (err) {
-      toast.error(err.response?.data?.error || 'Invalid OTP');
-    } finally { setVerifying(false); }
-  };
-
-  // Resend OTP
-  const handleResend = async () => {
-    if (resendTimer > 0) return;
-    setSending(true);
-    try {
-      const { data } = await withdrawAPI.sendOtp({
-        coin: selectedCoin.symbol,
-        network: selectedNetwork,
-        address: address.trim(),
-        amount: amt,
-      });
-      setOtp(['', '', '', '', '', '']);
-      setResendTimer(60);
-      toast.success('New OTP sent');
-      setTimeout(() => otpRefs.current[0]?.focus(), 100);
-    } catch (err) {
-      toast.error(err.response?.data?.error || 'Failed to resend OTP');
-    } finally { setSending(false); }
+      toast.error(err.response?.data?.error || 'Failed to submit withdrawal');
+    } finally { setSubmitting(false); }
   };
 
   return (
@@ -207,8 +125,8 @@ export default function Withdraw() {
       </div>
 
       {/* ── Withdraw Form ── */}
-      {tab === 'withdraw' && !otpStep && (
-        <form onSubmit={handleSendOtp} className="space-y-4">
+      {tab === 'withdraw' && (
+        <form onSubmit={handleSubmit} className="space-y-4">
           {/* Coin selector */}
           <div className={`${WITHDRAW_PANEL} space-y-3 p-5`}>
             <p className="text-xs font-semibold text-text-muted uppercase tracking-wide">{t('withdraw.selectCoin')}</p>
@@ -291,86 +209,21 @@ export default function Withdraw() {
             </div>
           </div>
 
-          <button type="submit" disabled={sending || amt < MIN_WITHDRAW || amt > balance || !address.trim()}
+          <button type="submit" disabled={submitting || amt < MIN_WITHDRAW || amt > balance || !address.trim()}
             className="h-14 w-full rounded-full text-sm font-semibold text-white shadow-[0_18px_40px_rgba(24,91,100,0.35)] transition-all hover:-translate-y-0.5 disabled:opacity-50 disabled:cursor-not-allowed"
             style={{ background: 'linear-gradient(135deg, #185B64, #0E2026)' }}>
-            {sending ? (
+            {submitting ? (
               <span className="flex items-center justify-center gap-2">
                 <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                Sending OTP...
+                Submitting...
               </span>
             ) : !address.trim() ? 'Enter Wallet Address'
               : amt <= 0 ? `Enter Amount (Min $${MIN_WITHDRAW})`
               : amt < MIN_WITHDRAW ? `Minimum $${MIN_WITHDRAW} Required`
               : amt > balance ? 'Insufficient Balance'
-              : 'Send OTP & Continue'}
+              : 'Submit Withdrawal'}
           </button>
-          <p className="text-center text-[10px] text-text-muted/50">An OTP will be sent to your registered email</p>
         </form>
-      )}
-
-      {/* ── OTP Verification Step ── */}
-      {tab === 'withdraw' && otpStep && (
-        <div className="space-y-5">
-          {/* OTP Card */}
-          <div className={`${WITHDRAW_PANEL} space-y-4 p-5`}>
-            {/* Header */}
-            <div className="text-center space-y-1">
-              <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full border border-brand-primary/40 bg-brand-primary/20 text-2xl">🔐</div>
-              <h2 className="text-base font-bold text-text-primary">Verify Your Email</h2>
-              <p className="text-xs text-text-muted">OTP sent to <span className="text-text-primary font-medium">{otpEmail}</span></p>
-              <p className="text-xs text-text-muted">Withdraw: <span className="text-brand-primary font-bold">${amt.toFixed(2)} USDT</span></p>
-            </div>
-
-            {/* 6-digit OTP input */}
-            <div className="flex justify-center gap-2" onPaste={handleOtpPaste}>
-              {otp.map((digit, i) => (
-                <input
-                  key={i}
-                  ref={el => otpRefs.current[i] = el}
-                  type="text"
-                  inputMode="numeric"
-                  maxLength={1}
-                  value={digit}
-                  onChange={e => handleOtpChange(i, e.target.value)}
-                  onKeyDown={e => handleOtpKeyDown(i, e)}
-                  className="w-11 h-14 text-center text-xl font-bold text-text-primary rounded-xl outline-none transition-all"
-                  style={{
-                    background: digit ? '#185B6418' : '#f2f3f5',
-                    border: digit ? '2px solid #185B64' : '2px solid #E8EAED',
-                  }}
-                />
-              ))}
-            </div>
-
-            {/* Verify button */}
-            <button onClick={handleVerifyOtp} disabled={verifying || otp.join('').length !== 6}
-              className="h-14 w-full rounded-full text-sm font-semibold text-white shadow-[0_18px_40px_rgba(24,91,100,0.35)] transition-all hover:-translate-y-0.5 disabled:opacity-40"
-              style={{ background: 'linear-gradient(135deg, #185B64, #0E2026)' }}>
-              {verifying ? (
-                <span className="flex items-center justify-center gap-2">
-                  <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                  Verifying...
-                </span>
-              ) : 'Confirm Withdrawal'}
-            </button>
-
-            {/* Resend */}
-            <div className="text-center">
-              <span className="text-xs text-text-muted">Didn't receive OTP? </span>
-              <button onClick={handleResend} disabled={resendTimer > 0 || sending}
-                className={`text-xs font-semibold transition-colors ${resendTimer > 0 ? 'text-text-muted' : 'text-brand-primary hover:underline'} disabled:opacity-60`}>
-                {resendTimer > 0 ? `Resend in ${resendTimer}s` : 'Resend OTP'}
-              </button>
-            </div>
-          </div>
-
-          {/* Back button */}
-          <button onClick={() => setOtpStep(false)}
-            className="w-full rounded-full border border-[#d8e4e5] bg-white py-3 text-sm font-semibold text-[#506d72] transition-all hover:-translate-y-0.5">
-            ← Back to Edit
-          </button>
-        </div>
       )}
 
       {/* ── History ── */}

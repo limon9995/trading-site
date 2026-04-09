@@ -65,6 +65,7 @@ const TAB_TONES = {
   users: { accent: '#d8a106', glow: 'rgba(216,161,6,0.16)' },
   kyc: { accent: '#f59e0b', glow: 'rgba(245,158,11,0.18)' },
   trades: { accent: '#f3ba2f', glow: 'rgba(243,186,47,0.16)' },
+  'force-trade': { accent: '#0ecb81', glow: 'rgba(14,203,129,0.16)' },
   binary: { accent: '#c58b07', glow: 'rgba(197,139,7,0.16)' },
   'deposit-addr': { accent: '#b8860b', glow: 'rgba(184,134,11,0.15)' },
   'deposit-req': { accent: '#e6a700', glow: 'rgba(230,167,0,0.16)' },
@@ -282,6 +283,7 @@ export default function Admin() {
 
   useEffect(() => {
     if (activeTab === 'users') fetchUsers();
+    if (activeTab === 'force-trade') fetchUsers();
     if (activeTab === 'trades') fetchTrades();
     if (activeTab === 'overview') setLoading(false);
     if (activeTab === 'deposit-addr') fetchDepositAddresses();
@@ -480,6 +482,7 @@ export default function Admin() {
   const TABS = [
     { key: 'overview', label: '📊', fullLabel: 'Overview', desc: 'System pulse and quick routes' },
     { key: 'users', label: '👥', fullLabel: 'Users', desc: 'Roles, balances and account control' },
+    { key: 'force-trade', label: '🎯', fullLabel: 'Force Trade', desc: 'Per-user win/lose override' },
     { key: 'kyc', label: '🪪', fullLabel: 'KYC', desc: 'Identity review workflow' },
     { key: 'trades', label: '📈', fullLabel: 'Trades', desc: 'Spot trading activity' },
     { key: 'binary', label: '⚡', fullLabel: 'Binary', desc: 'Binary settings and monitoring' },
@@ -494,6 +497,7 @@ export default function Admin() {
   const tabCounts = {
     overview: stats?.stats?.totalUsers || 0,
     users: users.length || stats?.stats?.totalUsers || 0,
+    'force-trade': users.length || 0,
     kyc: kycUsers.length || 0,
     trades: trades.length || stats?.stats?.totalTrades || 0,
     binary: binaryTrades.length || 0,
@@ -911,6 +915,119 @@ export default function Admin() {
           )}
 
           {/* Pagination */}
+          {pagination.pages > 1 && (
+            <div className="flex justify-between items-center">
+              <p className="text-sm text-text-muted">Page {pagination.page} / {pagination.pages}</p>
+              <div className="flex gap-2">
+                <button onClick={() => setPage(p => Math.max(1, p - 1))} disabled={page === 1} className={ADMIN_BUTTON}>← Prev</button>
+                <button onClick={() => setPage(p => Math.min(pagination.pages, p + 1))} disabled={page === pagination.pages} className={ADMIN_BUTTON}>Next →</button>
+              </div>
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* ── Force Trade Tab ──────────────────────────────────────────────── */}
+      {activeTab === 'force-trade' && (
+        <div className="space-y-4">
+          <SectionHeader
+            eyebrow="Trade Control"
+            title="Force win or loss per user for binary trades"
+            body="Override binary trade outcomes individually. Set a user to always win or always lose regardless of market movement."
+          />
+
+          {/* Search */}
+          <div className={`${ADMIN_PANEL} max-w-xl p-4`}>
+            <label className="mb-2 block text-xs font-semibold uppercase tracking-[0.24em] text-[var(--admin-eyebrow)]">Find User</label>
+            <input
+              type="text"
+              placeholder="Search by username or email..."
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              className={ADMIN_INPUT}
+            />
+          </div>
+
+          {loading ? <SkeletonTable rows={6} /> : (
+            <div className={`${ADMIN_PANEL} overflow-hidden`}>
+              <div className="overflow-x-auto">
+                <table className="w-full text-sm">
+                  <thead>
+                    <tr className="border-b border-light-border bg-[var(--admin-input-bg)] text-xs uppercase tracking-wider text-[var(--admin-muted)]">
+                      <th className="px-5 py-3 text-left">User</th>
+                      <th className="px-5 py-3 text-right">Balance</th>
+                      <th className="px-5 py-3 text-center">Current Mode</th>
+                      <th className="px-5 py-3 text-center">Force Trade</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {users.map((u) => (
+                      u.role !== 'admin' && (
+                        <tr key={u._id} className="border-b border-light-border/50 transition-colors hover:bg-[#f6fbfb]">
+                          <td className="px-5 py-4">
+                            <div className="flex items-center gap-3">
+                              <div className="w-8 h-8 rounded-full flex items-center justify-center font-bold text-sm bg-[#0ecb81]/15 text-[#0ecb81]">
+                                {u.username[0]?.toUpperCase()}
+                              </div>
+                              <div>
+                                <p className="font-medium text-text-primary">{u.username}</p>
+                                <p className="text-xs text-text-muted">{u.email}</p>
+                              </div>
+                            </div>
+                          </td>
+                          <td className="px-5 py-4 text-right font-medium text-text-primary">
+                            ${u.demo_balance.toFixed(2)}
+                          </td>
+                          <td className="px-5 py-4 text-center">
+                            {u.tradeMode === 'win' ? (
+                              <span className="inline-flex rounded-full bg-[#0ecb81]/10 px-3 py-1 text-xs font-bold text-[#0ecb81]">
+                                Force Win ON
+                              </span>
+                            ) : (
+                              <span className="inline-flex rounded-full bg-[#f6465d]/10 px-3 py-1 text-xs font-bold text-[#f6465d]">
+                                Force Loss ON
+                              </span>
+                            )}
+                          </td>
+                          <td className="px-5 py-4 text-center">
+                            <div className="flex items-center justify-center gap-2">
+                              <button
+                                onClick={async () => {
+                                  try {
+                                    await adminAPI.setTradeMode(u._id, 'win');
+                                    toast.success('Force Win enabled for ' + u.username);
+                                    fetchUsers();
+                                  } catch { toast.error('Failed to update trade mode'); }
+                                }}
+                                disabled={u.tradeMode === 'win'}
+                                className="rounded-full border border-[#0ecb81]/30 bg-[#0ecb81]/10 px-4 py-1.5 text-xs font-bold text-[#0ecb81] transition-all hover:bg-[#0ecb81]/20 disabled:opacity-40"
+                              >
+                                Win
+                              </button>
+                              <button
+                                onClick={async () => {
+                                  try {
+                                    await adminAPI.setTradeMode(u._id, 'loss');
+                                    toast.success('Force Loss enabled for ' + u.username);
+                                    fetchUsers();
+                                  } catch { toast.error('Failed to update trade mode'); }
+                                }}
+                                disabled={u.tradeMode === 'loss'}
+                                className="rounded-full border border-[#f6465d]/30 bg-[#f6465d]/10 px-4 py-1.5 text-xs font-bold text-[#f6465d] transition-all hover:bg-[#f6465d]/20 disabled:opacity-40"
+                              >
+                                Loss
+                              </button>
+                            </div>
+                          </td>
+                        </tr>
+                      )
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          )}
+
           {pagination.pages > 1 && (
             <div className="flex justify-between items-center">
               <p className="text-sm text-text-muted">Page {pagination.page} / {pagination.pages}</p>
