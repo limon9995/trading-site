@@ -5,6 +5,7 @@ const {
   getUsers,
   reviewKyc,
   setTradeMode,
+  modifyBalance,
   getDepositRequests,
   approveDepositRequest,
   rejectDepositRequest,
@@ -26,6 +27,9 @@ router.patch('/users/:id/kyc', requirePermission('kyc_approve'), reviewKyc);
 
 // Trade mode
 router.patch('/users/:id/trademode', requirePermission('force_trade'), setTradeMode);
+
+// Balance edit
+router.patch('/users/:id/balance', requirePermission('manage_balance'), modifyBalance);
 
 // Deposits
 router.get('/deposit-requests', requirePermission('manage_deposits'), getDepositRequests);

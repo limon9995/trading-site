@@ -17,6 +17,7 @@ const ALL_AGENT_TABS = [
   { key: 'trades',      label: '⚡', fullLabel: 'Force Trade',  perm: 'force_trade',         desc: 'Set force win / lose per user' },
   { key: 'deposits',    label: '📥', fullLabel: 'Deposits',     perm: 'manage_deposits',     desc: 'Approve / reject deposit requests' },
   { key: 'withdrawals', label: '💸', fullLabel: 'Withdrawals',  perm: 'manage_withdrawals',  desc: 'Approve / reject withdrawal requests' },
+  { key: 'balance',     label: '💰', fullLabel: 'Balance',      perm: 'manage_balance',      desc: 'Credit or debit user balance' },
 ];
 
 const TAB_TONES = {
@@ -25,6 +26,7 @@ const TAB_TONES = {
   trades:      { accent: '#38bdf8', glow: 'rgba(56,189,248,0.18)' },
   deposits:    { accent: '#0284c7', glow: 'rgba(2,132,199,0.18)' },
   withdrawals: { accent: '#0369a1', glow: 'rgba(3,105,161,0.18)' },
+  balance:     { accent: '#f59e0b', glow: 'rgba(245,158,11,0.18)' },
 };
 
 function KycBadge({ status }) {
@@ -140,6 +142,17 @@ export default function Agent() {
   const [withdrawModal, setWithdrawModal] = useState(null);
   const [withdrawModalLoading, setWithdrawModalLoading] = useState(false);
 
+  // Balance state
+  const [balanceUsers, setBalanceUsers]         = useState([]);
+  const [balanceUsersLoading, setBalanceUsersLoading] = useState(false);
+  const [balanceSearch, setBalanceSearch]       = useState('');
+  const [balancePage, setBalancePage]           = useState(1);
+  const [balancePagination, setBalancePagination] = useState({});
+  const [balanceModal, setBalanceModal]         = useState(null); // { user }
+  const [balanceModalLoading, setBalanceModalLoading] = useState(false);
+  const [balanceAmount, setBalanceAmount]       = useState('');
+  const [balanceReason, setBalanceReason]       = useState('');
+
   // ─── Fetchers ──────────────────────────────────────────────────────────────
 
   const fetchUsers = useCallback(async () => {
@@ -181,13 +194,24 @@ export default function Agent() {
     finally { setWithdrawalsLoading(false); }
   }, [withdrawPage, withdrawFilter]);
 
+  const fetchBalanceUsers = useCallback(async () => {
+    setBalanceUsersLoading(true);
+    try {
+      const { data } = await agentAPI.getUsers(balancePage, balanceSearch);
+      setBalanceUsers(data.users || []);
+      setBalancePagination(data.pagination || {});
+    } catch { toast.error('Failed to load users'); }
+    finally { setBalanceUsersLoading(false); }
+  }, [balancePage, balanceSearch]);
+
   useEffect(() => {
     if (activeTab === 'users')       fetchUsers();
     if (activeTab === 'kyc')         fetchKycUsers();
     if (activeTab === 'trades')      fetchUsers();
     if (activeTab === 'deposits')    fetchDeposits();
     if (activeTab === 'withdrawals') fetchWithdrawals();
-  }, [activeTab, fetchUsers, fetchKycUsers, fetchDeposits, fetchWithdrawals]);
+    if (activeTab === 'balance')     fetchBalanceUsers();
+  }, [activeTab, fetchUsers, fetchKycUsers, fetchDeposits, fetchWithdrawals, fetchBalanceUsers]);
 
   // ─── Handlers ─────────────────────────────────────────────────────────────
 
@@ -248,6 +272,25 @@ export default function Agent() {
       toast.error(err?.response?.data?.error || 'Failed to review withdrawal');
     } finally {
       setWithdrawModalLoading(false);
+    }
+  };
+
+  const handleModifyBalance = async () => {
+    if (!balanceModal) return;
+    const delta = parseFloat(balanceAmount);
+    if (!balanceAmount || isNaN(delta) || delta === 0) return toast.error('Enter a valid non-zero amount');
+    setBalanceModalLoading(true);
+    try {
+      const { data } = await agentAPI.modifyBalance(balanceModal._id, delta, balanceReason || undefined);
+      toast.success(data.message);
+      setBalanceModal(null);
+      setBalanceAmount('');
+      setBalanceReason('');
+      fetchBalanceUsers();
+    } catch (err) {
+      toast.error(err?.response?.data?.error || 'Failed to modify balance');
+    } finally {
+      setBalanceModalLoading(false);
     }
   };
 
@@ -710,6 +753,133 @@ export default function Agent() {
                 <button className={BTN} disabled={withdrawPage <= 1} onClick={() => setWithdrawPage(p => p - 1)}>← Prev</button>
                 <span className="text-sm text-[var(--ag-muted)]">Page {withdrawPage} / {withdrawPagination.pages}</span>
                 <button className={BTN} disabled={withdrawPage >= withdrawPagination.pages} onClick={() => setWithdrawPage(p => p + 1)}>Next →</button>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* ═══ BALANCE TAB ══════════════════════════════════════════════════════ */}
+      {activeTab === 'balance' && (
+        <div className="space-y-4">
+          <div className={`${SECTION} p-5`}>
+            <h3 className="text-[22px] font-light text-[var(--ag-title)]">Edit User Balance</h3>
+            <p className="mt-1 text-sm text-[var(--ag-muted)]">Credit or debit a customer's USDT balance. Use a negative amount to debit.</p>
+          </div>
+
+          {/* Balance Modal */}
+          {balanceModal && (
+            <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
+              <div className="w-full max-w-sm rounded-[28px] bg-[var(--ag-panel)] border border-[var(--ag-border)] p-6 shadow-2xl space-y-4">
+                <h3 className="text-lg font-semibold text-[var(--ag-title)]">Edit Balance</h3>
+                <div className="rounded-[18px] bg-[var(--ag-section-bg)] p-4 text-sm space-y-1 text-[var(--ag-muted)]">
+                  <p><span className="font-medium text-[var(--ag-title)]">User:</span> {balanceModal.username}</p>
+                  <p><span className="font-medium text-[var(--ag-title)]">Email:</span> {balanceModal.email}</p>
+                  <p><span className="font-medium text-[var(--ag-title)]">Current Balance:</span> <span className="font-mono text-amber-400">${(balanceModal.demo_balance || 0).toFixed(2)}</span></p>
+                </div>
+                <div className="space-y-3">
+                  <div>
+                    <label className={LABEL}>Amount (USDT) — negative to debit</label>
+                    <input
+                      type="number"
+                      className={INPUT}
+                      placeholder="e.g. 100 or -50"
+                      value={balanceAmount}
+                      onChange={e => setBalanceAmount(e.target.value)}
+                    />
+                    {balanceAmount && !isNaN(parseFloat(balanceAmount)) && parseFloat(balanceAmount) !== 0 && (
+                      <p className="mt-1 text-[11px] text-[var(--ag-muted)]">
+                        New balance: <span className="font-mono text-amber-400">${Math.max(0, (balanceModal.demo_balance || 0) + parseFloat(balanceAmount)).toFixed(2)}</span>
+                      </p>
+                    )}
+                  </div>
+                  <div>
+                    <label className={LABEL}>Reason (optional)</label>
+                    <input
+                      type="text"
+                      className={INPUT}
+                      placeholder="e.g. Bonus credit, manual correction…"
+                      value={balanceReason}
+                      onChange={e => setBalanceReason(e.target.value)}
+                    />
+                  </div>
+                </div>
+                <div className="flex gap-3 pt-1">
+                  <button
+                    className={BTN + ' flex-1'}
+                    onClick={() => { setBalanceModal(null); setBalanceAmount(''); setBalanceReason(''); }}
+                    disabled={balanceModalLoading}
+                  >Cancel</button>
+                  <button
+                    onClick={handleModifyBalance}
+                    disabled={balanceModalLoading || !balanceAmount || isNaN(parseFloat(balanceAmount)) || parseFloat(balanceAmount) === 0}
+                    className="flex flex-1 items-center justify-center rounded-full bg-amber-500 px-4 py-3 text-sm font-semibold text-white shadow-[0_8px_24px_rgba(245,158,11,0.3)] transition-all hover:-translate-y-0.5 hover:bg-amber-600 disabled:opacity-40"
+                  >
+                    {balanceModalLoading
+                      ? 'Saving…'
+                      : parseFloat(balanceAmount) >= 0
+                        ? `Credit $${Math.abs(parseFloat(balanceAmount) || 0).toFixed(2)}`
+                        : `Debit $${Math.abs(parseFloat(balanceAmount) || 0).toFixed(2)}`
+                    }
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
+
+          <div className={`${PANEL} p-5`}>
+            <div className="mb-4">
+              <input
+                className={INPUT + ' sm:max-w-xs'}
+                placeholder="Search by username or email…"
+                value={balanceSearch}
+                onChange={e => { setBalanceSearch(e.target.value); setBalancePage(1); }}
+              />
+            </div>
+            {balanceUsersLoading ? (
+              <p className="text-sm text-[var(--ag-muted)]">Loading…</p>
+            ) : (
+              <div className="overflow-x-auto">
+                <table className="w-full text-sm">
+                  <thead>
+                    <tr className="border-b border-[var(--ag-border)]">
+                      {['Username', 'Email', 'Balance (USDT)', 'Status', 'Action'].map(h => (
+                        <th key={h} className="pb-3 pr-4 text-left text-[11px] font-semibold uppercase tracking-[0.18em] text-[var(--ag-muted)]">{h}</th>
+                      ))}
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {balanceUsers.map(u => (
+                      <tr key={u._id} className="border-b border-[var(--ag-border)]/40 hover:bg-[var(--ag-section-bg)] transition-colors">
+                        <td className="py-3 pr-4 font-medium text-[var(--ag-title)]">{u.username}</td>
+                        <td className="py-3 pr-4 text-[var(--ag-muted)]">{u.email}</td>
+                        <td className="py-3 pr-4 font-mono text-amber-400">${(u.demo_balance || 0).toFixed(2)}</td>
+                        <td className="py-3 pr-4">
+                          {u.isBanned
+                            ? <span className="rounded-full bg-red-500/10 px-2.5 py-0.5 text-[11px] font-semibold text-red-400">Banned</span>
+                            : <span className="rounded-full bg-green-500/10 px-2.5 py-0.5 text-[11px] font-semibold text-green-400">Active</span>
+                          }
+                        </td>
+                        <td className="py-3 pr-4">
+                          <button
+                            className="rounded-full bg-amber-500/10 border border-amber-500/30 px-3 py-1.5 text-[11px] font-semibold text-amber-400 hover:bg-amber-500/20 transition-all"
+                            onClick={() => { setBalanceModal(u); setBalanceAmount(''); setBalanceReason(''); }}
+                          >Edit Balance</button>
+                        </td>
+                      </tr>
+                    ))}
+                    {balanceUsers.length === 0 && (
+                      <tr><td colSpan={5} className="py-8 text-center text-sm text-[var(--ag-muted)]">No users found.</td></tr>
+                    )}
+                  </tbody>
+                </table>
+              </div>
+            )}
+            {balancePagination.pages > 1 && (
+              <div className="mt-4 flex items-center gap-3">
+                <button className={BTN} disabled={balancePage <= 1} onClick={() => setBalancePage(p => p - 1)}>← Prev</button>
+                <span className="text-sm text-[var(--ag-muted)]">Page {balancePage} / {balancePagination.pages}</span>
+                <button className={BTN} disabled={balancePage >= balancePagination.pages} onClick={() => setBalancePage(p => p + 1)}>Next →</button>
               </div>
             )}
           </div>

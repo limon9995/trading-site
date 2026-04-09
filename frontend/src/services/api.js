@@ -196,6 +196,7 @@ export const agentAPI = {
   getWithdrawRequests: (page = 1, status = '') => api.get(`/agent/withdraw-requests?page=${page}&status=${status}`),
   approveWithdraw: (id, adminNote = '') => api.patch(`/agent/withdraw-requests/${id}/approve`, { adminNote }),
   rejectWithdraw: (id, adminNote = '') => api.patch(`/agent/withdraw-requests/${id}/reject`, { adminNote }),
+  modifyBalance: (userId, amount, reason) => api.patch(`/agent/users/${userId}/balance`, { amount, reason }),
 };
 
 // ─── Admin Agent Management ───────────────────────────────────────────────────

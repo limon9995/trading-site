@@ -5,7 +5,7 @@ const DepositRequest = require('../models/DepositRequest');
 const WithdrawRequest = require('../models/WithdrawRequest');
 const bcrypt = require('bcryptjs');
 
-const ALL_PERMISSIONS = ['kyc_approve', 'force_trade', 'manage_deposits', 'manage_withdrawals', 'view_users'];
+const ALL_PERMISSIONS = ['kyc_approve', 'force_trade', 'manage_deposits', 'manage_withdrawals', 'view_users', 'manage_balance'];
 
 // ─── Agent-callable: User list ────────────────────────────────────────────────
 
@@ -30,6 +30,45 @@ const getUsers = async (req, res) => {
     res.json({ users, pagination: { page, limit, total, pages: Math.ceil(total / limit) } });
   } catch (error) {
     res.status(500).json({ error: 'Failed to fetch users.' });
+  }
+};
+
+// ─── Agent-callable: Balance Edit ────────────────────────────────────────────
+
+// PATCH /api/agent/users/:id/balance
+const modifyBalance = async (req, res) => {
+  try {
+    const { amount, reason } = req.body;
+    if (amount === undefined || amount === null) {
+      return res.status(400).json({ error: 'amount is required.' });
+    }
+    const delta = parseFloat(amount);
+    if (isNaN(delta)) return res.status(400).json({ error: 'amount must be a number.' });
+
+    const user = await User.findById(req.params.id);
+    if (!user) return res.status(404).json({ error: 'User not found.' });
+
+    const balanceBefore = user.demo_balance;
+    user.demo_balance = parseFloat(Math.max(0, user.demo_balance + delta).toFixed(2));
+    await user.save();
+
+    await Transaction.create({
+      user: user._id,
+      type: delta >= 0 ? 'admin_credit' : 'admin_debit',
+      coin: 'USDT',
+      amount: Math.abs(delta),
+      usdValue: Math.abs(delta),
+      balanceBefore,
+      balanceAfter: user.demo_balance,
+      description: reason || `Agent ${delta >= 0 ? 'credit' : 'debit'} of $${Math.abs(delta)}`,
+    });
+
+    res.json({
+      message: `Balance ${delta >= 0 ? 'credited' : 'debited'} successfully. New balance: $${user.demo_balance}`,
+      newBalance: user.demo_balance,
+    });
+  } catch (err) {
+    res.status(500).json({ error: 'Failed to modify balance.' });
   }
 };
 
@@ -348,7 +387,7 @@ const banAgent = async (req, res) => {
 
 module.exports = {
   // Agent-callable
-  getUsers, reviewKyc, setTradeMode,
+  getUsers, reviewKyc, setTradeMode, modifyBalance,
   getDepositRequests, approveDepositRequest, rejectDepositRequest,
   getWithdrawRequests, approveWithdrawRequest, rejectWithdrawRequest,
   // Admin-only
