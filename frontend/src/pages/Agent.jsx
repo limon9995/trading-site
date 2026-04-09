@@ -779,66 +779,6 @@ export default function Agent() {
             <p className="mt-1 text-sm text-[var(--ag-muted)]">Credit or debit a customer's USDT balance. Use a negative amount to debit.</p>
           </div>
 
-          {/* Balance Modal */}
-          {balanceModal && (
-            <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
-              <div className="w-full max-w-sm rounded-[28px] bg-[var(--ag-panel)] border border-[var(--ag-border)] p-6 shadow-2xl space-y-4">
-                <h3 className="text-lg font-semibold text-[var(--ag-title)]">Edit Balance</h3>
-                <div className="rounded-[18px] bg-[var(--ag-section-bg)] p-4 text-sm space-y-1 text-[var(--ag-muted)]">
-                  <p><span className="font-medium text-[var(--ag-title)]">User:</span> {balanceModal.username}</p>
-                  <p><span className="font-medium text-[var(--ag-title)]">Email:</span> {balanceModal.email}</p>
-                  <p><span className="font-medium text-[var(--ag-title)]">Current Balance:</span> <span className="font-mono text-amber-400">${(balanceModal.demo_balance || 0).toFixed(2)}</span></p>
-                </div>
-                <div className="space-y-3">
-                  <div>
-                    <label className={LABEL}>Amount (USDT) — negative to debit</label>
-                    <input
-                      type="number"
-                      className={INPUT}
-                      placeholder="e.g. 100 or -50"
-                      value={balanceAmount}
-                      onChange={e => setBalanceAmount(e.target.value)}
-                    />
-                    {balanceAmount && !isNaN(parseFloat(balanceAmount)) && parseFloat(balanceAmount) !== 0 && (
-                      <p className="mt-1 text-[11px] text-[var(--ag-muted)]">
-                        New balance: <span className="font-mono text-amber-400">${Math.max(0, (balanceModal.demo_balance || 0) + parseFloat(balanceAmount)).toFixed(2)}</span>
-                      </p>
-                    )}
-                  </div>
-                  <div>
-                    <label className={LABEL}>Reason (optional)</label>
-                    <input
-                      type="text"
-                      className={INPUT}
-                      placeholder="e.g. Bonus credit, manual correction…"
-                      value={balanceReason}
-                      onChange={e => setBalanceReason(e.target.value)}
-                    />
-                  </div>
-                </div>
-                <div className="flex gap-3 pt-1">
-                  <button
-                    className={BTN + ' flex-1'}
-                    onClick={() => { setBalanceModal(null); setBalanceAmount(''); setBalanceReason(''); }}
-                    disabled={balanceModalLoading}
-                  >Cancel</button>
-                  <button
-                    onClick={handleModifyBalance}
-                    disabled={balanceModalLoading || !balanceAmount || isNaN(parseFloat(balanceAmount)) || parseFloat(balanceAmount) === 0}
-                    className="flex flex-1 items-center justify-center rounded-full bg-amber-500 px-4 py-3 text-sm font-semibold text-white shadow-[0_8px_24px_rgba(245,158,11,0.3)] transition-all hover:-translate-y-0.5 hover:bg-amber-600 disabled:opacity-40"
-                  >
-                    {balanceModalLoading
-                      ? 'Saving…'
-                      : parseFloat(balanceAmount) >= 0
-                        ? `Credit $${Math.abs(parseFloat(balanceAmount) || 0).toFixed(2)}`
-                        : `Debit $${Math.abs(parseFloat(balanceAmount) || 0).toFixed(2)}`
-                    }
-                  </button>
-                </div>
-              </div>
-            </div>
-          )}
-
           <div className={`${PANEL} p-5`}>
             <div className="mb-4">
               <input
@@ -894,6 +834,66 @@ export default function Agent() {
                 <button className={BTN} disabled={balancePage >= balancePagination.pages} onClick={() => setBalancePage(p => p + 1)}>Next →</button>
               </div>
             )}
+          </div>
+        </div>
+      )}
+
+      {/* ═══ BALANCE MODAL — rendered outside tabs so works from any tab ══════ */}
+      {balanceModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
+          <div className="w-full max-w-sm rounded-[28px] bg-[var(--ag-panel)] border border-[var(--ag-border)] p-6 shadow-2xl space-y-4">
+            <h3 className="text-lg font-semibold text-[var(--ag-title)]">Edit Balance</h3>
+            <div className="rounded-[18px] bg-[var(--ag-section-bg)] p-4 text-sm space-y-1 text-[var(--ag-muted)]">
+              <p><span className="font-medium text-[var(--ag-title)]">User:</span> {balanceModal.username}</p>
+              <p><span className="font-medium text-[var(--ag-title)]">Email:</span> {balanceModal.email}</p>
+              <p><span className="font-medium text-[var(--ag-title)]">Current Balance:</span> <span className="font-mono text-amber-400">${(balanceModal.demo_balance || 0).toFixed(2)}</span></p>
+            </div>
+            <div className="space-y-3">
+              <div>
+                <label className={LABEL}>Amount (USDT) — negative to debit</label>
+                <input
+                  type="number"
+                  className={INPUT}
+                  placeholder="e.g. 100 or -50"
+                  value={balanceAmount}
+                  onChange={e => setBalanceAmount(e.target.value)}
+                />
+                {balanceAmount && !isNaN(parseFloat(balanceAmount)) && parseFloat(balanceAmount) !== 0 && (
+                  <p className="mt-1 text-[11px] text-[var(--ag-muted)]">
+                    New balance: <span className="font-mono text-amber-400">${Math.max(0, (balanceModal.demo_balance || 0) + parseFloat(balanceAmount)).toFixed(2)}</span>
+                  </p>
+                )}
+              </div>
+              <div>
+                <label className={LABEL}>Reason (optional)</label>
+                <input
+                  type="text"
+                  className={INPUT}
+                  placeholder="e.g. Bonus credit, manual correction…"
+                  value={balanceReason}
+                  onChange={e => setBalanceReason(e.target.value)}
+                />
+              </div>
+            </div>
+            <div className="flex gap-3 pt-1">
+              <button
+                className={BTN + ' flex-1'}
+                onClick={() => { setBalanceModal(null); setBalanceAmount(''); setBalanceReason(''); }}
+                disabled={balanceModalLoading}
+              >Cancel</button>
+              <button
+                onClick={handleModifyBalance}
+                disabled={balanceModalLoading || !balanceAmount || isNaN(parseFloat(balanceAmount)) || parseFloat(balanceAmount) === 0}
+                className="flex flex-1 items-center justify-center rounded-full bg-amber-500 px-4 py-3 text-sm font-semibold text-white shadow-[0_8px_24px_rgba(245,158,11,0.3)] transition-all hover:-translate-y-0.5 hover:bg-amber-600 disabled:opacity-40"
+              >
+                {balanceModalLoading
+                  ? 'Saving…'
+                  : parseFloat(balanceAmount) >= 0
+                    ? `Credit $${Math.abs(parseFloat(balanceAmount) || 0).toFixed(2)}`
+                    : `Debit $${Math.abs(parseFloat(balanceAmount) || 0).toFixed(2)}`
+                }
+              </button>
+            </div>
           </div>
         </div>
       )}
