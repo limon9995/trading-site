@@ -798,7 +798,7 @@ export default function Admin() {
               <div className="overflow-x-auto">
                 <table className="w-full text-sm">
                   <thead>
-                    <tr className="border-b border-light-border bg-[var(--admin-input-bg)] text-xs uppercase tracking-wider text-[var(--admin-muted)]">
+                    <tr className="border-b border-[var(--admin-border)] bg-[var(--admin-input-bg)] text-xs uppercase tracking-wider text-[var(--admin-muted)]">
                       <th className="px-5 py-3 text-left">User</th>
                       <th className="px-5 py-3 text-right">Balance</th>
                       <th className="px-5 py-3 text-center">Role</th>
@@ -808,29 +808,29 @@ export default function Admin() {
                   </thead>
                   <tbody>
                     {users.map((u) => (
-                      <tr key={u._id} className={`border-b border-light-border/50 transition-colors hover:bg-[#f6fbfb] ${u.isBanned ? 'opacity-60' : ''}`}>
-                        <td className="px-5 py-4">
+                      <tr key={u._id} className={`border-b border-[var(--admin-border)] transition-colors hover:bg-[var(--admin-input-bg)] ${u.isBanned ? 'opacity-70' : ''}`}>
+                        <td className="px-5 py-3">
                           <div className="flex items-center gap-3">
-                            <div className={`w-8 h-8 rounded-full flex items-center justify-center font-bold text-sm ${u.isBanned ? 'bg-red-trade/20 text-red-trade' : 'bg-[#f0b90b]/15 text-[#9b7008]'}`}>
+                            <div className={`w-8 h-8 rounded-full flex items-center justify-center font-bold text-sm flex-shrink-0 ${u.isBanned ? 'bg-red-trade/20 text-red-trade' : 'bg-[#f0b90b]/20 text-[#f0b90b]'}`}>
                               {u.isBanned ? '🚫' : u.username[0]?.toUpperCase()}
                             </div>
                             <div>
                               <div className="flex items-center gap-2">
-                                <p className="font-medium text-text-primary">{u.username}</p>
+                                <p className="font-semibold text-[var(--admin-title)]">{u.username}</p>
                                 {u.isBanned && (
-                                  <span className="text-xs bg-red-trade/20 text-red-trade px-1.5 py-0.5 rounded font-semibold">BANNED</span>
+                                  <span className="text-[10px] bg-red-trade/20 text-red-trade px-1.5 py-0.5 rounded font-bold">BANNED</span>
                                 )}
                               </div>
-                              <p className="text-xs text-text-muted">{u.email}</p>
+                              <p className="text-xs text-[var(--admin-muted)]">{u.email}</p>
                               {u.isBanned && u.banReason && (
-                                <p className="text-xs text-red-trade/70 mt-0.5">Reason: {u.banReason}</p>
+                                <p className="text-xs text-red-trade mt-0.5">Reason: {u.banReason}</p>
                               )}
                             </div>
                           </div>
                         </td>
-                        <td className="px-5 py-4 text-right">
+                        <td className="px-5 py-3 text-right">
                           <div className="flex items-center justify-end gap-2">
-                            <span className="font-medium text-text-primary">${u.demo_balance.toFixed(2)}</span>
+                            <span className="font-bold text-[#f0b90b]">${u.demo_balance.toFixed(2)}</span>
                             <button
                               onClick={async () => {
                                 setBalanceModal({ user: u });
@@ -843,44 +843,28 @@ export default function Admin() {
                                 } catch {}
                               }}
                               title="Edit balance"
-                              className="w-6 h-6 rounded-full flex items-center justify-center bg-[#f0b90b]/20 text-[#9b7008] hover:bg-[#f0b90b]/35 transition-colors flex-shrink-0"
-                              style={{ fontSize: 12 }}
+                              className="w-7 h-7 rounded-full flex items-center justify-center bg-[#f0b90b]/25 hover:bg-[#f0b90b]/40 transition-colors flex-shrink-0"
+                              style={{ fontSize: 13 }}
                             >✏️</button>
                           </div>
                         </td>
-                        <td className="px-5 py-4 text-center">
-                          <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${
+                        <td className="px-5 py-3 text-center">
+                          <span className={`text-xs px-2.5 py-1 rounded-full font-semibold ${
                             u.role === 'admin'
-                              ? 'bg-red-trade/10 text-red-trade'
-                              : 'bg-light-border text-text-secondary'
+                              ? 'bg-red-trade/15 text-red-trade'
+                              : 'bg-[var(--admin-button-bg)] text-[var(--admin-muted)] border border-[var(--admin-border)]'
                           }`}>
                             {u.role}
                           </span>
                         </td>
-                        <td className="px-5 py-4 text-right text-xs text-text-muted">{formatDate(u.createdAt)}</td>
-                        <td className="px-5 py-4">
+                        <td className="px-5 py-3 text-right text-xs text-[var(--admin-muted)]">{formatDate(u.createdAt)}</td>
+                        <td className="px-5 py-3">
                           <div className="flex items-center justify-center gap-2 flex-wrap">
-                            {/* Modify balance */}
-                            <button
-                              onClick={async () => {
-                                setBalanceModal({ user: u });
-                                setBalanceCoin('USDT');
-                                setBalanceCoinAmount('');
-                                setBalanceReason('');
-                                try {
-                                  const { data } = await marketAPI.getPrices();
-                                  setCoinPrices(data.prices || data || {});
-                                } catch {}
-                              }}
-                              className="rounded-full bg-[#f0b90b]/15 px-3 py-1.5 text-xs font-semibold text-[#9b7008] transition-colors hover:bg-[#f0b90b]/25"
-                            >
-                              Balance
-                            </button>
                             {/* Toggle role */}
                             {u.role !== 'admin' && (
                               <button
                                 onClick={() => handleSetRole(u._id, 'admin')}
-                                className="rounded-full border border-light-border bg-[#f7fbfb] px-3 py-1.5 text-xs font-semibold text-text-secondary transition-colors hover:bg-light-border"
+                                className={`${ADMIN_BUTTON} text-[11px] px-3 py-1.5`}
                               >
                                 Make Admin
                               </button>
@@ -888,7 +872,7 @@ export default function Admin() {
                             {u.role === 'admin' && (
                               <button
                                 onClick={() => handleSetRole(u._id, 'user')}
-                                className="rounded-full border border-light-border bg-[#f7fbfb] px-3 py-1.5 text-xs font-semibold text-text-secondary transition-colors hover:bg-light-border"
+                                className={`${ADMIN_BUTTON} text-[11px] px-3 py-1.5`}
                               >
                                 Demote
                               </button>
@@ -899,8 +883,8 @@ export default function Admin() {
                                 onClick={() => handleBanUser(u._id, u.isBanned)}
                                 className={`rounded-full px-3 py-1.5 text-xs font-semibold transition-colors ${
                                   u.isBanned
-                                  ? 'bg-green-trade/10 text-green-trade hover:bg-green-trade/20'
-                                    : 'bg-red-trade/10 text-red-trade hover:bg-red-trade/20'
+                                  ? 'bg-green-trade/15 text-green-trade hover:bg-green-trade/25'
+                                    : 'bg-red-trade/15 text-red-trade hover:bg-red-trade/25'
                                 }`}
                               >
                                 {u.isBanned ? '✓ Unban' : '🚫 Ban'}
@@ -910,7 +894,6 @@ export default function Admin() {
                             {u.role !== 'admin' && (
                               <button
                                 onClick={() => handleSetTradeMode(u._id, u.tradeMode)}
-                                title={u.tradeMode === 'win' ? 'Disable force win for this customer' : 'Enable force win for this customer'}
                                 className="rounded-full border px-3 py-1.5 text-xs font-bold transition-colors"
                                 style={{
                                   background: u.tradeMode === 'win' ? 'rgba(14,203,129,0.15)' : 'rgba(246,70,93,0.12)',
@@ -918,7 +901,7 @@ export default function Admin() {
                                   borderColor: u.tradeMode === 'win' ? 'rgba(14,203,129,0.3)' : 'rgba(246,70,93,0.25)',
                                 }}
                               >
-                                {u.tradeMode === 'win' ? '✅ Force Win ON' : '❌ Force Win OFF'}
+                                {u.tradeMode === 'win' ? '✅ Win ON' : '❌ Win OFF'}
                               </button>
                             )}
                           </div>
