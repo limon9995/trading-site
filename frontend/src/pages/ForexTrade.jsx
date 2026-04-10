@@ -482,38 +482,45 @@ export default function ForexTrade() {
           </div>
         </div>
 
+        {/* ── Buy / Sell buttons ── */}
         <div className="grid grid-cols-2 gap-2">
           <button onClick={() => setTradeType('buy')}
-            className="py-3.5 rounded-full text-sm font-bold transition-all active:scale-95 hover:-translate-y-0.5"
+            className="py-3.5 rounded-full text-sm font-bold transition-all active:scale-95"
             style={{
-              background: tradeType === 'buy' ? 'linear-gradient(135deg,#0ecb81,#06a860)' : 'rgba(14,203,129,0.1)',
-              color: tradeType === 'buy' ? '#000' : '#0ecb81',
-              border: '1px solid rgba(14,203,129,0.4)',
-              boxShadow: tradeType === 'buy' ? '0 4px 16px rgba(14,203,129,0.3)' : 'none',
+              background: tradeType === 'buy'
+                ? 'linear-gradient(135deg,#0ecb81,#06a860)'
+                : 'rgba(14,203,129,0.18)',
+              color: tradeType === 'buy' ? '#fff' : '#0ecb81',
+              border: tradeType === 'buy' ? '1.5px solid #0ecb81' : '1.5px solid rgba(14,203,129,0.5)',
+              boxShadow: tradeType === 'buy' ? '0 6px 20px rgba(14,203,129,0.35)' : 'none',
             }}>
             ▲ {t('trade.up')} / Long
           </button>
           <button onClick={() => setTradeType('sell')}
-            className="py-3.5 rounded-full text-sm font-bold transition-all active:scale-95 hover:-translate-y-0.5"
+            className="py-3.5 rounded-full text-sm font-bold transition-all active:scale-95"
             style={{
-              background: tradeType === 'sell' ? 'linear-gradient(135deg,#f6465d,#c9303f)' : 'rgba(246,70,93,0.1)',
-              color: tradeType === 'sell' ? '#fff' : '#f6465d',
-              border: '1px solid rgba(246,70,93,0.4)',
-              boxShadow: tradeType === 'sell' ? '0 4px 16px rgba(246,70,93,0.3)' : 'none',
+              background: tradeType === 'sell'
+                ? 'linear-gradient(135deg,#f6465d,#c9303f)'
+                : 'rgba(246,70,93,0.18)',
+              color: '#fff',
+              border: tradeType === 'sell' ? '1.5px solid #f6465d' : '1.5px solid rgba(246,70,93,0.5)',
+              boxShadow: tradeType === 'sell' ? '0 6px 20px rgba(246,70,93,0.35)' : 'none',
             }}>
             ▼ {t('trade.down')} / Short
           </button>
         </div>
 
+        {/* ── Leverage ── */}
         <div className="mt-3">
-          <p className="mb-2 text-xs text-white/42">Leverage</p>
+          <p className="mb-2 text-xs font-semibold text-white/60">Leverage</p>
           <div className="flex gap-1.5 flex-wrap">
             {LEVERAGE_OPTIONS.map(lev => (
               <button key={lev} onClick={() => setLeverage(lev)}
-                className="px-3.5 py-1.5 rounded-full text-xs font-bold transition-all hover:-translate-y-0.5"
+                className="px-3.5 py-1.5 rounded-full text-xs font-bold transition-all"
                 style={{
-                  background: leverage === lev ? '#EE8267' : 'rgba(255,255,255,0.06)',
-                  color: leverage === lev ? '#1b1302' : 'rgba(255,255,255,0.72)',
+                  background: leverage === lev ? '#EE8267' : 'rgba(255,255,255,0.10)',
+                  color: leverage === lev ? '#fff' : 'rgba(255,255,255,0.85)',
+                  border: leverage === lev ? '1.5px solid #EE8267' : '1px solid rgba(255,255,255,0.15)',
                 }}>
                 {lev}x
               </button>
@@ -521,74 +528,115 @@ export default function ForexTrade() {
           </div>
         </div>
 
+        {/* ── Margin input ── */}
         <div className="mt-3">
           <div className="mb-1.5 flex justify-between">
-            <p className="text-xs text-white/42">Margin (USDT)</p>
-            <p className="text-xs text-white/42">Balance: <span className="font-semibold text-white">${balance.toFixed(2)}</span></p>
+            <p className="text-xs font-semibold text-white/70">Margin (USDT)</p>
+            <p className="text-xs text-white/55">Balance: <span className="font-bold text-[#0ecb81]">${balance.toFixed(2)}</span></p>
           </div>
-          <input type="number" value={amount} onChange={e => { setAmount(e.target.value); setError(''); }}
+          <input
+            type="number"
+            value={amount}
+            onChange={e => { setAmount(e.target.value); setError(''); }}
             placeholder="Enter margin amount"
-            className="w-full rounded-[1.15rem] border border-white/8 bg-white/6 px-4 py-3.5 text-sm font-semibold text-white outline-none placeholder:text-white/26" />
+            className="w-full rounded-[1.15rem] px-4 py-3.5 text-sm font-semibold outline-none transition-all"
+            style={{
+              background: 'rgba(255,255,255,0.08)',
+              border: '1.5px solid rgba(255,255,255,0.18)',
+              color: '#ffffff',
+              caretColor: '#EE8267',
+            }}
+            onFocus={e => e.target.style.borderColor = '#EE8267'}
+            onBlur={e => e.target.style.borderColor = 'rgba(255,255,255,0.18)'}
+          />
+          {/* Quick amount buttons */}
           <div className="flex gap-1.5 mt-2 flex-wrap">
             {[10, 25, 50, 100, 200].map(q => (
               <button key={q} onClick={() => { setAmount(String(q)); setError(''); }}
-                className="rounded-full bg-white/6 px-3 py-1.5 text-xs font-medium text-white/68 transition-colors hover:text-white">
+                className="rounded-full px-3 py-1.5 text-xs font-semibold transition-all hover:scale-105"
+                style={{
+                  background: 'rgba(255,255,255,0.10)',
+                  color: '#e0eaec',
+                  border: '1px solid rgba(255,255,255,0.18)',
+                }}>
                 ${q}
               </button>
             ))}
             <button onClick={() => { setAmount(String(Math.floor(balance * 100) / 100)); setError(''); }}
-              className="rounded-full bg-[#EE8267]/14 px-3 py-1.5 text-xs font-medium text-[#EE8267]">
+              className="rounded-full px-3 py-1.5 text-xs font-bold transition-all hover:scale-105"
+              style={{
+                background: 'rgba(238,130,103,0.22)',
+                color: '#EE8267',
+                border: '1px solid rgba(238,130,103,0.45)',
+              }}>
               Max
             </button>
           </div>
         </div>
 
+        {/* ── Position summary ── */}
         {parseFloat(amount) > 0 && (
-          <div className="mt-3 grid grid-cols-2 gap-2 rounded-[1.15rem] border border-white/8 bg-white/6 p-3 text-xs">
+          <div className="mt-3 grid grid-cols-2 gap-2 rounded-[1.15rem] p-3 text-xs"
+            style={{ background: 'rgba(255,255,255,0.07)', border: '1px solid rgba(255,255,255,0.14)' }}>
             <div>
-              <p className="text-white/42">Position Size</p>
-              <p className="font-bold text-white">${(parseFloat(amount) * leverage).toFixed(2)}</p>
+              <p className="text-white/55 mb-0.5">Position Size</p>
+              <p className="font-bold text-white text-sm">${(parseFloat(amount) * leverage).toFixed(2)}</p>
             </div>
             <div>
-              <p className="text-white/42">Leverage</p>
-              <p className="font-bold text-[#EE8267]">{leverage}x</p>
+              <p className="text-white/55 mb-0.5">Leverage</p>
+              <p className="font-bold text-[#EE8267] text-sm">{leverage}x</p>
             </div>
           </div>
         )}
 
+        {/* ── SL/TP toggle ── */}
         <button onClick={() => setShowSlTp(p => !p)}
-          className="mt-3 flex items-center gap-1 text-xs font-medium text-[#EE8267]">
-          {showSlTp ? '▲' : '▼'} {showSlTp ? 'Hide' : 'Add'} Stop Loss / Take Profit
+          className="mt-3 flex items-center gap-1.5 text-xs font-semibold"
+          style={{ color: '#EE8267' }}>
+          <span>{showSlTp ? '▲' : '▼'}</span>
+          <span>{showSlTp ? 'Hide' : 'Add'} Stop Loss / Take Profit</span>
         </button>
 
         {showSlTp && (
-          <div className="grid grid-cols-2 gap-2">
+          <div className="mt-2 grid grid-cols-2 gap-2">
             <div>
-              <p className="text-text-muted text-xs mb-1">Stop Loss</p>
+              <p className="text-xs font-semibold mb-1.5" style={{ color: '#f6465d' }}>Stop Loss</p>
               <input type="number" value={stopLoss} onChange={e => setStopLoss(e.target.value)}
                 placeholder="Price"
-                className="w-full px-3 py-2.5 rounded-[1.1rem] text-text-primary text-sm outline-none"
-                style={{ background: 'rgba(246,70,93,0.07)', border: '1px solid rgba(246,70,93,0.22)' }} />
+                className="w-full px-3 py-2.5 rounded-[1.1rem] text-sm font-semibold text-white outline-none"
+                style={{ background: 'rgba(246,70,93,0.12)', border: '1.5px solid rgba(246,70,93,0.4)', caretColor: '#f6465d' }} />
             </div>
             <div>
-              <p className="text-text-muted text-xs mb-1">Take Profit</p>
+              <p className="text-xs font-semibold mb-1.5" style={{ color: '#0ecb81' }}>Take Profit</p>
               <input type="number" value={takeProfit} onChange={e => setTakeProfit(e.target.value)}
                 placeholder="Price"
-                className="w-full px-3 py-2.5 rounded-[1.1rem] text-text-primary text-sm outline-none"
-                style={{ background: 'rgba(14,203,129,0.07)', border: '1px solid rgba(14,203,129,0.22)' }} />
+                className="w-full px-3 py-2.5 rounded-[1.1rem] text-sm font-semibold text-white outline-none"
+                style={{ background: 'rgba(14,203,129,0.12)', border: '1.5px solid rgba(14,203,129,0.4)', caretColor: '#0ecb81' }} />
             </div>
           </div>
         )}
 
-        {error && <p className="text-red-trade text-xs text-center">{error}</p>}
+        {error && (
+          <p className="mt-2 rounded-[0.8rem] px-3 py-2 text-xs font-semibold text-center"
+            style={{ background: 'rgba(246,70,93,0.12)', color: '#f6465d', border: '1px solid rgba(246,70,93,0.3)' }}>
+            {error}
+          </p>
+        )}
 
+        {/* ── Open button ── */}
         <button onClick={handleOpen} disabled={loading || !tradeType || !amount}
-          className="mt-3 w-full py-3.5 rounded-full font-bold text-sm transition-all active:scale-95 hover:-translate-y-0.5 disabled:opacity-50"
+          className="mt-3 w-full py-4 rounded-full font-bold text-sm transition-all active:scale-95 disabled:opacity-40"
           style={{
-            background: !tradeType ? 'rgba(255,255,255,0.1)'
-              : tradeType === 'buy' ? 'linear-gradient(135deg,#0ecb81,#06a860)'
-              : 'linear-gradient(135deg,#f6465d,#c9303f)',
-            color: tradeType === 'buy' ? '#000' : !tradeType ? '#51636b' : '#fff',
+            background: !tradeType
+              ? 'rgba(255,255,255,0.08)'
+              : tradeType === 'buy'
+                ? 'linear-gradient(135deg,#0ecb81,#06a860)'
+                : 'linear-gradient(135deg,#f6465d,#c9303f)',
+            color: !tradeType ? 'rgba(255,255,255,0.4)' : '#fff',
+            border: !tradeType ? '1px solid rgba(255,255,255,0.12)' : 'none',
+            boxShadow: !tradeType ? 'none'
+              : tradeType === 'buy' ? '0 8px 24px rgba(14,203,129,0.35)'
+              : '0 8px 24px rgba(246,70,93,0.35)',
           }}>
           {loading ? 'Opening...' : !tradeType ? 'Select Buy or Sell' : `Open ${tradeType === 'buy' ? '▲ Long' : '▼ Short'} · ${leverage}x`}
         </button>
