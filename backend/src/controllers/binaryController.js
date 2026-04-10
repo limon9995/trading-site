@@ -57,8 +57,6 @@ exports.placeTrade = async (req, res) => {
     const tradeAmount = parseFloat(amount);
     if (isNaN(tradeAmount) || tradeAmount < s.minTradeAmount)
       return res.status(400).json({ error: `Minimum trade amount is $${s.minTradeAmount}` });
-    if (tradeAmount > s.maxTradeAmount)
-      return res.status(400).json({ error: `Maximum trade amount is $${s.maxTradeAmount}` });
 
     const user = await User.findById(req.user._id);
     const balanceField = 'demo_balance';

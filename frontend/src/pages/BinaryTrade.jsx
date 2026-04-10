@@ -261,7 +261,6 @@ function OrderModal({ coin, direction, currentPrice, settings, balance, onConfir
     const amt = parseFloat(amount);
     if (!amt || amt <= 0)                         return setError('Please enter a valid amount');
     if (amt < (settings.minTradeAmount || 1))     return setError(`Minimum: $${settings.minTradeAmount}`);
-    if (amt > (settings.maxTradeAmount || 1000))  return setError(`Maximum: $${settings.maxTradeAmount}`);
     if (amt > balance)                            return setError('Insufficient balance');
     setError('');
     setLoading(true);
@@ -542,7 +541,7 @@ export default function BinaryTrade() {
   const [interval,     setInterval]     = useState('1m');
   const [settings,     setSettings]     = useState({
     tradingEnabled: true, maintenanceMode: false, payoutRate: 0.85, minTradeAmount: 1,
-    maxTradeAmount: 1000, expiryTimes: [20, 30, 60, 90, 180], availablePairs: COINS,
+    maxTradeAmount: Infinity, expiryTimes: [20, 30, 60, 90, 180], availablePairs: COINS,
   });
   const [resultModal,  setResultModal]  = useState(null);
   const [activeTrades, setActiveTrades] = useState([]);
@@ -586,7 +585,6 @@ export default function BinaryTrade() {
     if (!duration) return setTradeError('Select a duration');
     if (!amt || amt <= 0) return setTradeError('Enter a valid amount');
     if (amt < (settings.minTradeAmount || 1)) return setTradeError(`Minimum $${settings.minTradeAmount || 1}`);
-    if (amt > (settings.maxTradeAmount || 1000)) return setTradeError(`Maximum $${settings.maxTradeAmount || 1000}`);
     if (amt > balance) return setTradeError('Insufficient balance');
     setTradeError('');
     setPlacing(true);
