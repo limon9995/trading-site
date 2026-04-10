@@ -8,25 +8,25 @@ import { useAuth } from '../context/AuthContext';
 import { useTranslation } from 'react-i18next';
 
 const SHORTCUTS = [
-  { to: '/trade',       label: 'Trade',    color: '#EE8267', bg: '#EE826715',
+  { to: '/trade',       labelKey: 'dashboard.shortcutTrade',    color: '#EE8267', bg: '#EE826715',
     icon: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" className="w-6 h-6"><path strokeLinecap="round" strokeLinejoin="round" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/></svg> },
-  { to: '/deposit',     label: 'Deposit',  color: '#0ECB81', bg: '#0ECB8115',
+  { to: '/deposit',     labelKey: 'dashboard.shortcutDeposit',  color: '#0ECB81', bg: '#0ECB8115',
     icon: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" className="w-6 h-6"><path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m0 0l-4-4m4 4l4-4"/></svg> },
-  { to: '/withdraw',    label: 'Withdraw', color: '#f6465d', bg: '#f6465d15',
+  { to: '/withdraw',    labelKey: 'dashboard.shortcutWithdraw', color: '#f6465d', bg: '#f6465d15',
     icon: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" className="w-6 h-6"><path strokeLinecap="round" strokeLinejoin="round" d="M12 20V4m0 0l4 4m-4-4L8 8"/></svg> },
-  { to: '/wallet',      label: 'Assets',   color: '#185B64', bg: '#185B6415',
+  { to: '/wallet',      labelKey: 'dashboard.shortcutAssets',   color: '#185B64', bg: '#185B6415',
     icon: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" className="w-6 h-6"><path strokeLinecap="round" strokeLinejoin="round" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"/></svg> },
-  { to: '/new-coins',   label: 'New',      color: '#f97316', bg: '#f9731615',
+  { to: '/new-coins',   labelKey: 'dashboard.shortcutNew',      color: '#f97316', bg: '#f9731615',
     icon: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" className="w-6 h-6"><path strokeLinecap="round" strokeLinejoin="round" d="M17.657 18.657A8 8 0 016.343 7.343S7 9 9 10c0-2 .5-5 2.986-7C14 5 16.09 5.777 17.656 7.343A7.975 7.975 0 0120 13a7.975 7.975 0 01-2.343 5.657z"/><path strokeLinecap="round" strokeLinejoin="round" d="M9.879 16.121A3 3 0 1012.015 11L11 14H9c0 .768.293 1.536.879 2.121z"/></svg> },
-  { to: '/plans',       label: 'Invest',   color: '#a855f7', bg: '#a855f715',
+  { to: '/plans',       labelKey: 'dashboard.shortcutInvest',   color: '#a855f7', bg: '#a855f715',
     icon: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" className="w-6 h-6"><path strokeLinecap="round" strokeLinejoin="round" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg> },
-  { to: '/settings',    label: 'Referral', color: '#0ECB81', bg: '#0ECB8115',
+  { to: '/settings',    labelKey: 'dashboard.shortcutReferral', color: '#0ECB81', bg: '#0ECB8115',
     icon: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" className="w-6 h-6"><path strokeLinecap="round" strokeLinejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/></svg> },
-  { to: '/transfer',    label: 'Transfer', color: '#06b6d4', bg: '#06b6d415',
+  { to: '/transfer',    labelKey: 'dashboard.shortcutTransfer', color: '#06b6d4', bg: '#06b6d415',
     icon: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" className="w-6 h-6"><path strokeLinecap="round" strokeLinejoin="round" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"/></svg> },
-  { to: '/about',      label: 'About Us', color: '#EE8267', bg: '#EE826715',
+  { to: '/about',       labelKey: 'dashboard.shortcutAbout',   color: '#EE8267', bg: '#EE826715',
     icon: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" className="w-6 h-6"><path strokeLinecap="round" strokeLinejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg> },
-  { to: '/support',     label: 'Support',  color: '#566367', bg: '#56636715',
+  { to: '/support',     labelKey: 'dashboard.shortcutSupport',  color: '#566367', bg: '#56636715',
     icon: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" className="w-6 h-6"><path strokeLinecap="round" strokeLinejoin="round" d="M18.364 5.636l-3.536 3.536m0 5.656l3.536 3.536M9.172 9.172L5.636 5.636m3.536 9.192l-3.536 3.536M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-5 0a4 4 0 11-8 0 4 4 0 018 0z"/></svg> },
 ];
 
@@ -88,7 +88,7 @@ export default function Dashboard() {
             </p>
           )}
           <p className="text-white/50 text-sm mb-5">
-            ≈ ${balanceVisible ? usdtBalance.toFixed(2) : '••••'} available
+            ≈ ${balanceVisible ? usdtBalance.toFixed(2) : '••••'} {t('dashboard.availableSuffix')}
           </p>
 
           <div className="grid grid-cols-3 gap-3 mb-5">
@@ -123,26 +123,26 @@ export default function Dashboard() {
       {/* ── Shortcuts — CEX.IO style ────────────────────────────────── */}
       <div className="rounded-[30px] p-4 cex-surface">
         <div className="grid grid-cols-5 gap-2">
-          {SHORTCUTS.slice(0, 5).map(({ to, label, color, bg, icon }) => (
-            <Link key={to + label} to={to}
+          {SHORTCUTS.slice(0, 5).map(({ to, labelKey, color, bg, icon }) => (
+            <Link key={to + labelKey} to={to}
               className="flex flex-col items-center gap-1.5 group">
               <div className="w-12 h-12 rounded-2xl flex items-center justify-center transition-all duration-200 group-active:scale-95"
                 style={{ background: bg, border: `1px solid ${color}25`, color }}>
                 {icon}
               </div>
-              <span className="text-[10px] text-text-secondary text-center leading-tight group-hover:text-text-primary transition-colors font-medium">{label}</span>
+              <span className="text-[10px] text-text-secondary text-center leading-tight group-hover:text-text-primary transition-colors font-medium">{t(labelKey)}</span>
             </Link>
           ))}
         </div>
         <div className="grid grid-cols-5 gap-2 mt-3">
-          {SHORTCUTS.slice(5, 10).map(({ to, label, color, bg, icon }) => (
-            <Link key={to + label} to={to}
+          {SHORTCUTS.slice(5, 10).map(({ to, labelKey, color, bg, icon }) => (
+            <Link key={to + labelKey} to={to}
               className="flex flex-col items-center gap-1.5 group">
               <div className="w-12 h-12 rounded-2xl flex items-center justify-center transition-all duration-200 group-active:scale-95"
                 style={{ background: bg, border: `1px solid ${color}25`, color }}>
                 {icon}
               </div>
-              <span className="text-[10px] text-text-secondary text-center leading-tight group-hover:text-text-primary transition-colors font-medium">{label}</span>
+              <span className="text-[10px] text-text-secondary text-center leading-tight group-hover:text-text-primary transition-colors font-medium">{t(labelKey)}</span>
             </Link>
           ))}
         </div>
@@ -157,10 +157,10 @@ export default function Dashboard() {
 
         {/* Table header */}
         <div className="flex items-center justify-between px-4 py-2">
-          <span className="text-xs text-text-muted dark:text-white/40 font-medium">Name</span>
+          <span className="text-xs text-text-muted dark:text-white/40 font-medium">{t('dashboard.nameCol')}</span>
           <div className="flex items-center gap-6">
-            <span className="text-xs text-text-muted dark:text-white/40 font-medium">Price</span>
-            <span className="text-xs text-text-muted dark:text-white/40 font-medium w-16 text-right">24h Change</span>
+            <span className="text-xs text-text-muted dark:text-white/40 font-medium">{t('dashboard.priceCol')}</span>
+            <span className="text-xs text-text-muted dark:text-white/40 font-medium w-16 text-right">{t('dashboard.change24hCol')}</span>
           </div>
         </div>
 

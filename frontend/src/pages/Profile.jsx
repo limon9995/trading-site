@@ -26,12 +26,12 @@ function InputField({ label, icon, children }) {
   );
 }
 
-function KycStatusBanner({ status }) {
+function KycStatusBanner({ status, t }) {
   if (status === 'unverified') return null;
   const configs = {
-    pending:  { bg: 'rgba(234,179,8,0.08)',  border: 'rgba(234,179,8,0.35)',  icon: '🕐', title: 'Under Review',   desc: 'Your KYC is being reviewed. This usually takes 1–2 business days.', textColor: '#ca8a04' },
-    verified: { bg: 'rgba(14,203,129,0.08)', border: 'rgba(14,203,129,0.35)', icon: '✅', title: 'KYC Verified',    desc: 'Your identity has been successfully verified.', textColor: '#0ECB81' },
-    rejected: { bg: 'rgba(246,70,93,0.08)',  border: 'rgba(246,70,93,0.35)',  icon: '❌', title: 'KYC Rejected',    desc: 'Your submission was rejected. Please update and resubmit.', textColor: '#f6465d' },
+    pending:  { bg: 'rgba(234,179,8,0.08)',  border: 'rgba(234,179,8,0.35)',  icon: '🕐', titleKey: 'auth.kycUnderReviewBanner',   descKey: 'auth.kycUnderReviewDesc2', textColor: '#ca8a04' },
+    verified: { bg: 'rgba(14,203,129,0.08)', border: 'rgba(14,203,129,0.35)', icon: '✅', titleKey: 'auth.kycVerifiedBannerTitle',  descKey: 'auth.kycVerifiedBannerDesc', textColor: '#0ECB81' },
+    rejected: { bg: 'rgba(246,70,93,0.08)',  border: 'rgba(246,70,93,0.35)',  icon: '❌', titleKey: 'auth.kycRejectedBannerTitle',  descKey: 'auth.kycRejectedBannerDesc', textColor: '#f6465d' },
   };
   const c = configs[status];
   return (
@@ -40,15 +40,15 @@ function KycStatusBanner({ status }) {
         {c.icon}
       </div>
       <div>
-        <p className="text-sm font-bold" style={{ color: c.textColor }}>{c.title}</p>
-        <p className="text-xs text-text-muted mt-0.5 leading-relaxed">{c.desc}</p>
+        <p className="text-sm font-bold" style={{ color: c.textColor }}>{t(c.titleKey)}</p>
+        <p className="text-xs text-text-muted mt-0.5 leading-relaxed">{t(c.descKey)}</p>
       </div>
     </div>
   );
 }
 
 
-function UploadBox({ label, icon, preview, onChange, disabled }) {
+function UploadBox({ label, icon, preview, onChange, disabled, tapLabel }) {
   const ref = useRef();
   return (
     <div>
@@ -67,8 +67,7 @@ function UploadBox({ label, icon, preview, onChange, disabled }) {
         ) : (
           <div className="flex flex-col items-center gap-1 py-4 px-2 text-center">
             <span className="text-2xl" style={{ opacity: 0.6 }}>📎</span>
-            <span className="text-[10px] font-semibold text-text-secondary">Tap to upload</span>
-            <span className="text-[9px] text-text-muted">JPG, PNG — max 20MB</span>
+            <span className="text-[10px] font-semibold text-text-secondary">{tapLabel}</span>
           </div>
         )}
         {preview && (
@@ -105,12 +104,12 @@ export default function Profile() {
   const handleFileChange = (field) => (e) => {
     const file = e.target.files?.[0];
     if (!file) return;
-    if (file.size > 20 * 1024 * 1024) return toast.error('File too large. Max 20MB.');
     const reader = new FileReader();
     reader.onload = (ev) => {
       const img = new Image();
       img.onload = () => {
-        const MAX = 1600;
+        // Resize only if larger than 2400px, preserve quality
+        const MAX = 2400;
         let { width, height } = img;
         if (width > MAX || height > MAX) {
           if (width > height) { height = Math.round(height * MAX / width); width = MAX; }
@@ -120,8 +119,12 @@ export default function Profile() {
         canvas.width  = width;
         canvas.height = height;
         canvas.getContext('2d').drawImage(img, 0, 0, width, height);
-        const compressed = canvas.toDataURL('image/jpeg', 0.82);
+        const compressed = canvas.toDataURL('image/jpeg', 0.92);
         setDocPreviews(p => ({ ...p, [field]: compressed }));
+      };
+      img.onerror = () => {
+        // Fallback: use raw base64 if image parsing fails
+        setDocPreviews(p => ({ ...p, [field]: ev.target.result }));
       };
       img.src = ev.target.result;
     };
@@ -130,8 +133,8 @@ export default function Profile() {
 
   const handleSaveKyc = async () => {
     if (!kycDocType) return toast.error(t('kyc.selectDocType'));
-    if (!docPreviews.kycDocFront) return toast.error('Front side of document is required');
-    if (!docPreviews.kycDocBack) return toast.error('Back side of document is required');
+    if (!docPreviews.kycDocFront) return toast.error(t('auth.frontSideDoc'));
+    if (!docPreviews.kycDocBack) return toast.error(t('auth.backSideDoc'));
     setSaving(true);
     try {
       await profileAPI.update({
@@ -140,7 +143,7 @@ export default function Profile() {
         kycDocBack:  docPreviews.kycDocBack  || '',
       });
       await refreshUser();
-      toast.success('KYC submitted! Under review.');
+      toast.success(t('auth.kycSubmitted'));
     } catch (err) {
       toast.error(err.response?.data?.error || 'Failed to submit KYC');
     } finally {
@@ -149,13 +152,13 @@ export default function Profile() {
   };
 
   const handleChangePassword = async () => {
-    if (!pwForm.currentPassword || !pwForm.newPassword) return toast.error('Fill in all fields');
-    if (pwForm.newPassword !== pwForm.confirmPassword) return toast.error('Passwords do not match');
-    if (pwForm.newPassword.length < 6) return toast.error('Min 6 characters');
+    if (!pwForm.currentPassword || !pwForm.newPassword) return toast.error(t('auth.fillAllFields'));
+    if (pwForm.newPassword !== pwForm.confirmPassword) return toast.error(t('auth.passwordsMismatch'));
+    if (pwForm.newPassword.length < 6) return toast.error(t('auth.minSixChars'));
     setPwSaving(true);
     try {
       await authAPI.changePassword({ currentPassword: pwForm.currentPassword, newPassword: pwForm.newPassword });
-      toast.success('Password changed!');
+      toast.success(t('auth.passwordChanged'));
       setPwForm({ currentPassword: '', newPassword: '', confirmPassword: '' });
     } catch (err) {
       toast.error(err.response?.data?.error || 'Failed to change password');
@@ -186,11 +189,11 @@ export default function Profile() {
                 border: `1px solid ${kycStatus === 'verified' ? 'rgba(14,203,129,0.4)' : kycStatus === 'pending' ? 'rgba(234,179,8,0.4)' : 'rgba(255,255,255,0.15)'}`,
               }}>
               <span>{kycStatus === 'verified' ? '✓' : kycStatus === 'pending' ? '⏳' : '○'}</span>
-              KYC {kycStatus === 'verified' ? 'Verified' : kycStatus === 'pending' ? 'Pending' : 'Not Submitted'}
+              KYC {kycStatus === 'verified' ? t('profile.kycVerifiedBadge') : kycStatus === 'pending' ? t('profile.kycPendingBadge') : t('profile.kycNotSubmitted')}
             </div>
           </div>
           <div className="text-right flex-shrink-0">
-            <p className="text-[10px] uppercase tracking-wider text-white/40">Plan</p>
+            <p className="text-[10px] uppercase tracking-wider text-white/40">{t('profile.planLabel')}</p>
             <p className="text-white font-bold text-sm mt-1">{user?.plan && user.plan !== 'none' ? user.plan.toUpperCase() : 'STANDARD'}</p>
           </div>
         </div>
@@ -198,7 +201,7 @@ export default function Profile() {
 
       {/* ── Tab switcher ── */}
       <div className="grid grid-cols-2 gap-1.5 rounded-[28px] border border-[#d9e6e7] bg-white p-1.5 shadow-[0_18px_50px_rgba(8,35,41,0.07)]">
-        {[['kyc', '🪪  KYC Verification'], ['password', '🔐  Change Password']].map(([key, label]) => (
+        {[['kyc', `🪪  ${t('profile.kycTab')}`], ['password', `🔐  ${t('profile.passwordTab')}`]].map(([key, label]) => (
           <button key={key} onClick={() => setTab(key)}
             className={`rounded-[22px] py-3 text-sm font-semibold transition-all ${
               tab === key
@@ -215,15 +218,15 @@ export default function Profile() {
         <div className="rounded-[30px] border border-[#d9e6e7] bg-white shadow-[0_24px_80px_rgba(8,35,41,0.08)] p-5 space-y-4">
 
           {/* Status banner */}
-          {kycStatus !== 'unverified' && <KycStatusBanner status={kycStatus} />}
+          {kycStatus !== 'unverified' && <KycStatusBanner status={kycStatus} t={t} />}
 
           {/* Unverified intro */}
           {kycStatus === 'unverified' && (
             <div className="rounded-[20px] p-4 flex items-start gap-3" style={{ background: 'rgba(10,224,208,0.06)', border: '1px solid rgba(10,224,208,0.2)' }}>
               <div className="w-10 h-10 rounded-full flex items-center justify-center text-xl flex-shrink-0" style={{ background: 'rgba(10,224,208,0.12)' }}>🛡️</div>
               <div>
-                <p className="text-sm font-bold text-text-primary">Identity Verification Required</p>
-                <p className="text-xs text-text-muted mt-0.5 leading-relaxed">Upload your document photos to complete KYC. Verification typically takes 1–2 business days.</p>
+                <p className="text-sm font-bold text-text-primary">{t('profile.identityRequired')}</p>
+                <p className="text-xs text-text-muted mt-0.5 leading-relaxed">{t('profile.identityRequiredDesc')}</p>
               </div>
             </div>
           )}
@@ -261,6 +264,7 @@ export default function Profile() {
               preview={docPreviews.kycDocFront}
               onChange={handleFileChange('kycDocFront')}
               disabled={isDisabled}
+              tapLabel={t('profile.tapToUpload')}
             />
             <UploadBox
               label={t('kyc.backSide')}
@@ -268,6 +272,7 @@ export default function Profile() {
               preview={docPreviews.kycDocBack}
               onChange={handleFileChange('kycDocBack')}
               disabled={isDisabled}
+              tapLabel={t('profile.tapToUpload')}
             />
           </div>
 
@@ -277,7 +282,7 @@ export default function Profile() {
               className="w-full py-3.5 rounded-[18px] text-sm font-bold text-white flex items-center justify-center gap-2 transition-all active:scale-95"
               style={{ background: 'linear-gradient(135deg,#ee8267,#f4927e)', boxShadow: '0 12px 32px rgba(238,130,103,0.3)' }}>
               {saving && <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />}
-              {saving ? 'Submitting...' : '🚀 Submit KYC'}
+              {saving ? t('profile.submitting') : `🚀 ${t('profile.submitKyc')}`}
             </button>
           )}
 
@@ -290,18 +295,18 @@ export default function Profile() {
           <div className="flex items-center gap-3 pb-2">
             <div className="w-10 h-10 rounded-[14px] flex items-center justify-center text-xl" style={{ background: '#ee826715' }}>🔐</div>
             <div>
-              <p className="font-bold text-text-primary text-sm">Change Password</p>
-              <p className="text-xs text-text-muted">Keep your account secure</p>
+              <p className="font-bold text-text-primary text-sm">{t('profile.changePassword')}</p>
+              <p className="text-xs text-text-muted">{t('profile.keepSecure')}</p>
             </div>
           </div>
 
           {[
-            { key: 'cur',  field: 'currentPassword', label: 'Current Password', placeholder: '••••••••' },
-            { key: 'new',  field: 'newPassword',      label: 'New Password',     placeholder: 'Min 6 characters' },
-            { key: 'con',  field: 'confirmPassword',  label: 'Confirm Password', placeholder: 'Repeat new password' },
-          ].map(({ key, field, label, placeholder }) => (
+            { key: 'cur',  field: 'currentPassword', labelKey: 'profile.currentPassword', placeholder: '••••••••' },
+            { key: 'new',  field: 'newPassword',      labelKey: 'profile.newPassword',     placeholder: t('auth.minChars') },
+            { key: 'con',  field: 'confirmPassword',  labelKey: 'profile.confirmPassword', placeholder: t('auth.minChars') },
+          ].map(({ key, field, labelKey, placeholder }) => (
             <div key={key}>
-              <label className="text-xs font-semibold text-text-secondary mb-2 block">{label}</label>
+              <label className="text-xs font-semibold text-text-secondary mb-2 block">{t(labelKey)}</label>
               <div className="relative">
                 <input
                   type={showPw[key] ? 'text' : 'password'}
@@ -330,7 +335,7 @@ export default function Profile() {
                 }} />
               ))}
               <span className="text-[10px] text-text-muted ml-1 self-center">
-                {pwForm.newPassword.length < 4 ? 'Weak' : pwForm.newPassword.length < 8 ? 'Fair' : pwForm.newPassword.length < 12 ? 'Good' : 'Strong'}
+                {pwForm.newPassword.length < 4 ? t('profile.weakPw') : pwForm.newPassword.length < 8 ? t('profile.fairPw') : pwForm.newPassword.length < 12 ? t('profile.goodPw') : t('profile.strongPw')}
               </span>
             </div>
           )}
@@ -339,7 +344,7 @@ export default function Profile() {
             className="w-full py-3.5 rounded-[18px] text-sm font-bold text-white flex items-center justify-center gap-2 transition-all active:scale-95"
             style={{ background: 'linear-gradient(135deg,#ee8267,#f4927e)', boxShadow: '0 12px 32px rgba(238,130,103,0.3)' }}>
             {pwSaving && <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />}
-            {pwSaving ? 'Saving...' : 'Update Password'}
+            {pwSaving ? t('profile.saving') : t('profile.updatePassword')}
           </button>
         </div>
       )}

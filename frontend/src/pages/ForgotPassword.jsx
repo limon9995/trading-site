@@ -2,11 +2,13 @@ import React, { useState, useRef } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import toast from 'react-hot-toast';
 import { authAPI } from '../services/api';
+import { useTranslation } from 'react-i18next';
 
 const STEPS = { EMAIL: 1, OTP: 2, PASSWORD: 3, DONE: 4 };
 
 export default function ForgotPassword() {
   const navigate = useNavigate();
+  const { t } = useTranslation();
   const [step, setStep] = useState(STEPS.EMAIL);
   const [email, setEmail] = useState('');
   const [otp, setOtp] = useState(['', '', '', '', '', '']);
@@ -149,18 +151,18 @@ export default function ForgotPassword() {
           {/* Step 1: Email */}
           {step === STEPS.EMAIL && (
             <>
-              <h2 className="text-2xl font-extrabold text-text-primary mb-1">Forgot Password</h2>
-              <p className="text-sm text-text-secondary mb-6">Enter your registered email to continue</p>
+              <h2 className="text-2xl font-extrabold text-text-primary mb-1">{t('auth.forgotPasswordTitle')}</h2>
+              <p className="text-sm text-text-secondary mb-6">{t('auth.forgotPasswordSubtitle')}</p>
               <form onSubmit={handleSendOtp} className="space-y-4">
                 <div>
-                  <label className="block text-sm font-semibold text-text-primary mb-1.5">Email Address</label>
+                  <label className="block text-sm font-semibold text-text-primary mb-1.5">{t('auth.emailAddress')}</label>
                   <input type="email" value={email} onChange={(e) => setEmail(e.target.value)}
                     placeholder="you@example.com" required className={inputCls} style={inputStyle}
                     onFocus={e => e.target.style.borderColor = '#EE8267'}
                     onBlur={e => e.target.style.borderColor = '#E8EAED'} />
                 </div>
                 <button type="submit" disabled={loading} className={btnPrimary} style={{ background: '#EE8267' }}>
-                  {loading ? <><div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />Checking...</> : 'Continue'}
+                  {loading ? <><div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />{t('auth.checking')}</> : t('auth.continue')}
                 </button>
               </form>
             </>
@@ -169,9 +171,9 @@ export default function ForgotPassword() {
           {/* Step 2: OTP */}
           {step === STEPS.OTP && (
             <>
-              <h2 className="text-2xl font-extrabold text-text-primary mb-1">Enter OTP</h2>
+              <h2 className="text-2xl font-extrabold text-text-primary mb-1">{t('auth.enterOtp')}</h2>
               <p className="text-sm text-text-secondary mb-6">
-                We sent a 6-digit code to <span className="font-semibold" style={{ color: '#EE8267' }}>{email}</span>
+                {t('auth.codeSentTo')} <span className="font-semibold" style={{ color: '#EE8267' }}>{email}</span>
               </p>
               <form onSubmit={handleVerifyOtp} className="space-y-5">
                 <div className="flex gap-2 justify-center" onPaste={handleOtpPaste}>
@@ -186,15 +188,15 @@ export default function ForgotPassword() {
                   ))}
                 </div>
                 <button type="submit" disabled={loading} className={btnPrimary} style={{ background: '#EE8267' }}>
-                  {loading ? <><div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />Verifying...</> : 'Verify OTP'}
+                  {loading ? <><div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />{t('auth.verifying')}</> : t('auth.verifyOtp')}
                 </button>
                 <div className="text-center">
                   {resendTimer > 0
-                    ? <p className="text-sm text-text-muted">Resend in <span className="font-semibold" style={{ color: '#EE8267' }}>{resendTimer}s</span></p>
-                    : <button type="button" onClick={handleResend} disabled={loading} className="text-sm font-semibold hover:underline" style={{ color: '#EE8267' }}>Resend OTP</button>
+                    ? <p className="text-sm text-text-muted">{t('auth.resendIn')} <span className="font-semibold" style={{ color: '#EE8267' }}>{resendTimer}s</span></p>
+                    : <button type="button" onClick={handleResend} disabled={loading} className="text-sm font-semibold hover:underline" style={{ color: '#EE8267' }}>{t('auth.resendOtp')}</button>
                   }
                 </div>
-                <button type="button" onClick={() => setStep(STEPS.EMAIL)} className="text-sm text-text-muted hover:text-text-primary w-full text-center transition-colors">← Change email</button>
+                <button type="button" onClick={() => setStep(STEPS.EMAIL)} className="text-sm text-text-muted hover:text-text-primary w-full text-center transition-colors">{t('auth.changeEmail')}</button>
               </form>
             </>
           )}
@@ -202,28 +204,28 @@ export default function ForgotPassword() {
           {/* Step 3: New Password */}
           {step === STEPS.PASSWORD && (
             <>
-              <h2 className="text-2xl font-extrabold text-text-primary mb-1">Set New Password</h2>
-              <p className="text-sm text-text-secondary mb-6">Choose a strong password for your account</p>
+              <h2 className="text-2xl font-extrabold text-text-primary mb-1">{t('auth.setNewPassword')}</h2>
+              <p className="text-sm text-text-secondary mb-6">{t('auth.chooseStrongPassword')}</p>
               <form onSubmit={handleResetPassword} className="space-y-4">
                 <div>
-                  <label className="block text-sm font-semibold text-text-primary mb-1.5">New Password</label>
+                  <label className="block text-sm font-semibold text-text-primary mb-1.5">{t('auth.newPasswordLabel')}</label>
                   <div className="relative">
                     <input type={showPass ? 'text' : 'password'} value={newPassword} onChange={(e) => setNewPassword(e.target.value)}
-                      placeholder="Min. 6 characters" required className={`${inputCls} pr-10`} style={inputStyle}
+                      placeholder={t('auth.minChars')} required className={`${inputCls} pr-10`} style={inputStyle}
                       onFocus={e => e.target.style.borderColor = '#EE8267'}
                       onBlur={e => e.target.style.borderColor = '#E8EAED'} />
                     <button type="button" onClick={() => setShowPass(!showPass)} className="absolute right-3 top-1/2 -translate-y-1/2 text-text-muted hover:text-text-primary text-sm">{showPass ? '🙈' : '👁️'}</button>
                   </div>
                 </div>
                 <div>
-                  <label className="block text-sm font-semibold text-text-primary mb-1.5">Confirm Password</label>
+                  <label className="block text-sm font-semibold text-text-primary mb-1.5">{t('auth.confirmPasswordLabel')}</label>
                   <input type={showPass ? 'text' : 'password'} value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)}
-                    placeholder="Re-enter password" required className={inputCls} style={inputStyle}
+                    placeholder={t('auth.minChars')} required className={inputCls} style={inputStyle}
                     onFocus={e => e.target.style.borderColor = '#EE8267'}
                     onBlur={e => e.target.style.borderColor = '#E8EAED'} />
                 </div>
                 <button type="submit" disabled={loading} className={btnPrimary} style={{ background: '#EE8267' }}>
-                  {loading ? <><div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />Resetting...</> : 'Reset Password'}
+                  {loading ? <><div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />{t('auth.resetting')}</> : t('auth.resetPassword')}
                 </button>
               </form>
             </>
@@ -236,16 +238,16 @@ export default function ForgotPassword() {
                 style={{ background: 'rgba(14,203,129,0.1)', border: '1px solid rgba(14,203,129,0.3)' }}>
                 <svg viewBox="0 0 24 24" fill="none" stroke="#0ECB81" strokeWidth="2.5" className="w-8 h-8"><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7"/></svg>
               </div>
-              <h2 className="text-xl font-extrabold text-text-primary mb-2">Password Reset!</h2>
-              <p className="text-sm text-text-secondary mb-6">Your password has been updated. You can now log in.</p>
-              <button onClick={() => navigate('/login')} className={btnPrimary} style={{ background: '#EE8267' }}>Go to Login</button>
+              <h2 className="text-xl font-extrabold text-text-primary mb-2">{t('auth.passwordResetTitle')}</h2>
+              <p className="text-sm text-text-secondary mb-6">{t('auth.passwordResetDesc')}</p>
+              <button onClick={() => navigate('/login')} className={btnPrimary} style={{ background: '#EE8267' }}>{t('auth.goToLogin')}</button>
             </div>
           )}
 
           {step !== STEPS.DONE && (
             <p className="text-center text-sm text-text-secondary mt-6">
-              Remember your password?{' '}
-              <Link to="/login" className="font-bold hover:underline" style={{ color: '#EE8267' }}>Sign in</Link>
+              {t('auth.rememberPassword')}{' '}
+              <Link to="/login" className="font-bold hover:underline" style={{ color: '#EE8267' }}>{t('auth.signInLink')}</Link>
             </p>
           )}
         </div>

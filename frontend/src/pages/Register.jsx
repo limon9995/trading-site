@@ -3,6 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import toast from 'react-hot-toast';
 import { useAuth } from '../context/AuthContext';
 import { useTheme } from '../context/ThemeContext';
+import { useTranslation } from 'react-i18next';
 
 function AuthBrand() {
   return (
@@ -24,6 +25,7 @@ export default function Register() {
   const { register } = useAuth();
   const navigate = useNavigate();
   const { isDark, toggleTheme } = useTheme();
+  const { t } = useTranslation();
   const [form, setForm] = useState({ username: '', email: '', password: '', referralCode: '' });
   const [showPass, setShowPass] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -38,10 +40,10 @@ export default function Register() {
   const passwordStrength = () => {
     const p = form.password;
     if (p.length === 0) return null;
-    if (p.length < 6) return { label: 'Too short', color: '#f6465d', width: 'w-1/4' };
-    if (p.length < 8) return { label: 'Weak', color: '#f97316', width: 'w-1/2' };
-    if (p.length < 12) return { label: 'Good', color: '#EE8267', width: 'w-3/4' };
-    return { label: 'Strong', color: '#0ECB81', width: 'w-full' };
+    if (p.length < 6) return { labelKey: 'auth.passwordTooShort', color: '#f6465d', width: 'w-1/4' };
+    if (p.length < 8) return { labelKey: 'auth.passwordWeak', color: '#f97316', width: 'w-1/2' };
+    if (p.length < 12) return { labelKey: 'auth.passwordGood', color: '#EE8267', width: 'w-3/4' };
+    return { labelKey: 'auth.passwordStrong', color: '#0ECB81', width: 'w-full' };
   };
   const strength = passwordStrength();
 
@@ -209,8 +211,8 @@ export default function Register() {
 
             <div className="flex items-start justify-between gap-4 mb-6">
               <div>
-                <h2 className="text-[34px] font-light leading-none mb-2" style={textPrimary}>Create your account</h2>
-                <p className="text-[15px]" style={textSecondary}>Fast, secure, and consistent with the new exchange-style front page</p>
+                <h2 className="text-[34px] font-light leading-none mb-2" style={textPrimary}>{t('auth.createAccount')}</h2>
+                <p className="text-[15px]" style={textSecondary}>{t('auth.fastSecure')}</p>
               </div>
               <div className="hidden sm:flex w-12 h-12 rounded-2xl items-center justify-center text-white" style={{ background: 'linear-gradient(135deg, #0E2026 0%, #185B64 100%)' }}>
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="w-5 h-5"><path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4"/></svg>
@@ -233,11 +235,11 @@ export default function Register() {
             {/* Step 1 */}
             {step === 1 && (
               <>
-                <h3 className="text-xl font-bold mb-1" style={textPrimary}>Your details</h3>
-                <p className="text-sm mb-5" style={textSecondary}>Fast, secure, and free to join</p>
+                <h3 className="text-xl font-bold mb-1" style={textPrimary}>{t('auth.yourDetails')}</h3>
+                <p className="text-sm mb-5" style={textSecondary}>{t('auth.fastSecure')}</p>
                 <form onSubmit={handleSendOtp} className="space-y-4">
                   <div>
-                    <label className="block text-sm font-semibold mb-1.5" style={textPrimary}>Username</label>
+                    <label className="block text-sm font-semibold mb-1.5" style={textPrimary}>{t('auth.username')}</label>
                     <input type="text" name="username" value={form.username} onChange={handleChange}
                       placeholder="satoshi" required minLength={3} maxLength={20}
                       className={inputCls} style={inputStyle}
@@ -245,7 +247,7 @@ export default function Register() {
                       onBlur={e => e.target.style.borderColor = blurBorderColor} />
                   </div>
                   <div>
-                    <label className="block text-sm font-semibold mb-1.5" style={textPrimary}>Email</label>
+                    <label className="block text-sm font-semibold mb-1.5" style={textPrimary}>{t('auth.email')}</label>
                     <input type="email" name="email" value={form.email} onChange={handleChange}
                       placeholder="you@example.com" required
                       className={inputCls} style={inputStyle}
@@ -253,10 +255,10 @@ export default function Register() {
                       onBlur={e => e.target.style.borderColor = blurBorderColor} />
                   </div>
                   <div>
-                    <label className="block text-sm font-semibold mb-1.5" style={textPrimary}>Password</label>
+                    <label className="block text-sm font-semibold mb-1.5" style={textPrimary}>{t('auth.password')}</label>
                     <div className="relative">
                       <input type={showPass ? 'text' : 'password'} name="password" value={form.password}
-                        onChange={handleChange} placeholder="Min. 6 characters" required
+                        onChange={handleChange} placeholder={t('auth.minChars')} required
                         className={`${inputCls} pr-10`} style={inputStyle}
                         onFocus={e => e.target.style.borderColor = '#EE8267'}
                         onBlur={e => e.target.style.borderColor = blurBorderColor} />
@@ -274,25 +276,25 @@ export default function Register() {
                         <div className="h-1 rounded-full overflow-hidden" style={{ background: isDark ? 'rgba(255,255,255,0.08)' : '#E8EAED' }}>
                           <div className={`h-full ${strength.width} transition-all duration-300`} style={{ background: strength.color }} />
                         </div>
-                        <p className="text-xs mt-1 font-medium" style={{ color: strength.color }}>{strength.label}</p>
+                        <p className="text-xs mt-1 font-medium" style={{ color: strength.color }}>{t(strength.labelKey)}</p>
                       </div>
                     )}
                   </div>
                   <div>
                     <label className="block text-sm font-semibold mb-1.5" style={textPrimary}>
-                      Referral Code <span className="font-normal" style={textMuted}>(optional)</span>
+                      {t('auth.referralCode')} <span className="font-normal" style={textMuted}>({t('auth.optional')})</span>
                     </label>
                     <input type="text" name="referralCode" value={form.referralCode} onChange={handleChange}
                       placeholder="ABC123" maxLength={6}
                       className={`${inputCls} uppercase`} style={inputStyle}
                       onFocus={e => e.target.style.borderColor = '#EE8267'}
                       onBlur={e => e.target.style.borderColor = blurBorderColor} />
-                    <p className="text-xs mt-1" style={textMuted}>Enter your referrer's code to earn them rewards</p>
+                    <p className="text-xs mt-1" style={textMuted}>{t('auth.referralHint')}</p>
                   </div>
                   <button type="submit" disabled={loading}
                     className="w-full h-[56px] rounded-full font-semibold text-[16px] text-white mt-3 flex items-center justify-center gap-2 transition-all active:scale-95 disabled:opacity-50 hover:brightness-105"
                     style={{ background: '#F4927E' }}>
-                    {loading ? <><div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />Creating account...</> : 'Create Account'}
+                    {loading ? <><div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />{t('auth.creatingAccount')}</> : t('auth.createAccountBtn')}
                   </button>
                 </form>
               </>
@@ -301,9 +303,9 @@ export default function Register() {
             {/* Step 2 */}
             {step === 2 && (
               <>
-                <h3 className="text-xl font-bold mb-1" style={textPrimary}>Verify Your Email</h3>
+                <h3 className="text-xl font-bold mb-1" style={textPrimary}>{t('auth.verifyEmail')}</h3>
                 <p className="text-sm mb-6" style={textSecondary}>
-                  We sent a 6-digit code to <span className="font-semibold" style={{ color: '#EE8267' }}>{form.email}</span>
+                  {t('auth.codeSentTo')} <span className="font-semibold" style={{ color: '#EE8267' }}>{form.email}</span>
                 </p>
                 <form onSubmit={handleVerifyAndRegister} className="space-y-5">
                   <div className="flex gap-2 justify-center" onPaste={handleOtpPaste}>
@@ -325,29 +327,29 @@ export default function Register() {
                   <button type="submit" disabled={loading}
                     className="w-full h-[56px] rounded-full font-semibold text-[16px] text-white flex items-center justify-center gap-2 transition-all active:scale-95 disabled:opacity-50 hover:brightness-105"
                     style={{ background: '#F4927E' }}>
-                    {loading ? <><div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />Creating account...</> : 'Verify & Create Account'}
+                    {loading ? <><div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />{t('auth.creatingAccount')}</> : t('auth.verifyCreate')}
                   </button>
 
                   <div className="text-center">
                     {resendTimer > 0 ? (
-                      <p className="text-sm" style={textMuted}>Resend OTP in <span className="font-semibold" style={{ color: '#EE8267' }}>{resendTimer}s</span></p>
+                      <p className="text-sm" style={textMuted}>{t('auth.resendIn')} <span className="font-semibold" style={{ color: '#EE8267' }}>{resendTimer}s</span></p>
                     ) : (
                       <button type="button" onClick={handleResend} disabled={loading} className="text-sm font-semibold hover:underline" style={{ color: '#EE8267' }}>
-                        Resend OTP
+                        {t('auth.resendOtp')}
                       </button>
                     )}
                   </div>
 
                   <button type="button" onClick={() => setStep(1)} className="text-sm w-full text-center transition-colors" style={textMuted}>
-                    ← Edit details
+                    {t('auth.editDetails')}
                   </button>
                 </form>
               </>
             )}
 
             <p className="text-center text-sm mt-6" style={textSecondary}>
-              Already have an account?{' '}
-              <Link to="/login" className="font-bold hover:underline" style={{ color: '#EE8267' }}>Sign in</Link>
+              {t('auth.alreadyHaveAccount')}{' '}
+              <Link to="/login" className="font-bold hover:underline" style={{ color: '#EE8267' }}>{t('auth.signInLink')}</Link>
             </p>
           </div>
         </div>

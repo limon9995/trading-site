@@ -69,12 +69,75 @@ class ErrorBoundary extends React.Component {
 
 // Route guards
 const FullScreenLoader = ({ label = 'Loading...' }) => (
-  <div className="min-h-screen flex items-center justify-center px-6"
-    style={{ background: 'radial-gradient(circle at top left, rgba(24,91,100,0.12), transparent 22%), linear-gradient(180deg, #fbfcfd 0%, #f2f3f5 100%)' }}>
-    <div className="cex-surface rounded-[28px] px-8 py-7 text-center min-w-[240px]">
-      <div className="w-11 h-11 mx-auto border-4 border-brand-primary border-t-transparent rounded-full animate-spin" />
-      <p className="text-sm text-text-secondary mt-4">{label}</p>
+  <div className="min-h-screen flex flex-col items-center justify-center"
+    style={{ background: 'linear-gradient(160deg, #071d23 0%, #0f3e45 55%, #071d23 100%)' }}>
+
+    {/* Ambient glow */}
+    <div className="absolute inset-0 pointer-events-none overflow-hidden">
+      <div style={{
+        position: 'absolute', top: '25%', left: '50%', transform: 'translate(-50%,-50%)',
+        width: 480, height: 480,
+        background: 'radial-gradient(circle, rgba(238,130,103,0.12) 0%, transparent 70%)',
+      }} />
+      <div style={{
+        position: 'absolute', bottom: '20%', right: '20%',
+        width: 320, height: 320,
+        background: 'radial-gradient(circle, rgba(10,224,208,0.08) 0%, transparent 70%)',
+      }} />
     </div>
+
+    {/* Logo */}
+    <div className="relative flex flex-col items-center gap-6">
+      {/* CEX.IO SVG logo with pulse ring */}
+      <div className="relative flex items-center justify-center">
+        <div className="absolute w-24 h-24 rounded-full animate-ping"
+          style={{ background: 'rgba(238,130,103,0.12)', animationDuration: '1.8s' }} />
+        <div className="relative w-16 h-16 rounded-[22px] flex items-center justify-center shadow-[0_0_40px_rgba(238,130,103,0.25)]"
+          style={{ background: 'linear-gradient(135deg, #0f3e45 0%, #185B64 100%)', border: '1.5px solid rgba(10,224,208,0.25)' }}>
+          <svg viewBox="0 0 46 44" width="36" height="36" xmlns="http://www.w3.org/2000/svg">
+            <polygon fill="#0AE0D0" points="44.359,14.556 44.359,9.089 35.868,9.089 41.334,14.556"/>
+            <polygon fill="#0AE0D0" points="35.551,34.119 44.359,34.119 44.359,28.652 41.018,28.652"/>
+            <path fill="#0AE0D0" d="M34.198,28.652H22.625c-3.436,0-6.232-3.161-6.232-7.047c0-3.887,2.796-7.049,6.232-7.049h11.89l-5.467-5.467h-6.422c-6.451,0-11.699,5.615-11.699,12.516c0,6.9,5.248,12.514,11.699,12.514h6.181l-0.037-0.035L34.198,28.652z"/>
+            <path fill="#0AE0D0" d="M38.689,18.73l-15.78,0.141c-1.509,0.014-2.722,1.248-2.709,2.758c0.014,1.501,1.234,2.709,2.733,2.709c0.008,0,0.017,0,0.025,0l15.695-0.141l2.751-2.751L38.689,18.73z"/>
+            <path fill="#0AE0D0" d="M20.931,37.742c-8.029,0-14.561-7.24-14.561-16.137c0-8.898,6.531-16.138,14.561-16.138h23.884V0H20.931C9.888,0,0.903,9.692,0.903,21.605c0,11.913,8.984,21.604,20.028,21.604h23.884v-5.467H20.931z"/>
+          </svg>
+        </div>
+      </div>
+
+      {/* Brand name */}
+      <div className="text-center">
+        <div className="flex items-center justify-center gap-1 mb-1">
+          <span className="text-[28px] font-light tracking-tight text-white">CEX</span>
+          <span className="text-[28px] font-light text-white/40">.IO</span>
+        </div>
+        <p className="text-xs tracking-[0.22em] uppercase text-white/30">Exchange Platform</p>
+      </div>
+
+      {/* Animated bar loader */}
+      <div className="flex items-end gap-1.5 h-8 mt-2">
+        {[0, 1, 2, 3, 4].map((i) => (
+          <div key={i}
+            className="w-1.5 rounded-full"
+            style={{
+              background: i % 2 === 0 ? '#EE8267' : '#0AE0D0',
+              height: '100%',
+              animation: `barPulse 1.1s ease-in-out ${i * 0.15}s infinite`,
+              opacity: 0.85,
+            }}
+          />
+        ))}
+      </div>
+
+      {/* Label */}
+      <p className="text-xs text-white/35 tracking-widest uppercase mt-1">{label}</p>
+    </div>
+
+    <style>{`
+      @keyframes barPulse {
+        0%, 100% { transform: scaleY(0.25); }
+        50% { transform: scaleY(1); }
+      }
+    `}</style>
   </div>
 );
 

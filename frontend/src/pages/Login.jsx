@@ -3,6 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import toast from 'react-hot-toast';
 import { useAuth } from '../context/AuthContext';
 import { useTheme } from '../context/ThemeContext';
+import { useTranslation } from 'react-i18next';
 
 function AuthBrand() {
   return (
@@ -24,6 +25,7 @@ export default function Login() {
   const { login } = useAuth();
   const navigate = useNavigate();
   const { isDark, toggleTheme } = useTheme();
+  const { t } = useTranslation();
   const [form, setForm] = useState({ email: '', password: '' });
   const [loading, setLoading] = useState(false);
   const [showPass, setShowPass] = useState(false);
@@ -135,8 +137,8 @@ export default function Login() {
             }}>
           <div className="flex items-start justify-between gap-4 mb-8">
             <div>
-              <h2 className="text-[34px] font-light leading-none mb-2" style={{ color: isDark ? '#e8f0f2' : '#0E2026' }}>Welcome back</h2>
-              <p className="text-[15px]" style={{ color: isDark ? '#9BA3A6' : '#566367' }}>Sign in to continue trading and managing your assets</p>
+              <h2 className="text-[34px] font-light leading-none mb-2" style={{ color: isDark ? '#e8f0f2' : '#0E2026' }}>{t('auth.welcomeBack')}</h2>
+              <p className="text-[15px]" style={{ color: isDark ? '#9BA3A6' : '#566367' }}>{t('auth.signInSubtitle')}</p>
             </div>
             <div className="hidden sm:flex w-12 h-12 rounded-2xl items-center justify-center text-white" style={{ background: 'linear-gradient(135deg, #0E2026 0%, #185B64 100%)' }}>
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="w-5 h-5"><path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7"/></svg>
@@ -146,7 +148,7 @@ export default function Login() {
           <form onSubmit={handleSubmit} className="space-y-4">
             {/* Email */}
             <div>
-              <label className="block text-sm font-semibold mb-1.5" style={{ color: isDark ? '#e8f0f2' : '#0E2026' }}>Email Address</label>
+              <label className="block text-sm font-semibold mb-1.5" style={{ color: isDark ? '#e8f0f2' : '#0E2026' }}>{t('auth.emailAddress')}</label>
               <input
                 type="email" name="email" value={form.email} onChange={handleChange}
                 placeholder="you@example.com" required
@@ -160,8 +162,8 @@ export default function Login() {
             {/* Password */}
             <div>
               <div className="flex items-center justify-between mb-1.5">
-                <label className="block text-sm font-semibold" style={{ color: isDark ? '#e8f0f2' : '#0E2026' }}>Password</label>
-                <Link to="/forgot-password" className="text-xs font-semibold hover:underline" style={{ color: '#EE8267' }}>Forgot password?</Link>
+                <label className="block text-sm font-semibold" style={{ color: isDark ? '#e8f0f2' : '#0E2026' }}>{t('auth.password')}</label>
+                <Link to="/forgot-password" className="text-xs font-semibold hover:underline" style={{ color: '#EE8267' }}>{t('auth.forgotPasswordLink')}</Link>
               </div>
               <div className="relative">
                 <input
@@ -186,7 +188,7 @@ export default function Login() {
             <button type="submit" disabled={loading}
               className="w-full h-[56px] rounded-full font-semibold text-[16px] text-white transition-all active:scale-95 disabled:opacity-50 flex items-center justify-center gap-2 mt-3 hover:brightness-105"
               style={{ background: '#F4927E' }}>
-              {loading ? <><div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />Signing in...</> : 'Sign In'}
+              {loading ? <><div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />{t('auth.signingIn')}</> : t('auth.signIn')}
             </button>
           </form>
 
@@ -195,13 +197,13 @@ export default function Login() {
             style={{ background: 'rgba(244,146,126,0.08)', border: '1px solid rgba(244,146,126,0.16)' }}>
             <span className="w-10 h-10 rounded-2xl flex items-center justify-center text-[#0E2026] font-bold flex-shrink-0" style={{ background: '#F4927E' }}>+</span>
             <p className="text-sm leading-6" style={{ color: isDark ? '#9BA3A6' : '#566367' }}>
-              New here? <span style={{ color: '#EE8267' }} className="font-semibold">Register</span> and get <span className="font-bold" style={{ color: isDark ? '#e8f0f2' : '#0E2026' }}>$10,000 USDT</span> demo credit to explore the dashboard.
+              {t('auth.promoNewHere')} <span style={{ color: '#EE8267' }} className="font-semibold">{t('auth.promoRegister')}</span> {t('auth.promoGetCredit')} <span className="font-bold" style={{ color: isDark ? '#e8f0f2' : '#0E2026' }}>{t('auth.promoUSDT')}</span> {t('auth.promoExplore')}
             </p>
           </div>
 
           <p className="text-center text-sm mt-6" style={{ color: isDark ? '#9BA3A6' : '#566367' }}>
-            Don't have an account?{' '}
-            <Link to="/register" className="font-bold hover:underline" style={{ color: '#EE8267' }}>Create one free</Link>
+            {t('auth.noAccount')}{' '}
+            <Link to="/register" className="font-bold hover:underline" style={{ color: '#EE8267' }}>{t('auth.createFree')}</Link>
           </p>
           </div>
         </div>

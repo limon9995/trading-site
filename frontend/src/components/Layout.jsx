@@ -16,11 +16,11 @@ const LANGUAGES = [
 
 
 const bottomNav = [
-  { to: '/dashboard',    label: 'Home',    icon: HomeIcon },
-  { to: '/trading',      label: 'Markets', icon: MarketIcon },
-  { to: '/trade',        label: 'Trade',   icon: TradeIcon },
-  { to: '/transactions', label: 'History', icon: HistoryIcon },
-  { to: '/wallet',       label: 'Assets',  icon: WalletIcon },
+  { to: '/dashboard',    labelKey: 'layout.home',       icon: HomeIcon },
+  { to: '/trading',      labelKey: 'layout.markets',    icon: MarketIcon },
+  { to: '/trade',        labelKey: 'layout.trade',      icon: TradeIcon },
+  { to: '/transactions', labelKey: 'layout.historyNav', icon: HistoryIcon },
+  { to: '/wallet',       labelKey: 'layout.assetsNav',  icon: WalletIcon },
 ];
 
 const DRAWER_ICON_PATHS = {
@@ -217,7 +217,7 @@ export default function Layout() {
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   onFocus={() => setSearchOpen(true)}
-                  placeholder="Search coins..."
+                  placeholder={t('layout.searchCoins')}
                   className="bg-transparent text-xs w-full outline-none"
                   style={{ color: 'var(--cex-text)' }}
                 />
@@ -231,10 +231,10 @@ export default function Layout() {
                 <div className="absolute top-full left-0 right-0 mt-2 rounded-[24px] overflow-hidden shadow-xl z-50"
                   style={{ background: isDark ? 'rgba(14,32,38,0.98)' : 'rgba(255,255,255,0.96)', border: `1px solid ${isDark ? 'rgba(255,255,255,0.08)' : '#E8EAED'}`, backdropFilter: 'blur(18px)' }}>
                   <div className="px-3 py-2" style={{ borderBottom: `1px solid ${isDark ? 'rgba(255,255,255,0.08)' : '#E8EAED'}` }}>
-                    <p className="text-xs" style={{ color: 'var(--cex-text-3)' }}>{searchQuery ? `Results for "${searchQuery}"` : 'Popular Coins'}</p>
+                    <p className="text-xs" style={{ color: 'var(--cex-text-3)' }}>{searchQuery ? `${t('layout.resultsFor')} "${searchQuery}"` : t('layout.popularCoins')}</p>
                   </div>
                   {searchResults.length === 0 ? (
-                    <div className="px-3 py-4 text-center text-xs" style={{ color: 'var(--cex-text-3)' }}>No coins found</div>
+                    <div className="px-3 py-4 text-center text-xs" style={{ color: 'var(--cex-text-3)' }}>{t('layout.noCoinsFound')}</div>
                   ) : (
                     searchResults.map((coin) => (
                       <button key={coin.symbol} onClick={() => handleSelectCoin(coin.symbol)}
@@ -347,12 +347,12 @@ export default function Layout() {
             </button>
             {user?.role === 'admin' && (
               <button onClick={() => navigate('/admin')} className="text-xs font-bold px-3 py-2 rounded-full text-white shadow-sm" style={{ background: 'linear-gradient(135deg, #F4927E 0%, #EE8267 100%)' }}>
-                Admin
+                {t('layout.admin')}
               </button>
             )}
             {user?.role === 'agent' && (
               <button onClick={() => navigate('/agent')} className="text-xs font-bold px-3 py-2 rounded-full text-white shadow-sm" style={{ background: 'linear-gradient(135deg, #0ea5e9 0%, #0369a1 100%)' }}>
-                Agent Panel
+                {t('layout.agentPanel')}
               </button>
             )}
           </div>
@@ -493,7 +493,7 @@ export default function Layout() {
           minHeight: 70,
         }}>
         <div className="grid grid-cols-5 h-[70px] max-w-2xl mx-auto">
-          {bottomNav.map(({ to, label, icon: Icon }) => (
+          {bottomNav.map(({ to, labelKey, icon: Icon }) => (
             <NavLink key={to} to={to}
               className={({ isActive }) =>
                 `flex flex-col items-center justify-center gap-1 transition-all ${isActive ? '' : 'opacity-50 hover:opacity-75'}`
@@ -503,7 +503,7 @@ export default function Layout() {
                 <>
                   <Icon active={isActive} />
                   <span className={`text-[10px] font-semibold tracking-wide ${isActive ? 'text-brand-primary' : 'text-text-muted'}`}>
-                    {label}
+                    {t(labelKey)}
                   </span>
                 </>
               )}
