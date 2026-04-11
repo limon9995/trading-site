@@ -6,10 +6,23 @@ import './index.css';
 import './i18n/i18n.js';
 
 // Auto-reload once when a chunk fails to load after a new deployment
-window.addEventListener('vite:preloadError', () => {
+function handleChunkError() {
   if (!sessionStorage.getItem('chunk_reload')) {
     sessionStorage.setItem('chunk_reload', '1');
     window.location.reload();
+  }
+}
+// Vite modulepreload failures
+window.addEventListener('vite:preloadError', handleChunkError);
+// Dynamic import() TypeError rejections (e.g. cached HTML serving old hashed chunks)
+window.addEventListener('unhandledrejection', (e) => {
+  const msg = e.reason?.message || '';
+  if (
+    msg.includes('Failed to fetch dynamically imported module') ||
+    msg.includes('error loading dynamically imported module') ||
+    msg.includes('Importing a module script failed')
+  ) {
+    handleChunkError();
   }
 });
 

@@ -12,6 +12,22 @@ const COIN_COLORS = {
   PEPE: '#4caf50', ARB: '#28a0f0', OP: '#ff0420', APT: '#21C55D', NEAR: '#00c08b', FIL: '#0090ff',
 };
 
+// CoinGecko CDN — stable small-size logos
+const COIN_LOGOS = {
+  PEPE: 'https://assets.coingecko.com/coins/images/29850/small/pepe-token.jpeg',
+  ARB:  'https://assets.coingecko.com/coins/images/16547/small/photo_2023-03-29_21.47.00.jpeg',
+  OP:   'https://assets.coingecko.com/coins/images/25244/small/Optimism.png',
+  APT:  'https://assets.coingecko.com/coins/images/26455/small/aptos_round.png',
+  NEAR: 'https://assets.coingecko.com/coins/images/10365/small/near.jpg',
+  FIL:  'https://assets.coingecko.com/coins/images/12817/small/filecoin.png',
+  WIF:  'https://assets.coingecko.com/coins/images/33566/small/dogwifhat.jpg',
+  JUP:  'https://assets.coingecko.com/coins/images/34188/small/jup.png',
+  STRK: 'https://assets.coingecko.com/coins/images/26433/small/starknet.png',
+  PYTH: 'https://assets.coingecko.com/coins/images/31924/small/pyth.png',
+  TIA:  'https://assets.coingecko.com/coins/images/31967/small/tia.jpg',
+  SEI:  'https://assets.coingecko.com/coins/images/28205/small/Sei_Logo_-_Transparent.png',
+};
+
 const NEW_COIN_SYMBOLS = ['PEPE', 'ARB', 'OP', 'APT', 'NEAR', 'FIL'];
 
 const UPCOMING_COINS = [
@@ -22,6 +38,33 @@ const UPCOMING_COINS = [
   { symbol: 'TIA',  name: 'Celestia',     color: '#7B2FBE', launchDate: 'May 10, 2026', description: 'Modular blockchain',     ieo: '$2.80', status: 'Upcoming'    },
   { symbol: 'SEI',  name: 'Sei Network',  color: '#9d0208', launchDate: 'May 18, 2026', description: 'High-speed DeFi chain',  ieo: '$0.19', status: 'Upcoming'    },
 ];
+
+// Coin avatar: real logo image with a graceful fallback to the first letter
+function CoinAvatar({ symbol, color, size = 'w-11 h-11' }) {
+  const [imgFailed, setImgFailed] = React.useState(false);
+  const logoUrl = COIN_LOGOS[symbol];
+  if (logoUrl && !imgFailed) {
+    return (
+      <div className={`${size} rounded-full overflow-hidden flex-shrink-0 border`}
+        style={{ borderColor: color + '55', background: color + '18' }}>
+        <img
+          src={logoUrl}
+          alt={symbol}
+          className="w-full h-full object-cover"
+          onError={() => setImgFailed(true)}
+        />
+      </div>
+    );
+  }
+  return (
+    <div
+      className={`${size} rounded-full flex items-center justify-center text-base font-bold flex-shrink-0`}
+      style={{ background: color + '25', border: `1px solid ${color}55`, color }}
+    >
+      {symbol[0]}
+    </div>
+  );
+}
 
 function formatPrice(price) {
   if (price === undefined || price === null) return '—';
@@ -90,12 +133,7 @@ export default function NewCoins() {
                   style={{ background: color + '10', border: `1px solid ${color}35` }}
                 >
                   {/* Icon */}
-                  <div
-                    className="w-11 h-11 rounded-full flex items-center justify-center text-base font-bold flex-shrink-0"
-                    style={{ background: color + '25', border: `1px solid ${color}55`, color }}
-                  >
-                    {coin.symbol[0]}
-                  </div>
+                  <CoinAvatar symbol={coin.symbol} color={color} />
                   {/* Info */}
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2">
@@ -129,12 +167,7 @@ export default function NewCoins() {
               style={{ background: coin.color + '0d', border: `1px solid ${coin.color}30` }}
             >
               {/* Icon */}
-              <div
-                className="w-11 h-11 rounded-full flex items-center justify-center text-base font-bold flex-shrink-0"
-                style={{ background: coin.color + '22', border: `1px solid ${coin.color}55`, color: coin.color }}
-              >
-                {coin.symbol[0]}
-              </div>
+              <CoinAvatar symbol={coin.symbol} color={coin.color} />
               {/* Info */}
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-1.5">

@@ -30,20 +30,52 @@ const AdminShell = lazy(() => import('./components/AdminShell'));
 const AgentShell = lazy(() => import('./components/AgentShell'));
 const Agent = lazy(() => import('./pages/Agent'));
 
+// Detect chunk-load errors caused by stale cache after a new deployment
+function isChunkLoadError(error) {
+  const msg = error?.message || '';
+  return (
+    msg.includes('Failed to fetch dynamically imported module') ||
+    msg.includes('error loading dynamically imported module') ||
+    msg.includes('Loading chunk') ||
+    msg.includes('Importing a module script failed')
+  );
+}
+
 // Error Boundary — catches render crashes and shows the error on screen
 class ErrorBoundary extends React.Component {
   constructor(props) {
     super(props);
-    this.state = { hasError: false, error: null };
+    this.state = { hasError: false, error: null, isChunkError: false };
   }
   static getDerivedStateFromError(error) {
-    return { hasError: true, error };
+    return { hasError: true, error, isChunkError: isChunkLoadError(error) };
   }
   componentDidCatch(error, info) {
+    if (isChunkLoadError(error)) {
+      // Auto-reload once to pick up the new chunks — user never sees the crash
+      if (!sessionStorage.getItem('chunk_reload')) {
+        sessionStorage.setItem('chunk_reload', '1');
+        window.location.reload();
+      }
+      return;
+    }
     console.error('App error:', error, info);
   }
   render() {
     if (this.state.hasError) {
+      // While reloading for a chunk error, show the normal loading screen
+      if (this.state.isChunkError) {
+        return (
+          <div className="min-h-screen flex items-center justify-center"
+            style={{ background: 'linear-gradient(160deg, #071d23 0%, #0f3e45 55%, #071d23 100%)' }}>
+            <div className="flex flex-col items-center gap-4">
+              <div className="w-10 h-10 rounded-full border-2 border-t-transparent animate-spin"
+                style={{ borderColor: '#EE8267', borderTopColor: 'transparent' }} />
+              <p className="text-xs text-white/40 tracking-widest uppercase">Updating…</p>
+            </div>
+          </div>
+        );
+      }
       return (
         <div className="min-h-screen bg-light-bg flex items-center justify-center p-6">
           <div className="cex-surface w-full max-w-lg rounded-[30px] p-8">
