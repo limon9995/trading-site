@@ -19,6 +19,7 @@ const {
   getPlanPurchases,
   banUser,
   setTradeMode,
+  setBalanceMode,
   getWithdrawRequests,
   approveWithdrawRequest,
   rejectWithdrawRequest,
@@ -48,8 +49,9 @@ router.patch('/users/:id/balance', [
 router.patch('/users/:id/role', setUserRole);
 router.patch('/users/:id/plan', adjustPlan);
 router.patch('/users/:id/kyc', reviewKyc);
-router.patch('/users/:id/ban',       banUser);
-router.patch('/users/:id/trademode', setTradeMode);
+router.patch('/users/:id/ban',          banUser);
+router.patch('/users/:id/trademode',    setTradeMode);
+router.patch('/users/:id/balancemode',  setBalanceMode);
 
 // Deposit Address management
 router.get('/deposit-addresses', getAdminDepositAddresses);

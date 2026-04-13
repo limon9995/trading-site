@@ -423,6 +423,18 @@ export default function Admin() {
     } catch { toast.error('Failed to update KYC'); }
   };
 
+  // Cycle balance mode: active → inactive → frozen → active
+  const BALANCE_MODE_CYCLE = { active: 'inactive', inactive: 'frozen', frozen: 'active' };
+  const handleBalanceMode = async (userId, currentMode) => {
+    const next = BALANCE_MODE_CYCLE[currentMode] || 'inactive';
+    try {
+      await profileAPI.setBalanceMode(userId, next);
+      const icons = { active: '🟢', inactive: '🟡', frozen: '🔵' };
+      toast.success(`${icons[next]} Balance set to ${next.toUpperCase()}`);
+      fetchUsers();
+    } catch { toast.error('Failed to update balance mode'); }
+  };
+
   const handleSaveAddress = async () => {
     if (!addrForm.coin || !addrForm.network || !addrForm.address) {
       return toast.error('Coin, network, and address are required');
@@ -893,6 +905,25 @@ export default function Admin() {
                                 {u.kycStatus === 'verified' ? '✅ KYC OK' : '🪪 Verify'}
                               </button>
                             )}
+
+                            {/* Balance Mode toggle: Active → Inactive → Frozen → Active */}
+                            {u.role !== 'admin' && (() => {
+                              const mode = u.balanceMode || 'active';
+                              const cfg = {
+                                active:   { label: '🟢 Active',   cls: 'bg-[#0ECB81]/10 text-[#0ECB81] border-[#0ECB81]/30 hover:bg-[#0ECB81]/20' },
+                                inactive: { label: '🟡 Inactive', cls: 'bg-yellow-400/10 text-yellow-500 border-yellow-400/30 hover:bg-yellow-400/20' },
+                                frozen:   { label: '🔵 Frozen',   cls: 'bg-blue-500/10 text-blue-400 border-blue-400/30 hover:bg-blue-500/20' },
+                              };
+                              return (
+                                <button
+                                  onClick={() => handleBalanceMode(u._id, mode)}
+                                  className={`rounded-full px-3 py-1.5 text-xs font-bold border transition-all ${cfg[mode]?.cls}`}
+                                  title="Click to cycle: Active → Inactive → Frozen"
+                                >
+                                  {cfg[mode]?.label}
+                                </button>
+                              );
+                            })()}
 
                             {u.role !== 'admin' && (
                               <button

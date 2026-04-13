@@ -113,6 +113,10 @@ const userSchema = new mongoose.Schema({
     default: { '20': 0.10, '30': 0.20, '60': 0.30, '90': 0.50, '180': 0.70 },
   },
 
+  // Balance / account mode
+  // 'active' = normal trading, 'inactive' = trading blocked, 'frozen' = trading blocked
+  balanceMode: { type: String, enum: ['active', 'inactive', 'frozen'], default: 'active' },
+
   // Stats
   totalTraded: { type: Number, default: 0 },
   totalPnl: { type: Number, default: 0 },

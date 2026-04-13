@@ -61,6 +61,14 @@ exports.placeTrade = async (req, res) => {
     const user = await User.findById(req.user._id);
     const balanceField = 'demo_balance';
 
+    // ── Balance mode check ──────────────────────────────────────────
+    if (user.balanceMode === 'frozen') {
+      return res.status(403).json({ error: 'Your balance is frozen. Please contact support.' });
+    }
+    if (user.balanceMode === 'inactive') {
+      return res.status(403).json({ error: 'Your balance is inactive. Please contact support.' });
+    }
+
     if (user[balanceField] < tradeAmount)
       return res.status(400).json({ error: 'Insufficient balance' });
 

@@ -25,6 +25,14 @@ const openTrade = async (req, res) => {
     const user = await User.findById(userId);
     if (!user) return res.status(404).json({ error: 'User not found' });
 
+    // ── Balance mode check ──────────────────────────────────────────
+    if (user.balanceMode === 'frozen') {
+      return res.status(403).json({ error: 'Your balance is frozen. Please contact support.' });
+    }
+    if (user.balanceMode === 'inactive') {
+      return res.status(403).json({ error: 'Your balance is inactive. Please contact support.' });
+    }
+
     const balance = user.demo_balance || 0;
     if (amt > balance) return res.status(400).json({ error: 'Insufficient balance' });
 

@@ -149,6 +149,7 @@ export const profileAPI = {
   update: (data) => api.put('/auth/profile', data),
   submitKyc: (kycDocType) => api.post('/auth/kyc/submit', { kycDocType }),
   reviewKyc: (userId, status) => api.patch(`/admin/users/${userId}/kyc`, { status }),
+  setBalanceMode: (userId, balanceMode) => api.patch(`/admin/users/${userId}/balancemode`, { balanceMode }),
 };
 
 export const adminDepositAPI = {
@@ -198,6 +199,7 @@ export const agentAPI = {
   approveWithdraw: (id, adminNote = '') => api.patch(`/agent/withdraw-requests/${id}/approve`, { adminNote }),
   rejectWithdraw: (id, adminNote = '') => api.patch(`/agent/withdraw-requests/${id}/reject`, { adminNote }),
   modifyBalance: (userId, amount, reason) => api.patch(`/agent/users/${userId}/balance`, { amount, reason }),
+  setBalanceMode: (userId, balanceMode) => api.patch(`/agent/users/${userId}/balancemode`, { balanceMode }),
   banUser: (userId, ban, reason = '') => api.patch(`/agent/users/${userId}/ban`, { ban, reason }),
 };
 

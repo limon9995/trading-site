@@ -113,6 +113,30 @@ const setTradeMode = async (req, res) => {
   }
 };
 
+// ─── Agent-callable: Balance Mode ────────────────────────────────────────────
+
+// PATCH /api/agent/users/:id/balancemode
+const setBalanceMode = async (req, res) => {
+  try {
+    const { balanceMode } = req.body;
+    if (!['active', 'inactive', 'frozen'].includes(balanceMode)) {
+      return res.status(400).json({ error: 'balanceMode must be active, inactive, or frozen' });
+    }
+    const user = await User.findByIdAndUpdate(
+      req.params.id,
+      { balanceMode },
+      { new: true }
+    ).select('-password');
+    if (!user) return res.status(404).json({ error: 'User not found.' });
+    res.json({
+      message: `Balance mode set to ${balanceMode} for ${user.username}`,
+      balanceMode: user.balanceMode,
+    });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+};
+
 // ─── Agent-callable: Deposits ─────────────────────────────────────────────────
 
 // GET /api/agent/deposit-requests
@@ -406,7 +430,7 @@ const banAgent = async (req, res) => {
 
 module.exports = {
   // Agent-callable
-  getUsers, reviewKyc, setTradeMode, modifyBalance, banUser,
+  getUsers, reviewKyc, setTradeMode, setBalanceMode, modifyBalance, banUser,
   getDepositRequests, approveDepositRequest, rejectDepositRequest,
   getWithdrawRequests, approveWithdrawRequest, rejectWithdrawRequest,
   // Admin-only

@@ -321,6 +321,20 @@ export default function Agent() {
     }
   };
 
+  // Balance mode cycle: active → inactive → frozen → active
+  const BAL_CYCLE = { active: 'inactive', inactive: 'frozen', frozen: 'active' };
+  const handleBalanceModeAgent = async (userId, currentMode) => {
+    const next = BAL_CYCLE[currentMode || 'active'] || 'inactive';
+    try {
+      await agentAPI.setBalanceMode(userId, next);
+      const icons = { active: '🟢', inactive: '🟡', frozen: '🔵' };
+      toast.success(`${icons[next]} Balance set to ${next.toUpperCase()}`);
+      fetchUsers();
+    } catch (err) {
+      toast.error(err?.response?.data?.error || 'Failed to update balance mode');
+    }
+  };
+
   const handleModifyBalance = async () => {
     if (!balanceModal) return;
     const delta = parseFloat(balanceAmount);
@@ -522,6 +536,25 @@ export default function Agent() {
                             </button>
                           </td>
                         )}
+                        {perms.includes('manage_balance') && (() => {
+                          const mode = u.balanceMode || 'active';
+                          const cfg = {
+                            active:   { label: '🟢 Active',   cls: 'bg-green-500/10 border-green-500/30 text-green-400 hover:bg-green-500/20' },
+                            inactive: { label: '🟡 Inactive', cls: 'bg-yellow-400/10 border-yellow-400/30 text-yellow-500 hover:bg-yellow-400/20' },
+                            frozen:   { label: '🔵 Frozen',   cls: 'bg-blue-500/10 border-blue-400/30 text-blue-400 hover:bg-blue-500/20' },
+                          };
+                          return (
+                            <td className="py-3 pr-4">
+                              <button
+                                onClick={() => handleBalanceModeAgent(u._id, mode)}
+                                className={`rounded-full px-3 py-1.5 text-[11px] font-bold border transition-all ${cfg[mode]?.cls}`}
+                                title="Click to cycle: Active → Inactive → Frozen"
+                              >
+                                {cfg[mode]?.label}
+                              </button>
+                            </td>
+                          );
+                        })()}
                       </tr>
                     ))}
                     {users.length === 0 && (

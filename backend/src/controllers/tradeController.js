@@ -27,6 +27,14 @@ const executeBuy = async (req, res) => {
     const user = await User.findById(req.user._id);
     const amount = parseFloat(usdtAmount);
 
+    // ── Balance mode check ──────────────────────────────────────
+    if (user.balanceMode === 'frozen') {
+      return res.status(403).json({ error: 'Your balance is frozen. Please contact support.' });
+    }
+    if (user.balanceMode === 'inactive') {
+      return res.status(403).json({ error: 'Your balance is inactive. Please contact support.' });
+    }
+
     // Minimum trade size check
     if (amount < 1) {
       return res.status(400).json({ error: 'Minimum trade amount is $1 USDT.' });
@@ -154,6 +162,14 @@ const executeSell = async (req, res) => {
 
     const user = await User.findById(req.user._id);
     const amount = parseFloat(coinAmount);
+
+    // ── Balance mode check ──────────────────────────────────────
+    if (user.balanceMode === 'frozen') {
+      return res.status(403).json({ error: 'Your balance is frozen. Please contact support.' });
+    }
+    if (user.balanceMode === 'inactive') {
+      return res.status(403).json({ error: 'Your balance is inactive. Please contact support.' });
+    }
 
     if (amount <= 0) {
       return res.status(400).json({ error: 'Sell amount must be positive.' });

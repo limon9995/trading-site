@@ -83,9 +83,20 @@ export default function Dashboard() {
           {loadingWallet ? (
             <div className="h-10 w-44 bg-white/20 rounded animate-pulse mb-2" />
           ) : (
-            <p className="text-[40px] sm:text-[48px] font-light tracking-[-0.04em] text-white mb-1">
-              {balanceVisible ? <>$<AnimatedNumber value={totalBalance} decimals={2} /></> : '••••••'}
-            </p>
+            <div className="flex items-end gap-3 mb-1">
+              <p className="text-[40px] sm:text-[48px] font-light tracking-[-0.04em] text-white">
+                {balanceVisible ? <>${<AnimatedNumber value={totalBalance} decimals={2} />}</> : '••••••'}
+              </p>
+              <span className={`mb-3 rounded-full px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wide ${
+                user?.balanceMode === 'frozen'
+                  ? 'bg-blue-500/30 text-blue-200 border border-blue-400/40'
+                  : user?.balanceMode === 'inactive'
+                  ? 'bg-yellow-400/25 text-yellow-200 border border-yellow-400/40'
+                  : 'bg-[#0ECB81]/20 text-[#0ECB81] border border-[#0ECB81]/30'
+              }`}>
+                {user?.balanceMode === 'frozen' ? '🔵 Frozen' : user?.balanceMode === 'inactive' ? '🟡 Inactive' : '🟢 Active'}
+              </span>
+            </div>
           )}
           <p className="text-white/50 text-sm mb-5">
             ≈ ${balanceVisible ? usdtBalance.toFixed(2) : '••••'} {t('dashboard.availableSuffix')}
