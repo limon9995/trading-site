@@ -413,6 +413,16 @@ export default function Admin() {
     } catch { toast.error('Failed to update KYC'); }
   };
 
+  // Direct KYC toggle from Users table (no submission required)
+  const handleKycDirect = async (userId, currentStatus) => {
+    const newStatus = currentStatus === 'verified' ? 'unverified' : 'verified';
+    try {
+      await profileAPI.reviewKyc(userId, newStatus);
+      toast.success(newStatus === 'verified' ? '✅ KYC Verified!' : '❌ KYC Unverified');
+      fetchUsers();
+    } catch { toast.error('Failed to update KYC'); }
+  };
+
   const handleSaveAddress = async () => {
     if (!addrForm.coin || !addrForm.network || !addrForm.address) {
       return toast.error('Coin, network, and address are required');
@@ -801,6 +811,7 @@ export default function Admin() {
                     <tr className="border-b border-[var(--admin-border)] bg-[var(--admin-input-bg)] text-xs uppercase tracking-wider text-[var(--admin-muted)]">
                       <th className="px-5 py-3 text-left">User</th>
                       <th className="px-5 py-3 text-right">Balance</th>
+                      <th className="px-5 py-3 text-center">KYC</th>
                       <th className="px-5 py-3 text-center">Role</th>
                       <th className="px-5 py-3 text-right">Joined</th>
                       <th className="px-5 py-3 text-center">Actions</th>
@@ -849,6 +860,14 @@ export default function Admin() {
                           </div>
                         </td>
                         <td className="px-5 py-3 text-center">
+                          <span className={`text-[10px] px-2 py-0.5 rounded-full font-bold ${
+                            u.kycStatus === 'verified'  ? 'bg-[#0ECB81]/15 text-[#0ECB81]' :
+                            u.kycStatus === 'pending'   ? 'bg-yellow-400/15 text-yellow-500' :
+                            u.kycStatus === 'rejected'  ? 'bg-red-trade/15 text-red-trade' :
+                            'bg-gray-400/10 text-gray-400'
+                          }`}>{u.kycStatus || 'unverified'}</span>
+                        </td>
+                        <td className="px-5 py-3 text-center">
                           <span className={`text-xs px-2.5 py-1 rounded-full font-semibold ${
                             u.role === 'admin'
                               ? 'bg-red-trade/15 text-red-trade'
@@ -860,7 +879,21 @@ export default function Admin() {
                         <td className="px-5 py-3 text-right text-xs text-[var(--admin-muted)]">{formatDate(u.createdAt)}</td>
                         <td className="px-5 py-3">
                           <div className="flex items-center justify-center gap-2 flex-wrap">
-                            {/* Toggle role */}
+                            {/* KYC direct verify/unverify */}
+                            {u.role !== 'admin' && (
+                              <button
+                                onClick={() => handleKycDirect(u._id, u.kycStatus)}
+                                className={`rounded-full px-3 py-1.5 text-xs font-bold transition-all ${
+                                  u.kycStatus === 'verified'
+                                    ? 'bg-[#0ECB81]/15 text-[#0ECB81] hover:bg-[#0ECB81]/25 border border-[#0ECB81]/30'
+                                    : 'bg-[#f0b90b]/15 text-[#b8860b] hover:bg-[#f0b90b]/25 border border-[#f0b90b]/30'
+                                }`}
+                                title={u.kycStatus === 'verified' ? 'Click to Unverify KYC' : 'Click to Verify KYC'}
+                              >
+                                {u.kycStatus === 'verified' ? '✅ KYC OK' : '🪪 Verify'}
+                              </button>
+                            )}
+
                             {u.role !== 'admin' && (
                               <button
                                 onClick={() => handleSetRole(u._id, 'admin')}

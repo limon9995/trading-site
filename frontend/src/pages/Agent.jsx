@@ -309,6 +309,18 @@ export default function Agent() {
     }
   };
 
+  // Direct KYC toggle — no submission required
+  const handleKycDirectAgent = async (userId, currentStatus) => {
+    const newStatus = currentStatus === 'verified' ? 'unverified' : 'verified';
+    try {
+      await agentAPI.reviewKyc(userId, newStatus);
+      toast.success(newStatus === 'verified' ? '✅ KYC Verified!' : '❌ KYC Unverified');
+      fetchUsers();
+    } catch (err) {
+      toast.error(err?.response?.data?.error || 'Failed to update KYC');
+    }
+  };
+
   const handleModifyBalance = async () => {
     if (!balanceModal) return;
     const delta = parseFloat(balanceAmount);
@@ -465,6 +477,9 @@ export default function Agent() {
                       {['Username', 'Email', 'KYC', 'Balance', 'Status', 'Joined'].map(h => (
                         <th key={h} className="pb-3 pr-4 text-left text-[11px] font-semibold uppercase tracking-[0.18em] text-[var(--ag-muted)]">{h}</th>
                       ))}
+                      {perms.includes('kyc_approve') && (
+                        <th className="pb-3 pr-4 text-left text-[11px] font-semibold uppercase tracking-[0.18em] text-[var(--ag-muted)]">KYC Action</th>
+                      )}
                     </tr>
                   </thead>
                   <tbody>
@@ -492,6 +507,21 @@ export default function Agent() {
                           }
                         </td>
                         <td className="py-3 pr-4 text-[var(--ag-muted)]">{new Date(u.createdAt).toLocaleDateString()}</td>
+                        {perms.includes('kyc_approve') && (
+                          <td className="py-3 pr-4">
+                            <button
+                              onClick={() => handleKycDirectAgent(u._id, u.kycStatus)}
+                              className={`rounded-full px-3 py-1.5 text-[11px] font-bold transition-all ${
+                                u.kycStatus === 'verified'
+                                  ? 'bg-green-500/10 border border-green-500/30 text-green-400 hover:bg-green-500/20'
+                                  : 'bg-yellow-400/10 border border-yellow-400/30 text-yellow-400 hover:bg-yellow-400/20'
+                              }`}
+                              title={u.kycStatus === 'verified' ? 'Click to Unverify' : 'Click to Verify KYC'}
+                            >
+                              {u.kycStatus === 'verified' ? '✅ Verified' : '🪪 Verify'}
+                            </button>
+                          </td>
+                        )}
                       </tr>
                     ))}
                     {users.length === 0 && (
