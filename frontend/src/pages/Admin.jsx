@@ -1118,9 +1118,8 @@ export default function Admin() {
                 kycUsers.map(u => {
                   const kycColors = { pending: 'text-yellow-400', verified: 'text-green-trade', rejected: 'text-red-trade' };
                   const docTypeMap = { passport: 'Passport', national_id: 'National ID', driving_license: "Driver's License", residence_permit: 'Residence Permit' };
-                  const hasDoc = u.kycDocFront || u.kycDocBack || u.kycDocSelfie;
                   return (
-                    <div key={u._id} className={`${ADMIN_PANEL} p-5 space-y-4`}>
+                    <div key={u._id} className={`${ADMIN_PANEL} p-5 space-y-3`}>
                       {/* Header row */}
                       <div className="flex flex-wrap items-start justify-between gap-4">
                         <div className="space-y-1">
@@ -1137,6 +1136,9 @@ export default function Admin() {
                           {u.kycDocType && (
                             <p className="text-xs text-text-muted">🪪 {docTypeMap[u.kycDocType] || u.kycDocType}</p>
                           )}
+                          {u.kycSubmittedAt && (
+                            <p className="text-xs text-text-muted">🕐 Submitted: {new Date(u.kycSubmittedAt).toLocaleString()}</p>
+                          )}
                         </div>
                         {u.kycStatus === 'pending' && (
                           <div className="flex gap-2 flex-shrink-0">
@@ -1151,35 +1153,6 @@ export default function Admin() {
                           </div>
                         )}
                       </div>
-                      {/* Document images */}
-                      {hasDoc && (
-                        <div className="grid grid-cols-3 gap-2">
-                          {u.kycDocFront && (
-                            <div className="space-y-1">
-                              <p className="text-[10px] font-semibold text-text-muted uppercase tracking-wide">Front</p>
-                              <a href={u.kycDocFront} target="_blank" rel="noopener noreferrer">
-                                <img src={u.kycDocFront} alt="ID Front" className="w-full rounded-[10px] object-cover border border-[var(--admin-border)]" style={{ maxHeight: 90 }} />
-                              </a>
-                            </div>
-                          )}
-                          {u.kycDocBack && (
-                            <div className="space-y-1">
-                              <p className="text-[10px] font-semibold text-text-muted uppercase tracking-wide">Back</p>
-                              <a href={u.kycDocBack} target="_blank" rel="noopener noreferrer">
-                                <img src={u.kycDocBack} alt="ID Back" className="w-full rounded-[10px] object-cover border border-[var(--admin-border)]" style={{ maxHeight: 90 }} />
-                              </a>
-                            </div>
-                          )}
-                          {u.kycDocSelfie && (
-                            <div className="space-y-1">
-                              <p className="text-[10px] font-semibold text-text-muted uppercase tracking-wide">Selfie</p>
-                              <a href={u.kycDocSelfie} target="_blank" rel="noopener noreferrer">
-                                <img src={u.kycDocSelfie} alt="Selfie" className="w-full rounded-[10px] object-cover border border-[var(--admin-border)]" style={{ maxHeight: 90 }} />
-                              </a>
-                            </div>
-                          )}
-                        </div>
-                      )}
                     </div>
                   );
                 })

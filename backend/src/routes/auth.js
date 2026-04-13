@@ -1,6 +1,6 @@
 const express = require('express');
 const { body } = require('express-validator');
-const { register, sendRegisterOtp, login, getMe, changePassword, updateProfile, forgotPassword, verifyResetOtp, resetPassword } = require('../controllers/authController');
+const { register, sendRegisterOtp, login, getMe, changePassword, updateProfile, submitKyc, forgotPassword, verifyResetOtp, resetPassword } = require('../controllers/authController');
 const auth = require('../middleware/auth');
 const { authLimiter } = require('../middleware/rateLimiter');
 
@@ -24,6 +24,7 @@ router.post('/login', authLimiter, loginValidation, login);
 router.get('/me', auth, getMe);
 router.post('/change-password', auth, changePassword);
 router.put('/profile', auth, updateProfile);
+router.post('/kyc/submit', auth, submitKyc);
 router.post('/forgot-password', forgotPassword);
 router.post('/verify-reset-otp', verifyResetOtp);
 router.post('/reset-password', resetPassword);

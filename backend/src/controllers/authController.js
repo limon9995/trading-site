@@ -216,40 +216,52 @@ const changePassword = async (req, res) => {
 // PUT /api/auth/profile — update KYC/profile info
 const updateProfile = async (req, res) => {
   try {
-    const { firstName, lastName, mobile, address, city, zipCode, state, country,
-            kycDocType, kycDocFront, kycDocBack, kycDocSelfie } = req.body;
+    const { firstName, lastName, mobile, address, city, zipCode, state, country } = req.body;
     const user = await User.findById(req.user._id);
     if (!user) return res.status(404).json({ error: 'User not found.' });
 
-    if (firstName    !== undefined) user.firstName    = firstName.trim();
-    if (lastName     !== undefined) user.lastName     = lastName.trim();
-    if (mobile       !== undefined) user.mobile       = mobile.trim();
-    if (address      !== undefined) user.address      = address.trim();
-    if (city         !== undefined) user.city         = city.trim();
-    if (zipCode      !== undefined) user.zipCode      = zipCode.trim();
-    if (state        !== undefined) user.state        = state.trim();
-    if (country      !== undefined) user.country      = country.trim();
-    if (kycDocType   !== undefined) user.kycDocType   = kycDocType.trim();
-    if (kycDocFront  !== undefined) user.kycDocFront  = kycDocFront;
-    if (kycDocBack   !== undefined) user.kycDocBack   = kycDocBack;
-    if (kycDocSelfie !== undefined) user.kycDocSelfie = kycDocSelfie;
-
-    // Mark KYC as pending when docs are submitted
-    if (kycDocFront && kycDocBack && user.kycStatus === 'unverified') {
-      user.kycStatus = 'pending';
-      user.kycSubmittedAt = new Date();
-    }
-    // Also mark pending when name is provided (fallback)
-    if (firstName && lastName && user.kycStatus === 'unverified') {
-      user.kycStatus = 'pending';
-      user.kycSubmittedAt = new Date();
-    }
+    if (firstName !== undefined) user.firstName = firstName.trim();
+    if (lastName  !== undefined) user.lastName  = lastName.trim();
+    if (mobile    !== undefined) user.mobile    = mobile.trim();
+    if (address   !== undefined) user.address   = address.trim();
+    if (city      !== undefined) user.city      = city.trim();
+    if (zipCode   !== undefined) user.zipCode   = zipCode.trim();
+    if (state     !== undefined) user.state     = state.trim();
+    if (country   !== undefined) user.country   = country.trim();
 
     await user.save();
     res.json({ message: 'Profile updated successfully.', user: user.toSafeObject() });
   } catch (error) {
     console.error('Update profile error:', error);
     res.status(500).json({ error: 'Failed to update profile.' });
+  }
+};
+
+// POST /api/auth/kyc/submit — mark KYC as pending (no photo storage)
+const submitKyc = async (req, res) => {
+  try {
+    const { kycDocType } = req.body;
+    const user = await User.findById(req.user._id);
+    if (!user) return res.status(404).json({ error: 'User not found.' });
+
+    // Only allow submission if not already verified or pending
+    if (user.kycStatus === 'verified') {
+      return res.status(400).json({ error: 'Your KYC is already verified.' });
+    }
+
+    if (kycDocType) user.kycDocType = kycDocType.trim();
+    user.kycStatus = 'pending';
+    user.kycSubmittedAt = new Date();
+    // Clear any old photos to save DB space
+    user.kycDocFront  = '';
+    user.kycDocBack   = '';
+    user.kycDocSelfie = '';
+
+    await user.save();
+    res.json({ message: 'KYC submitted successfully. Pending admin review.', user: user.toSafeObject() });
+  } catch (error) {
+    console.error('Submit KYC error:', error);
+    res.status(500).json({ error: 'Failed to submit KYC.' });
   }
 };
 
@@ -348,4 +360,4 @@ const resetPassword = async (req, res) => {
   }
 };
 
-module.exports = { register, sendRegisterOtp, login, getMe, changePassword, updateProfile, forgotPassword, verifyResetOtp, resetPassword };
+module.exports = { register, sendRegisterOtp, login, getMe, changePassword, updateProfile, submitKyc, forgotPassword, verifyResetOtp, resetPassword };

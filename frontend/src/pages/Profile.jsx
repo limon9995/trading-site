@@ -87,9 +87,10 @@ export default function Profile() {
 
   const [kycDocType, setKycDocType] = useState(user?.kycDocType || '');
 
+  // Local-only previews — photos are NOT sent to server
   const [docPreviews, setDocPreviews] = useState({
-    kycDocFront: user?.kycDocFront || null,
-    kycDocBack:  user?.kycDocBack  || null,
+    kycDocFront: null,
+    kycDocBack:  null,
   });
 
   const [pwForm, setPwForm] = useState({ currentPassword: '', newPassword: '', confirmPassword: '' });
@@ -137,18 +138,12 @@ export default function Profile() {
     if (!docPreviews.kycDocBack) return toast.error(t('auth.backSideDoc'));
     setSaving(true);
     try {
-      await profileAPI.update({
-        kycDocType,
-        kycDocFront: docPreviews.kycDocFront || '',
-        kycDocBack:  docPreviews.kycDocBack  || '',
-      });
+      // Only send document type — NO photos sent to server
+      await profileAPI.submitKyc(kycDocType);
       await refreshUser();
       toast.success(t('auth.kycSubmitted'));
     } catch (err) {
-      const msg = err.response?.data?.error
-        || (err.code === 'ECONNABORTED' ? 'Upload timed out. Please try again with a smaller image.' : null)
-        || err.message
-        || 'Failed to submit KYC';
+      const msg = err.response?.data?.error || err.message || 'Failed to submit KYC';
       toast.error(msg, { duration: 5000 });
     } finally {
       setSaving(false);

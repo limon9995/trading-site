@@ -147,6 +147,7 @@ export const settingsAPI = {
 // ─── Profile ──────────────────────────────────────────────────────────────────
 export const profileAPI = {
   update: (data) => api.put('/auth/profile', data),
+  submitKyc: (kycDocType) => api.post('/auth/kyc/submit', { kycDocType }),
   reviewKyc: (userId, status) => api.patch(`/admin/users/${userId}/kyc`, { status }),
 };
 
