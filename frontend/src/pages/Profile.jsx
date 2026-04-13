@@ -108,8 +108,8 @@ export default function Profile() {
     reader.onload = (ev) => {
       const img = new Image();
       img.onload = () => {
-        // Resize only if larger than 2400px, preserve quality
-        const MAX = 2400;
+        // Aggressively resize for mobile uploads — keep max 1200px, quality 0.75
+        const MAX = 1200;
         let { width, height } = img;
         if (width > MAX || height > MAX) {
           if (width > height) { height = Math.round(height * MAX / width); width = MAX; }
@@ -119,7 +119,7 @@ export default function Profile() {
         canvas.width  = width;
         canvas.height = height;
         canvas.getContext('2d').drawImage(img, 0, 0, width, height);
-        const compressed = canvas.toDataURL('image/jpeg', 0.92);
+        const compressed = canvas.toDataURL('image/jpeg', 0.75);
         setDocPreviews(p => ({ ...p, [field]: compressed }));
       };
       img.onerror = () => {
@@ -145,7 +145,11 @@ export default function Profile() {
       await refreshUser();
       toast.success(t('auth.kycSubmitted'));
     } catch (err) {
-      toast.error(err.response?.data?.error || 'Failed to submit KYC');
+      const msg = err.response?.data?.error
+        || (err.code === 'ECONNABORTED' ? 'Upload timed out. Please try again with a smaller image.' : null)
+        || err.message
+        || 'Failed to submit KYC';
+      toast.error(msg, { duration: 5000 });
     } finally {
       setSaving(false);
     }

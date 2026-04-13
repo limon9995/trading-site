@@ -18,6 +18,8 @@ app.use(cors({
     process.env.FRONTEND_URL || 'http://localhost:5173',
     'http://localhost:3001',
     'http://localhost:3000',
+    'https://cexbr.com',
+    'https://www.cexbr.com',
   ],
   credentials: true,
 }));

@@ -20,7 +20,15 @@
       "Bash(npm run:*)",
       "Read(//home/md-limon-hossain/SAAS/kafi\\\\ web/frontend/src/context/**)",
       "Bash(node src/createAccounts.js)",
-      "Bash(xargs '-I{}' sh -c 'file=\"{}\"; python3 -c \":*)"
+      "Bash(xargs '-I{}' sh -c 'file=\"{}\"; python3 -c \":*)",
+      "Bash(code-review-graph --version)",
+      "Read(//home/md-limon-hossain/SAAS/kafi\\\\ web/backend/src/models/**)",
+      "Read(//home/md-limon-hossain/SAAS/kafi\\\\ web/backend/src/routes/**)",
+      "Bash(wc -l \"/home/md-limon-hossain/SAAS/kafi web/backend/src/controllers\"/*.js)",
+      "Bash(grep -n \"require.*Controller\" \"/home/md-limon-hossain/SAAS/kafi web/backend/src/routes\"/*.js)",
+      "Bash(xargs basename:*)",
+      "Bash(grep -h \"require.*models\" \"/home/md-limon-hossain/SAAS/kafi web/backend/src/controllers\"/*.js)",
+      "Bash(grep -L \"useTranslation\" \"/home/md-limon-hossain/SAAS/kafi web/frontend/src/pages/\"*.jsx)"
     ]
   }
 }
