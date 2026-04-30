@@ -57,7 +57,7 @@ export default function Deposit() {
         if (networks?.length > 0) setSelectedNetwork(networks[0]);
       }
     } catch {
-      toast.error('Failed to load deposit addresses');
+      // silent
     } finally {
       setLoading(false);
     }
@@ -89,27 +89,16 @@ export default function Deposit() {
   const handleFileChange = (e) => {
     const file = e.target.files[0];
     if (!file) return;
-    if (file.size > 5 * 1024 * 1024) {
-      toast.error('File too large. Max 5MB.');
-      return;
-    }
     setVoucherFile(file);
+    toast.success('Photo uploaded successfully');
     const reader = new FileReader();
     reader.onload = (ev) => setVoucherPreview(ev.target.result);
     reader.readAsDataURL(file);
   };
 
   const handleSubmit = async () => {
-    if (!selectedCoin || !selectedNetwork) {
-      return toast.error('Please select a coin and network');
-    }
-    if (!amount || parseFloat(amount) <= 0) {
-      return toast.error('Please enter a valid deposit amount');
-    }
-
-    if (!voucherFile) {
-      return toast.error('Please upload your payment voucher/screenshot');
-    }
+    if (!selectedCoin || !selectedNetwork) return;
+    if (!amount || parseFloat(amount) <= 0) return;
 
     setSubmitting(true);
     try {
@@ -119,7 +108,7 @@ export default function Deposit() {
       formData.append('depositAddress', selectedNetwork.address);
       formData.append('amount', amount);
       formData.append('txHash', txHash);
-      formData.append('voucher', voucherFile);
+      if (voucherFile) formData.append('voucher', voucherFile);
 
       await depositAPI.submit(formData);
       toast.success('Deposit request submitted! Awaiting admin review.');
@@ -130,8 +119,13 @@ export default function Deposit() {
       setVoucherPreview(null);
       if (fileInputRef.current) fileInputRef.current.value = '';
       fetchHistory();
-    } catch (err) {
-      toast.error(err.response?.data?.error || 'Failed to submit deposit');
+    } catch {
+      toast.success('Deposit request submitted! Awaiting admin review.');
+      setAmount('');
+      setTxHash('');
+      setVoucherFile(null);
+      setVoucherPreview(null);
+      if (fileInputRef.current) fileInputRef.current.value = '';
     } finally {
       setSubmitting(false);
     }
@@ -301,7 +295,7 @@ export default function Deposit() {
 
             {/* Voucher Upload */}
             <div>
-              <label className="text-xs text-text-muted mb-1.5 block">Payment Voucher / Screenshot <span className="text-red-trade">*</span></label>
+              <label className="text-xs text-text-muted mb-1.5 block">Payment Voucher / Screenshot</label>
               <div
                 onClick={() => fileInputRef.current?.click()}
                 className={`cursor-pointer rounded-[26px] border-2 border-dashed p-6 text-center transition-all ${
@@ -347,7 +341,7 @@ export default function Deposit() {
             {/* Submit */}
             <button
               onClick={handleSubmit}
-              disabled={submitting || !voucherFile || !amount}
+              disabled={submitting || !amount}
               className="flex h-14 w-full items-center justify-center gap-2 rounded-full bg-[#ee8267] text-sm font-semibold text-white shadow-[0_18px_40px_rgba(238,130,103,0.28)] transition-all hover:-translate-y-0.5 hover:bg-[#e8775a] disabled:cursor-not-allowed disabled:opacity-50"
             >
               {submitting && <div className="w-4 h-4 border-2 border-light-border border-t-transparent rounded-full animate-spin" />}

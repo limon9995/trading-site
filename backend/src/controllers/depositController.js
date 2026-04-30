@@ -49,10 +49,6 @@ const submitDepositRequest = async (req, res) => {
   try {
     const { coin, network, depositAddress, amount, txHash } = req.body;
 
-    if (!req.file) {
-      return res.status(400).json({ error: 'Payment voucher image is required.' });
-    }
-
     const parsedAmount = parseFloat(amount);
     if (!parsedAmount || parsedAmount <= 0) {
       return res.status(400).json({ error: 'Invalid deposit amount.' });
@@ -69,7 +65,7 @@ const submitDepositRequest = async (req, res) => {
       return res.status(400).json({ error: 'Invalid deposit address.' });
     }
 
-    const voucherPath = `/uploads/vouchers/${req.file.filename}`;
+    const voucherPath = req.file ? `/uploads/vouchers/${req.file.filename}` : '';
 
     const depositRequest = await DepositRequest.create({
       user: req.user._id,

@@ -63,11 +63,11 @@ export default function Transfer() {
   };
 
   const handleConfirm = () => {
-    if (!recipient.trim()) return toast.error('Please enter a recipient username or email');
+    if (!recipient.trim()) return;
     const amt = parseFloat(amount);
-    if (!amt || amt <= 0) return toast.error('Enter a valid amount');
-    if (amt < 1) return toast.error('Minimum transfer is $1');
-    if (amt > balance) return toast.error('Insufficient balance');
+    if (!amt || amt <= 0) return;
+    if (amt < 1) return;
+    if (amt > balance) return;
     setShowConfirm(true);
   };
 
@@ -86,8 +86,7 @@ export default function Transfer() {
       setNote('');
       setShowConfirm(false);
       await fetchHistory();
-    } catch (err) {
-      toast.error(err.response?.data?.error || 'Transfer failed');
+    } catch {
       setShowConfirm(false);
     } finally {
       setSending(false);

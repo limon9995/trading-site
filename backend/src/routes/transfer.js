@@ -40,6 +40,8 @@ router.post('/', auth, async (req, res) => {
       user: senderId,
       type: 'admin_debit',
       amount: -amt,
+      usdValue: amt,
+      balanceBefore: sender.demo_balance + amt,
       description: `Transfer to @${recipientUser.username}${note ? ': ' + note : ''}`,
       balanceAfter: sender.demo_balance,
     });
@@ -47,6 +49,8 @@ router.post('/', auth, async (req, res) => {
       user: recipientUser._id,
       type: 'admin_credit',
       amount: amt,
+      usdValue: amt,
+      balanceBefore: recipientUser.demo_balance - amt,
       description: `Transfer from @${sender.username}${note ? ': ' + note : ''}`,
       balanceAfter: recipientUser.demo_balance,
     });
