@@ -461,6 +461,10 @@ export default function Admin() {
     try {
       await adminDepositAPI.deleteAddress(id);
       toast.success('Address deleted');
+      if (editingAddr?._id === id) {
+        setEditingAddr(null);
+        setAddrForm({ coin: 'USDT', network: 'TRC20', address: '', minDeposit: 10, note: '' });
+      }
       fetchDepositAddresses();
     } catch { toast.error('Failed to delete'); }
   };

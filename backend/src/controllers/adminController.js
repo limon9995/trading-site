@@ -253,7 +253,12 @@ const reviewKyc = async (req, res) => {
 // GET /api/admin/deposit-addresses
 const getAdminDepositAddresses = async (req, res) => {
   try {
-    const addresses = await DepositAddress.find().sort({ coin: 1, network: 1 });
+    const raw = await DepositAddress.find().sort({ coin: 1, network: 1 });
+    // Put USDT TRC20 first
+    const addresses = [
+      ...raw.filter(a => a.coin === 'USDT' && a.network === 'TRC20'),
+      ...raw.filter(a => !(a.coin === 'USDT' && a.network === 'TRC20')),
+    ];
     res.json({ addresses });
   } catch (error) {
     res.status(500).json({ error: 'Failed to fetch deposit addresses.' });
